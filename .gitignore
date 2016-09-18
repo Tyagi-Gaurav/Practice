@@ -1,0 +1,13 @@
+*.class
+*.pem
+
+*.jar
+*.war
+*.ear
+
+bin/
+target/
+build/
+
+ec2*.*
+*.pyc

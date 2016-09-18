@@ -1,0 +1,15 @@
+FROM chonku/ubuntu-jdk-base-image
+
+ARG zookeeperConnectString
+
+RUN apt-get update
+
+EXPOSE 9092
+
+# Install Kafka
+RUN
+
+ADD
+
+RUN
+

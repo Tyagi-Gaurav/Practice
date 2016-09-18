@@ -1,0 +1,14 @@
+FROM chonku/ubuntu-jdk-base-image
+
+ARG zookeeperConnectString
+
+RUN apt-get update
+
+EXPOSE 8080
+
+# Download Wiremock
+RUN wget "http://repo1.maven.org/maven2/com/github/tomakehurst/wiremock-standalone/2.1.12/wiremock-standalone-2.1.12.jar" && \
+    mkdir -p /opt/wiremock && \
+    cp wiremock-standalone-2.1.12.jar /opt/wiremock/wiremock-standalone.jar
+
+ADD ./mappings/ /opt/mappings
