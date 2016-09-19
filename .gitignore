@@ -11,3 +11,8 @@ build/
 
 ec2*.*
 *.pyc
+
+.idea/
+.gradle/
+gradle.bat
+gradlew*

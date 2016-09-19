@@ -1,0 +1,1 @@
+java -javaagent:../JavaAgent-1.0-SNAPSHOT-jar-with-dependencies.jar org.practice.java.agentExample.RunExample
