@@ -1,0 +1,21 @@
+@(loginForm : Form[User])
+
+@main("Login Page") {
+	@loginForm.globalError.map { error =>
+		<div class="errors">
+			@error.message
+		</div>
+	}
+	@helper.form(action = routes.Application.login) {
+		@helper.inputText(loginForm("UserName"), '_label -> "Enter UserName", 'required -> "required"
+		, 'error -> loginForm.error("UserName"), '_help -> "")
+
+		@helper.inputPassword(loginForm("Password"), '_label -> "Password", 'required -> "required"
+		, 'error -> loginForm.error("Password"), '_help -> "")
+		
+		<div class="submit floatRight">
+			<input id="proceed" type="submit" value="Submit" />
+		</div>
+	
+	}
+}

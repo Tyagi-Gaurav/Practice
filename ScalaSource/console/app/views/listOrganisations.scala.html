@@ -1,0 +1,8 @@
+@(orgList : List[Organisation])
+@main("Organisation List") {
+	<ul>
+	  @orgList.map { org => 
+		<li>@org.name</li>
+	  }
+	</ul>
+}
