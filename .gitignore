@@ -16,3 +16,4 @@ ec2*.*
 .gradle/
 gradle.bat
 gradlew*
+*.iml
