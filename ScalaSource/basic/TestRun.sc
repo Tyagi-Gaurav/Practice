@@ -52,6 +52,17 @@ calc_power(10, 4)
 calc_power(10, -1)
 calc_power(45, -1)
 
+val b = Array(1,2,3,1,2,3,3,2,4)
+b.distinct
+
+var distinct_set = Set[Int]()
+
+for(i<-0 until(b.length) if (!distinct_set.contains(b(i)))) yield {
+  distinct_set += b(i)
+  b(i)
+}
+
+
 
 
 
