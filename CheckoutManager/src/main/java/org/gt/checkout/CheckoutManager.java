@@ -18,7 +18,6 @@ public class CheckoutManager {
     }
 
     public Invoice checkoutItemsIn(List<String> cart) {
-        final BigDecimal sum = BigDecimal.ZERO;
         List<Item> shoppingCart = new ArrayList<Item>();
 
         cart.stream().forEach(itemName -> {
