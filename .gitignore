@@ -17,3 +17,4 @@ ec2*.*
 gradle.bat
 gradlew*
 *.iml
+*.DS_Store
