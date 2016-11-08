@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,27 +25,27 @@ public class InMemoryDiscountRuleEngineTest {
     @Test
     public void applyDiscountOnItems() throws Exception {
         //Given
-        BigDecimal expectedDiscount = BigDecimal.valueOf(0.5);
-        Item apple = new Item("apple", BigDecimal.valueOf(0.5));
-        itemSet = new ArrayList<>();
-        itemSet.add(apple);
+        BigDecimal expectedDiscount = BigDecimal.valueOf(0.50);
+        Item apple = new Item("Apple", BigDecimal.valueOf(0.5));
 
         //When
-        BigDecimal actualDiscount = inMemoryDiscountRuleEngine.apply(apple, itemSet);
+        BigDecimal discount1 = inMemoryDiscountRuleEngine.apply(apple);
+        BigDecimal discount2 = inMemoryDiscountRuleEngine.apply(apple);
 
         //Then
-        assertThat(actualDiscount).isEqualTo(expectedDiscount.negate());
+        assertThat(discount1).isEqualTo(BigDecimal.ZERO);
+        assertThat(discount2.compareTo(expectedDiscount.negate())).isEqualTo(0);
     }
 
     @Test
     public void applyNoDiscountWhenNoneAvailable() throws Exception {
         //Given
-        Item orange = new Item("orange", BigDecimal.valueOf(1.5));
+        Item orange = new Item("hgdhghd", BigDecimal.valueOf(1.5));
         itemSet = new ArrayList<>();
         itemSet.add(orange);
 
         //When
-        BigDecimal actualDiscount = inMemoryDiscountRuleEngine.apply(orange, itemSet);
+        BigDecimal actualDiscount = inMemoryDiscountRuleEngine.apply(orange);
 
         //Then
         assertThat(actualDiscount).isEqualTo(BigDecimal.ZERO);

@@ -6,5 +6,5 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface DiscountRuleEngine {
-    BigDecimal apply(Item item, List<Item> itemSet);
+    BigDecimal apply(Item item);
 }

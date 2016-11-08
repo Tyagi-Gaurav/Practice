@@ -36,13 +36,9 @@ public class CheckoutManager {
         List<Item> currentList = new ArrayList<Item>();
         currentList.addAll(shoppingCart);
         int itemCounts = currentList.size();
-        BigDecimal totalPrice = currentList.stream().reduce(BigDecimal.ZERO,
-                (BigDecimal acc, Item item) -> {
-                    BigDecimal add = acc.add(item.price());
-                    System.out.println("Adding " + item.price() + "with " + acc);
-                    System.out.println("Result : " + add);
-                    return add;
-                },
+        BigDecimal totalPrice = currentList
+                .stream().reduce(BigDecimal.ZERO,
+                (BigDecimal acc, Item item) -> acc.add(item.price()),
                 BigDecimal::add);
 
         return new Invoice(totalPrice,
@@ -51,7 +47,7 @@ public class CheckoutManager {
     }
 
     private Optional<Item> applyDiscountFor(Item itemDetails, List<Item> itemSet) {
-        BigDecimal discount = inMemoryDiscountRuleEngine.apply(itemDetails, itemSet);
+        BigDecimal discount = inMemoryDiscountRuleEngine.apply(itemDetails);
         Optional<Item> discountItem = Optional.empty();
         if (discount.compareTo(BigDecimal.ZERO) < 0) {
             discountItem = Optional.of(new Item("Discount: " + itemDetails.name(), discount));

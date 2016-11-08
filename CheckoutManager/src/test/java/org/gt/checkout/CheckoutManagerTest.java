@@ -31,7 +31,7 @@ public class CheckoutManagerTest {
         mockInMemoryDiscountRuleEngine = mock(InMemoryDiscountRuleEngine.class);
         checkoutManager = new CheckoutManager(mockItemRepository, mockInMemoryDiscountRuleEngine);
 
-        when(mockInMemoryDiscountRuleEngine.apply(any(Item.class), any(List.class))).thenReturn(BigDecimal.ZERO);
+        when(mockInMemoryDiscountRuleEngine.apply(any(Item.class))).thenReturn(BigDecimal.ZERO);
     }
 
     @Test
@@ -80,7 +80,7 @@ public class CheckoutManagerTest {
 
         when(mockItemRepository.getItemDetails(APPLE)).thenReturn(appleItem);
         when(mockItemRepository.getItemDetails(ORANGE)).thenReturn(orangeItem);
-        when(mockInMemoryDiscountRuleEngine.apply(eq(appleItem), any(List.class)))
+        when(mockInMemoryDiscountRuleEngine.apply(eq(appleItem)))
                 .thenReturn(appleItem.price())
                 .thenReturn(appleItem.price().negate());
 
@@ -92,8 +92,8 @@ public class CheckoutManagerTest {
         BigDecimal result = orangeItem.price().add(appleItem.price());
         assertThat(invoice.totalPrice()).isEqualTo(result);
         assertThat(invoice.totalItems()).isEqualTo(4);
-        verify(mockInMemoryDiscountRuleEngine, times(2)).apply(eq(appleItem), any(List.class));
-        verify(mockInMemoryDiscountRuleEngine).apply(eq(orangeItem), any(List.class));
+        verify(mockInMemoryDiscountRuleEngine, times(2)).apply(eq(appleItem));
+        verify(mockInMemoryDiscountRuleEngine).apply(eq(orangeItem));
     }
 
     @Test
@@ -108,7 +108,7 @@ public class CheckoutManagerTest {
 
         when(mockItemRepository.getItemDetails(APPLE)).thenReturn(appleItem);
         when(mockItemRepository.getItemDetails(ORANGE)).thenReturn(orangeItem);
-        when(mockInMemoryDiscountRuleEngine.apply(eq(appleItem), any(List.class)))
+        when(mockInMemoryDiscountRuleEngine.apply(eq(appleItem)))
                 .thenReturn(appleItem.price())
                 .thenReturn(appleItem.price().negate());
 
