@@ -1,0 +1,13 @@
+{
+  "name": "chatrooms",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Minimalistic Chat Room",
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "socket.io" : "~0.9.6",
+    "mime" : "~1.2.7"
+  }
+}
