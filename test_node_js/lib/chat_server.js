@@ -64,5 +64,56 @@ function joinRoom(socket, room) {
 }
 
 function handleNameChangeAttempts(socket, nickNames, namesUsed) {
-    
+    socket.on('nameAttempt', function(name) {
+       if (name.indexOf('Guest') == 0) {
+           socket.emit('nameResult', {
+               success: false,
+               message: 'Names cannot begin with a "Guest".'
+           });
+       } else {
+           if (namesUsed.indexOf(name) == -1) {
+               var previousName = nickNames[socket.id];
+               var previousNamesIndex = namesUsed.indexOf(previousName);
+               namesUsed.push(name);
+               nickNames[socket.id] = name;
+               delete namesUsed[previousNamesIndex];
+
+               socket.emit("nameResult", {
+                  success: true,
+                   name: name
+               });
+               socket.broadcast.to(currentRoom[socket.id]).emit('message', {
+                  text: previousName + ' is known as ' + name + '.'
+               });
+           } else {
+               socket.emit('nameResult', {
+                  success: false,
+                   message: 'That name is already in use.'
+               });
+           }
+       }
+    });
+}
+
+function handleMessageBroadcasting(socket) {
+    socket.on('message', function(message) {
+       socket.broadcast.to(message.room).emit('message', {
+          text: nickNames[socket.id] + ':' + message.text
+       });
+    });
+}
+
+function handleRoomJoining(socket) {
+    socket.on('join', function(room) {
+       socket.leave(currentRoom[socket.id]);
+        joinRoom(socket, room.newRoom);
+    });
+}
+
+function handleClientDisconnection(socket) {
+    socket.on('disconnect', function() {
+       var nameIndex = namesUsed.indexOf(nickNames[socket.id]);
+        delete namesUsed[nameIndex];
+        delete nickNames[socket.id];
+    });
 }
