@@ -6,7 +6,7 @@ var nickNames = {};
 var namesUsed = [];
 var currentRoom = {};
 
-exports.listen(function(server) {
+exports.listen = function(server) {
     io = socketIO.listen(server);
     io.set('log level', 1)
 
@@ -23,7 +23,7 @@ exports.listen(function(server) {
 
         handleClientDisconnection(socket, nickNames, namesUsed);
     });
-});
+};
 
 function assignGuestName(socket, guestNumber, nickNames, namesUsed) {
     var name = 'Guest' + guestNumber;
