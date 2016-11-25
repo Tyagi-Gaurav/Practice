@@ -11,6 +11,7 @@ exports.listen = function(server) {
     io.set('log level', 1)
 
     io.sockets.on('connection', function (socket) {
+       console.log("Connection established...")
        guestNumber = assignGuestName(socket, guestNumber, nickNames, namesUsed);
         joinRoom(socket, 'Lobby');
         handleMessageBroadcasting(socket, nickNames);
