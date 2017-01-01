@@ -20,3 +20,4 @@ gradlew*
 *.DS_Store
 
 node_modules/
+snapkite-engine/
