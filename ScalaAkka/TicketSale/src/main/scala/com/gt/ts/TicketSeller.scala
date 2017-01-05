@@ -1,6 +1,7 @@
 package com.gt.ts
 
-import akka.actor.Actor
+import akka.actor.{Actor, PoisonPill, Props}
+import akka.util.Timeout
 
 object TicketSeller {
   def props(implicit timeout: Timeout) = Props(new TicketSeller)
@@ -14,7 +15,7 @@ object TicketSeller {
   case object Cancel
 }
 
-class TicketSeller extends Actor {
+class TicketSeller(event: String) extends Actor {
   import TicketSeller._
 
   var tickets = Vector.empty[Ticket]

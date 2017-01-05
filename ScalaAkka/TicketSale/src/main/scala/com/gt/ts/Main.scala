@@ -1,10 +1,11 @@
 package com.gt.ts
 
+import scala.concurrent.Future
 import akka.actor.{ActorSystem, Actor, Props}
 import akka.event.Logging
 import akka.util.Timeout
 
-import akka.http.scaladsl.http
+import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
