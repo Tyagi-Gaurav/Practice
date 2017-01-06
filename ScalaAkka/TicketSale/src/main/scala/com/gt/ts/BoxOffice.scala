@@ -22,7 +22,7 @@ object BoxOffice {
   case object EventExists extends EventResponse
 }
 
-class BoxOffice extends Actor {
+class BoxOffice(implicit timeout: Timeout) extends Actor {
   import BoxOffice._
   def createTicketSeller(name: String) =
     context.actorOf(TicketSeller.props(name), name)

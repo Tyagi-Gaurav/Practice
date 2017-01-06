@@ -20,8 +20,8 @@ object Main extends App with RequestTimeout {
   implicit val system = ActorSystem()
   implicit val ec = system.dispatcher
 
-  val api = new RestApi(system, requestTimeout(config)).routes
+  //val api = new RestApi(system, requestTimeout(config)).routes
 
   implicit val materializer = ActorMaterializer()
-  val bindingFuture: Future[ServerBinding] = Http().bindAndHandle(api, host, port)
+  //val bindingFuture: Future[ServerBinding] = Http().bindAndHandle(api, host, port)
 }

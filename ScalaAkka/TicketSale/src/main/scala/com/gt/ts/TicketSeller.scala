@@ -4,7 +4,7 @@ import akka.actor.{Actor, PoisonPill, Props}
 import akka.util.Timeout
 
 object TicketSeller {
-  def props(implicit timeout: Timeout) = Props(new TicketSeller)
+  def props(event: String) = Props(new TicketSeller(event))
   case class Add(tickets: Vector[Ticket])
   case class Buy(tickets: Int)
   case class Ticket(id : Int)
