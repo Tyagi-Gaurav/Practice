@@ -17,7 +17,7 @@
 - name: "Secure the issue/motd files"
   shell: chmod 0600 /etc/issue.net /etc/motd /etc/issue
 
-- include: remove_packages.yml
+#- include: remove_packages.yml
 
 - name: "Secure tty for root to login only using a single terminal"
   debug: msg="TODO Secure tty for root to login only using a single terminal"

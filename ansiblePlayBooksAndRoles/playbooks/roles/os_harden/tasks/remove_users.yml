@@ -1,6 +1,7 @@
 
 ---
 - name: "Remove user"
+  become: true
   user:
     name: "{{ item }}"
     state: absent
