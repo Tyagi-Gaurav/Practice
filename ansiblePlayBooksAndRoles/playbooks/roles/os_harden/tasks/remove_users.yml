@@ -1,0 +1,21 @@
+
+---
+- name: "Remove user"
+  user:
+    name: "{{ item }}"
+    state: absent
+    remove: yes
+  with_items:
+    - adm
+    - ftp
+    - games
+    - gopher
+    - lp
+    - mail
+    - mailnull
+    - nfsnobody
+    - operator
+#    - rpcuser (Errs out with user currently logged-in)
+#    - rpc (Errs out with user currently logged-in)
+    - uucp
+    - sync

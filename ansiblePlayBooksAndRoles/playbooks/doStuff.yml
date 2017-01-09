@@ -1,0 +1,18 @@
+---
+- hosts: tag_class_integration_test_instance
+  user: ec2-user
+  gather_facts: true
+  become: true
+  roles:
+    - os_harden
+    - ec2_prepare
+#    - docker
+#    - { role: mongoTools, when: ec2_tag_tier == db_tier_tag }
+#    - { role: userDatabase, when: ec2_tag_tier == db_tier_tag }
+#    - { role: userApplication, when: ec2_tag_tier == app_tier_tag }
+  tasks:
+    - name: "Run Tests"
+      debug: msg="TODO Run Tests"
+
+    - name: "Teardown Application VM"
+      debug: msg="TODO Teardown application"

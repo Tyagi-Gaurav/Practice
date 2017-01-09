@@ -1,0 +1,9 @@
+
+---
+- name: "Pull application image & Start Container"
+  docker_container:
+    name: myapplicationContainer
+    image: tyagigaurav/user-service-image:e8141c570e19dfdf768ea08df96a8a9803cf85cc_37
+    state: started
+    entrypoint:
+  become: true

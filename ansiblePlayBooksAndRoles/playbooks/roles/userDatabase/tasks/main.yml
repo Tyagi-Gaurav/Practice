@@ -1,0 +1,15 @@
+
+---
+- name: Pull database image & Start Container
+  docker_container:
+    name: mydbContainer
+    image: tyagigaurav/ubuntu-mongodb-image:latest
+    state: started
+    published_ports: 37017:37017
+  become: true
+
+- name: "Copy Script to remote location"
+  copy: src=/Users/gtyagi/personalWorkspace/Friend-Template/UserService/functionalTest/src/main/resources/db_scripts/user_credentials.json dest=/tmp/data
+
+- name: "Import data into database"
+  shell: mongoimport --host localhost:37017 --jsonArray --db=user --collection=user_credentials /tmp/data

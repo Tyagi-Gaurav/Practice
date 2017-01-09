@@ -1,0 +1,25 @@
+
+---
+- name: "Place grub.conf into bootloader configuration"
+  copy:
+    src: grub.conf
+    dest: /boot/grub/menu.lst
+    owner: root
+    group: root
+    mode: 0600
+
+- name: "Clear issue and issue.net files. Security by obscurity"
+  shell: clear > /etc/issue && clear > /etc/issue.net
+
+- name: "Clear MOTD file"
+  shell: clear > /etc/motd
+
+- name: "Secure the issue/motd files"
+  shell: chmod 0600 /etc/issue.net /etc/motd /etc/issue
+
+- include: remove_packages.yml
+
+- name: "Secure tty for root to login only using a single terminal"
+  debug: msg="TODO Secure tty for root to login only using a single terminal"
+
+- include: remove_users.yml

@@ -1,0 +1,20 @@
+
+---
+- name: "Make Sure Docker is installed on a given set of instance(s)"
+  yum: name=docker state=latest
+
+- name: "Make Sure Docker-py is installed on a given set of instance(s)"
+  pip: name=docker-py version=1.9.0
+
+- name: "Start Docker py service"
+  service: name=docker state=started
+
+- name: "Remove all existing containers"
+  shell: docker ps -a | awk 'NR>=2{print $1}' | xargs docker rm
+  become: true
+  ignore_errors: True
+
+- name: "Remove all existing images"
+  shell: docker images -a | awk 'NR>=2{print $3}' | xargs docker rmi > /dev/null
+  become: true
+  ignore_errors: True

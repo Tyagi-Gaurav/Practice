@@ -1,0 +1,22 @@
+---
+- stat: path="{{ ec2_py_file }}"
+  register: ec2_py_file_status
+
+- fail: msg="EC2 py file not found"
+  when: ec2_py_file_status.stat.exists == false
+
+- shell: "{{ ec2_py_file }} --refresh-cache"
+  register: ec2_info
+
+- set_fact:
+    ec2_output: "{{ ec2_info.stdout | from_json }}"
+
+- name: "Fetch EC2 instance Ids given instance tag"
+  set_fact: '{{ item.value["ec2_id"] }}'
+  when: item.value["ec2_tag_class"] is defined and item.value["ec2_tag_class"] == "{{ remote_instance_tag }}"
+  with_dict: "{{ ec2_output._meta.hostvars }}"
+  register: filtered_instance
+
+- name: "EC2 instances"
+  debug: msg="{{ filtered_instance.results | map(attribute='item.value.ec2_id') | list }}"
+  register: filtered_instance_ids

@@ -1,0 +1,12 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    access_key: "{{ lookup('env','AWS_ACCESS_KEY_ID') }}"
+    secret_key: "{{ lookup('env','AWS_SECRET_KEY') }}"
+    aws_region: "us-west-2"
+  roles:
+    - ec2_query
+  tasks:
+    - include: teardown_instance.yml security_group=DatabaseGroup key_pair_name=integration_instance_key remote_instance_id="{{ filtered_instance_ids['msg'] }}"

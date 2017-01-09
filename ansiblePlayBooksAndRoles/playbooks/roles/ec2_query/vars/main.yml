@@ -1,0 +1,2 @@
+---
+ec2_py_file: "{{ lookup('env','ANSIBLE_HOST') }}"

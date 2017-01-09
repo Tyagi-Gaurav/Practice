@@ -1,0 +1,21 @@
+---
+- name: "Teardown VM"
+  ec2:
+    key_name: "{{ key_pair_name }}"
+    region: "{{ aws_region }}"
+    state: absent
+    instance_ids: "{{ remote_instance_id }}"
+
+- name: "Delete Security Group"
+  ec2_group:
+    name: "{{ security_group }}"
+    description: Security Group
+    region: "{{ aws_region }}"
+    state: absent
+
+- name: "Delete EC2 Key"
+  ec2_key:
+    name: "{{ key_pair_name }}"
+    region: "{{ aws_region }}"
+    state: absent
+

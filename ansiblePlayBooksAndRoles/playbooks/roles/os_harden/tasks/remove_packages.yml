@@ -1,0 +1,17 @@
+
+---
+- name: "Stop atd service & disable it from restarting"
+  service:
+    name: atd
+    state: stopped
+    enabled: no
+
+- name: "Remove at package"
+  yum:
+    name: "at"
+    state: absent
+
+- name: "Remove X11 packages"
+  yum:
+    name: "*x11*"
+    state: absent
