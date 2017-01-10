@@ -6,6 +6,7 @@
     name: "{{ item }}"
     state: absent
     remove: yes
+  ignore_errors: True
   with_items:
     - adm
     - ftp

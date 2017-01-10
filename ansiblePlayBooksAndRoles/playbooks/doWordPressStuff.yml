@@ -4,10 +4,9 @@
   gather_facts: true
   become: true
   roles:
-    - os_harden
-    - ec2_prepare
-    - { role: mysql, when: ec2_tag_tier == db_tier_tag }
-#    - { role: wordpress, when: ec2_tag_tier == app_tier_tag }
+#    - os_harden
+#    - ec2_prepare
+    - wordpress
   tasks:
     - name: "Check connections to Mysql"
       debug: msg="TODO Run Tests"

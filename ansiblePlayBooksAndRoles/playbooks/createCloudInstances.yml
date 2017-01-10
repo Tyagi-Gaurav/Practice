@@ -7,7 +7,6 @@
     secret_key: "{{ lookup('env','AWS_SECRET_ACCESS_KEY') }}"
     aws_region: "us-west-2"
   tasks:
-    - include: create_instance.yml security_group=DatabaseGroup key_pair_name=integration_instance_key tier_tag="{{ db_tier_tag }}"
-#    - include: create_instance.yml security_group=DatabaseGroup key_pair_name=integration_instance_key tier_tag="{{ app_tier_tag }}"
+    - include: create_instance.yml security_group=DatabaseGroup key_pair_name=integration_instance_key tier_tag="{{ tier_tag_param }}"
 
 
