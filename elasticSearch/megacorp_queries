@@ -76,3 +76,36 @@ curl -XGET 'http://localhost:9200/megacorp/employee/_search' -d '
         }
     }
 }'
+
+Getting partial fields from search (Note the _source field)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+curl -XGET 'http://localhost:9200/megacorp/employee/_search?q=last_name:Smith&_source=first_name,last_name&pretty'
+
+Checking whether a document exists
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+curl -i -XHEAD 'http://localhost:9200/megacorp/employee/1'
+
+Updating a specific version of document in Elastic Search
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+curl -XGET 'http://localhost:9200/megacorp/employee/1'
+
+curl -XPUT 'http://localhost:9200/megacorp/employee/1?version=1' -d '
+{
+    "first_name" : "John",
+        "last_name" : "Smith",
+        "age" : 25,
+        "about" : "I love to go rock climbing",
+        "interests" : ["sports", "music", "travel"]
+}'
+Try the above request again and it should fail.
+
+Updating a document partially
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+curl -XGET 'http://localhost:9200/megacorp/employee/1'
+
+curl -XPOST 'http://localhost:9200/megacorp/employee/1/_update' -d '
+{
+    "doc" : {
+        "age" : 26
+    }
+}'
