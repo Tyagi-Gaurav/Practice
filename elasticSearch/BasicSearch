@@ -1,0 +1,16 @@
+Returns all documents in all indices
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+curl -XGET 'http://localhost:9200/_search'
+
+Can be specific to an index
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+curl -XGET 'http://localhost:9200/gb/_search'
+curl -XGET 'http://localhost:9200/gb,us/_search'
+curl -XGET 'http://localhost:9200/gb/user/_search'
+curl -XGET 'http://localhost:9200/_all/user,tweet/_search'
+
+Paginating
+~~~~~~~~~~
+curl -XGET 'http://localhost:9200/gb/_search?size=5'
+curl -XGET 'http://localhost:9200/gb/_search?size=5&from=5'
+

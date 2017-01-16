@@ -1,0 +1,25 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: "Create RDS instance here"
+      rds:
+        command: create
+        instance_name: new-database
+        db_engine: MySQL
+        size: 10
+        region: us-west-2
+        instance_type: db.m1.small
+        username: mysql_admin
+        password: 1nsecure
+        wait: yes
+        wait_timeout: 600
+        tags:
+          Environment: testing
+
+    - name: "Print RDS endpoint"
+      debug: msg="The new db endpoint is {{ rds.instance.endpoint }}"
+
+    - name: "Check connections to Mysql"
+      debug: msg="TODO Run Tests"

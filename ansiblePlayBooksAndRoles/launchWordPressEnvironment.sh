@@ -9,16 +9,15 @@ export ANSIBLE_HOST=./ec2.py
 export EC2_INI_PATH=./ec2.ini
 
 #Create VM
-#ansible-playbook -i localhost playbooks/createCloudInstances.yml $EXTRA_VARS
+# ansible-playbook -i localhost playbooks/createCloudInstances.yml $EXTRA_VARS
+
+ansible-playbook -i $ANSIBLE_HOST playbooks/create_mysql_rds.yml $EXTRA_VARS
 
 #Refresh Ansible Cache so it has latest ec2 inventory information.
 $ANSIBLE_HOST --refresh-cache > /dev/null
 
 #Do Stuff for Integration here
 #DEBUG: ansible-playbook -vvvv -i $ANSIBLE_HOST playbooks/doStuff.yml $EXTRA_VARS
-ansible-playbook -i $ANSIBLE_HOST playbooks/doWordPressStuff.yml $EXTRA_VARS
 
 #TearDown VMs
 #ansible-playbook -i localhost playbooks/teardownIntegrationInstances.yml $EXTRA_VARS
-
-

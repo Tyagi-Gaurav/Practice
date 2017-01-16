@@ -1,0 +1,3 @@
+Get Schema for a type
+~~~~~~~~~~~~~~~~~~~~~
+curl -XGET 'http://localhost:9200/gb/_mapping/tweet'
