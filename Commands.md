@@ -64,6 +64,14 @@ lsof -n -i4TCP:$PORT | grep LISTEN
 ```
 cat /proc/meminfo
 ```
+- Setup SSH Tunnel
+```
+ssh -N -L localhost:3306:DATABASE_MACHINE:3306 BRIDGE_MACHINE_USER@BRIDGE_MACHINE
+```
+- Setup strace for a Process
+```
+strace -f -o <output_file> <Process for which strace is required>
+```
 
 ### MySQL
 - Connect to MySQL as root
