@@ -1,5 +1,7 @@
 #!/bin/sh
 
+
+
 curl -XPUT 'http://localhost:9200/us/user/1?pretty=1' -d '
 {
    "email" : "john@smith.com",
@@ -121,3 +123,65 @@ curl -XPUT 'http://localhost:9200/us/tweet/14?pretty=1' -d '
    "user_id" : 1
 }
 '
+
+curl -XPUT 'http://localhost:9200/gb/tweet/15?pretty=1' -d '
+{
+   "date" : "2017-01-01",
+   "name" : "Gaurav Tyagi",
+   "tweet" : "These aggregations are really hot",
+   "user_id" : 2
+}
+'
+
+curl -XPUT 'http://localhost:9200/gb/tweet/16?pretty=1' -d '
+{
+   "date" : "2017-01-02",
+   "name" : "Gaurav Tyagi",
+   "tweet" : "These aggregations are not really warm",
+   "user_id" : 2
+}
+'
+
+curl -XGET 'http://localhost:9200/us/_mapping'
+
+### Following does not return any documents.
+curl -XPOST 'http://localhost:9200/gb,us/_search' -d '
+{
+	"query" : {
+        "bool" : {
+          "must" : [
+            {
+              "regexp" : {
+                "tweet" : {
+                  "value" : ".*really.*",
+                  "flags_value" : 65535,
+                  "max_determinized_states" : 10000,
+                  "boost" : 1.0
+                }
+              }
+            }
+        ]}
+    }
+}'
+
+curl -XPOST 'http://localhost:9200/gb,us/_close'
+
+curl -XPUT 'http://localhost:9200/gb,us/_settings' -d '
+{
+    "analysis" : {
+        "analyzer": {
+        "lower_keyword": {
+            "type": "custom",
+            "tokenizer": "lowercase",
+            "filter" : ["lowercase"]
+            }
+        }
+    }
+}
+'
+
+curl -XPOST 'http://localhost:9200/gb,us/_open'
+
+curl 'http://localhost:9200/gb/_analyze?analyzer=lower_keyword&field=tweet&text=REALLY'
+
+curl 'http://localhost:9200/gb/_mapping'

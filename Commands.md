@@ -72,6 +72,10 @@ ssh -N -L localhost:3306:DATABASE_MACHINE:3306 BRIDGE_MACHINE_USER@BRIDGE_MACHIN
 ```
 strace -f -o <output_file> <Process for which strace is required>
 ```
+- See Top Network Users
+```
+iftop
+```
 
 ### MySQL
 - Connect to MySQL as root
