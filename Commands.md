@@ -195,9 +195,31 @@ ALTER USER scott ACCOUNT UNLOCK;
 ```
 curl -s checkip.dyndns.org | sed -e 's/.*Current IP Address: //' -e 's/<.*$//‘
 ```
-- View mounted Volumes
+- View free disk space in human readble format
 ```
 df -h
+```
+- View disk space in all mounted systems
+```
+df -a
+```
+- View disk space for / filesystem
+```
+df -hT /
+```
+- Check where current directory is mounted (Use findmnt)
+```
+(until findmnt . ; do cd .. ; done)
+findmnt
+```
+- Check disk usage in the current directory
+```
+du -hsx * | sort -rh | head -10
+for i in G M K; do du -ah | grep [0-9]$i | sort -nr -k 1; done | head -n 11
+```
+- For total disk usage
+```
+du -ch /
 ```
 
 ### Vagrant

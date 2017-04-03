@@ -12,9 +12,16 @@ def ScalaSourceProject(name : String) : Project = (
     )
   )
 
-lazy val core = (ScalaSourceProject("algos").
+lazy val algos = (ScalaSourceProject("algos").
   settings(
     javaSource in Compile := baseDirectory.value / "src/main/scala",
     javaSource in Test := baseDirectory.value / "src/test/scala"
   )
+)
+
+lazy val simulations = (ScalaSourceProject("simulations").
+  settings(
+    javaSource in Compile := baseDirectory.value / "src/main/scala",
+    javaSource in Test := baseDirectory.value / "src/test/scala"
   )
+)
