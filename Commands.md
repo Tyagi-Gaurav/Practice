@@ -255,7 +255,23 @@ scp -i <pem_file> <war_file> <user_name>@<ec2_host>:<target_path>
 ```
 rsync -av --progress -e "ssh -i <pem_file>" <file> <user>@<host>:<target_path>
 ```
-
+- Check flavour of Linux
+```
+cat /proc/version
+cat /etc/redhat-release
+cat /etc/*-release
+lsb_release -a
+```
+- Why does home directory does not have permissions on it ?
+```
+Check umask
+umask 022 is usually the default.
+```
+- Why am I getting permission denied upon login or su - user ?
+```
+If "nofile" is set to "unlimited" in /etc/security/limits.conf (or in files in limits.d)
+then the user cannot login.
+```
 ### MongoDB
 - Importing Data in MongoDB
 ```
