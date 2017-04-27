@@ -1,4 +1,4 @@
-name := """Algos"""
+name := """performanceTools"""
 
 version := "1.0.0"
 
