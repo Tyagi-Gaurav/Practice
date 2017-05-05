@@ -76,7 +76,48 @@ strace -f -o <output_file> <Process for which strace is required>
 ```
 iftop
 ```
-
+- Check flavour of Linux
+```
+cat /proc/version
+cat /etc/redhat-release
+cat /etc/*-release
+lsb_release -a
+```
+- Why does home directory does not have permissions on it ?
+```
+Check umask
+umask 022 is usually the default.
+```
+- Why am I getting permission denied upon login or su - user ?
+```
+If "nofile" is set to "unlimited" in /etc/security/limits.conf (or in files in limits.d)
+then the user cannot login.
+```
+- How to increase the ulimit on a shell while logging in?
+```
+su <user> --shell /bin/bash -c "ulimit -l unlimited"
+```
+- How to check route/hops between source and target machine ?
+```
+traceroute -e <host> <port>
+traceroute -e -P TCP <host> <port>
+```
+- How to generate SSL Certificates
+```
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /tmp/self-signed.key -out /tmp/self-signed.crt
+```
+- How to remove install rpm when directories are partially removed ?
+```
+yum clean all && rpm --rebuilddb
+package-cleanup --problems
+yum erase <package>*
+yum --setopt=tsflags=noscripts remove <package>*
+rpm -e --noscripts <package>*
+```
+- Flatten out contents of a file
+```
+awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' <fileName>
+```
 ### MySQL
 - Connect to MySQL as root
 ```
@@ -254,23 +295,6 @@ scp -i <pem_file> <war_file> <user_name>@<ec2_host>:<target_path>
 - Sync local machine and remote machine
 ```
 rsync -av --progress -e "ssh -i <pem_file>" <file> <user>@<host>:<target_path>
-```
-- Check flavour of Linux
-```
-cat /proc/version
-cat /etc/redhat-release
-cat /etc/*-release
-lsb_release -a
-```
-- Why does home directory does not have permissions on it ?
-```
-Check umask
-umask 022 is usually the default.
-```
-- Why am I getting permission denied upon login or su - user ?
-```
-If "nofile" is set to "unlimited" in /etc/security/limits.conf (or in files in limits.d)
-then the user cannot login.
 ```
 ### MongoDB
 - Importing Data in MongoDB
