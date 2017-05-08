@@ -1,4 +1,4 @@
-curl -XPUT 'http://localhost:9200/megacorp/employee/1' -d '
+curl -XPUT 'http://localhost:8880/megacorp/employee/1' -d '
 {
     "first_name" : "John",
     "last_name" : "Smith",
@@ -7,7 +7,7 @@ curl -XPUT 'http://localhost:9200/megacorp/employee/1' -d '
     "interests" : ["sports", "music"]
 }'
 
-curl -XPUT 'http://localhost:9200/megacorp/employee/2' -d '
+curl -XPUT 'http://localhost:8880/megacorp/employee/2' -d '
 {
     "first_name" : "Jane",
     "last_name" : "Smith",
@@ -15,7 +15,7 @@ curl -XPUT 'http://localhost:9200/megacorp/employee/2' -d '
     "about" : "I like to collect rock albums",
     "interests" : ["music"]
 }'
-curl -XPUT 'http://localhost:9200/megacorp/employee/3' -d '
+curl -XPUT 'http://localhost:8880/megacorp/employee/3' -d '
 {
     "first_name" : "Douglas",
     "last_name" : "Fir",

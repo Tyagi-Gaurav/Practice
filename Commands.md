@@ -118,6 +118,20 @@ rpm -e --noscripts <package>*
 ```
 awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' <fileName>
 ```
+- Monitor packets - HTTP request on a specific port
+```tcpdump -A -s 0 'tcp port 8500 and (((ip[2:2] - ((ip[0]&0xf)<<2)) - ((tcp[12]&0xf0)>>2)) != 0)'
+```
+- Monitor packets - LocalHost to Local Host
+```tcpdump -A -s 0 'tcp port 8500 and (((ip[2:2] - ((ip[0]&0xf)<<2)) - ((tcp[12]&0xf0)>>2)) != 0)' -i lo
+```
+- How do I check my user ID ?
+```
+id
+```
+- What id systemctl does not work ?
+```
+export XDG_RUNTIME_DIR=/run/<user>/<user_id>
+```
 ### MySQL
 - Connect to MySQL as root
 ```
