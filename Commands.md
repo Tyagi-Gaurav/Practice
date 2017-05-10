@@ -104,7 +104,24 @@ traceroute -e -P TCP <host> <port>
 ```
 - How to generate SSL Certificates
 ```
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /tmp/self-signed.key -out /tmp/self-signed.crt
+openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /tmp/self-signed.key -out /tmp/self-signed.crt
+```
+- How to check if certificate and private key match ?
+```
+openssl x509 -noout -modulus -in certificate.crt | openssl md5
+openssl rsa -noout -modulus -in privateKey.key | openssl md5
+```
+- Check if server is ssl enabled with openssl ?
+```
+openssl s_client -connect <host_name>:443 -ssl3
+```
+- How to remove Bag attributes i.e the header part of a cert.pem key ?
+```
+openssl x509 -in cert.pem -out certout.pem
+```
+- How to print subject name inside a cert file ?
+```
+openssl x509 -noout -subject -in server.crt
 ```
 - How to remove install rpm when directories are partially removed ?
 ```
