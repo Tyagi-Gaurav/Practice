@@ -15,6 +15,20 @@ docker build --force-rm --no-cache -f ./NginxDockerFile -t es-nginx-image:latest
 # Clean up old images.
 docker images | grep -i "<none" | awk '{print $3}' | xargs docker rmi --force 2>/dev/null
 
-#docker run -d -p 9800:9200 -p 9900:9300 --name=es-server es-image:latest
+#docker rm -f es-server && docker run -d -p 9800:9200 -p 9900:9300 --name=es-server es-image:latest
 #docker inspect <es-container>
 #docker run -d -p 8080:80 -p 9443:443 --name=nginx-server --link es-server es-nginx-image:latest
+#docker run -d -p 8080:80 -p 9443:443 --name=nginx-server es-nginx-image:latest
+
+#curl -i -vvvv -XPUT 192.168.99.100:8080/test-index -d '
+#{
+#    "settings" : {
+#        "index" : {
+#            "number_of_shards" : 1,
+#            "number_of_replicas" : 1
+#        }
+#    }
+#}
+#'
+#
+#curl -i -vvvv -XPUT 192.168.99.100:8080/cat/indices

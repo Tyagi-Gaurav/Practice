@@ -28,14 +28,14 @@ http {
     #gzip  on;
 
     server {
-        listen       80;
+        listen       443;
         server_name  localhost;
 
         #charset koi8-r;
         #access_log  /var/log/nginx/log/host.access.log  main;
 
         location / {
-            proxy_pass http://172.17.0.2:9200;
+            proxy_pass http://aonlsureschm001.dev.aws.ean:9201;
         }
 
         #error_page  404              /404.html;
@@ -74,20 +74,13 @@ http {
 
 stream {
   server {
-     #listen 443 ssl;
-     listen 443;
+     listen 80;
 
-     #ssl_certificate /etc/nginx/ssl/certs/server.crt;
-     #ssl_certificate_key /etc/nginx/ssl/certs/server.key;
      ssl_protocols  SSLv3 TLSv1 TLSv1.1 TLSv1.2;
      ssl_ciphers    HIGH:!aNULL:!MD5;
      ssl_handshake_timeout 10s;
-     ssl_session_cache shared:SSL:20m;
-     ssl_session_timeout 4h;
-     #ssl_verify_client on;
-     #ssl_client_certificate /etc/nginx/ssl/certs/trusted_server.crt;
 
-     proxy_pass 172.17.0.2:9900;
+     proxy_pass aonlsureschm001.dev.aws.ean:9300;
      proxy_buffer_size 64k;
    }
 }

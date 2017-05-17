@@ -370,5 +370,9 @@ ansible all -i "localhost," -c local -m setup
 ### Docker Commands
 - How to attach to a running docker container
 ```
-
+docker attach <container_id>
+```
+- Run a command on an existing running container
+```
+docker exec -it <container_id_or_name> echo "Hello from container!"
 ```
