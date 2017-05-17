@@ -1,0 +1,6 @@
+cluster.name: my-application
+path.repo: ["/home/elasticsearchuser/"]
+bootstrap.memory_lock: true
+http.port: 9200
+http.host: 0.0.0.0
+transport.host: 127.0.0.1

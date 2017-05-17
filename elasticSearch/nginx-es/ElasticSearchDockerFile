@@ -1,0 +1,22 @@
+FROM es-base-image:latest
+
+ENV container docker
+RUN adduser -m -d /home/elasticsearchuser -G root elasticsearchuser
+
+RUN yum install -y initscripts && \
+    yum install -y which && \
+    yum install -y curl && \
+    yum install -y https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.1.1.rpm
+
+COPY elasticsearchuser.conf /etc/security/limits.d
+COPY elasticsearch_service_config /etc/sysconfig/elasticsearch
+COPY elasticsearch.yml /usr/share/elasticsearch/config/elasticsearch.yml
+COPY log4j2.properties /usr/share/elasticsearch/config/log4j2.properties
+
+RUN chown -R elasticsearchuser:elasticsearchuser /usr/share/elasticsearch/
+
+EXPOSE 9200 9300
+
+USER elasticsearchuser
+
+CMD ["/usr/share/elasticsearch/bin/elasticsearch"]

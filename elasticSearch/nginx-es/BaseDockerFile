@@ -1,0 +1,13 @@
+FROM centos:7.2.1511
+
+# Install Java 8
+RUN yum install -y wget && \
+    cd /opt/ && \
+    wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u121-b13/e9e7ea248e2c4826b92b3f075a80e441/jdk-8u121-linux-x64.tar.gz" && \
+    tar xzf jdk-8u121-linux-x64.tar.gz
+
+ENV JAVA_HOME=/opt/jdk1.8.0_121
+ENV PATH="/opt/jdk1.8.0_121/bin:${PATH}"
+ENV container docker
+
+

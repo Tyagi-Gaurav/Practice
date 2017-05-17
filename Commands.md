@@ -76,7 +76,7 @@ strace -f -o <output_file> <Process for which strace is required>
 ```
 iftop
 ```
-- Check flavour of Linux
+- Check flavour of Linux  
 ```
 cat /proc/version
 cat /etc/redhat-release
@@ -102,6 +102,10 @@ su <user> --shell /bin/bash -c "ulimit -l unlimited"
 traceroute -e <host> <port>
 traceroute -e -P TCP <host> <port>
 ```
+- How to check what's in a certificate ?
+```
+openssl x509 -in certificate.crt -text -noout
+```
 - How to generate SSL Certificates
 ```
 openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /tmp/self-signed.key -out /tmp/self-signed.crt
@@ -110,6 +114,10 @@ openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /tmp/self-signed.ke
 ```
 openssl x509 -noout -modulus -in certificate.crt | openssl md5
 openssl rsa -noout -modulus -in privateKey.key | openssl md5
+```
+- Connect to a secured server with openssl, certificate and key.
+```
+openssl s_client -connect <host>:443 -ssl3 -cert <cert> -key <key> -state -debug
 ```
 - Check if server is ssl enabled with openssl ?
 ```
@@ -140,6 +148,18 @@ awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' <fileName>
 ```
 - Monitor packets - LocalHost to Local Host
 ```tcpdump -A -s 0 'tcp port 8500 and (((ip[2:2] - ((ip[0]&0xf)<<2)) - ((tcp[12]&0xf0)>>2)) != 0)' -i lo
+```
+- Capture packets coming in from a specific Host
+```
+tcpdump src host <hostname>
+```
+- Show me all RESET packets ?
+```
+tcpdump 'tcp[13] & 4!=0'
+```
+- Show all packets coming into the system
+```
+tcpdump -i any -X -vvvv src <src_host> and dst port <dst_port>
 ```
 - How do I check my user ID ?
 ```
@@ -345,4 +365,10 @@ ansible <servername> -a uptime
 - Get Local Setup:
 ```
 ansible all -i "localhost," -c local -m setup
+```
+
+### Docker Commands
+- How to attach to a running docker container
+```
+
 ```
