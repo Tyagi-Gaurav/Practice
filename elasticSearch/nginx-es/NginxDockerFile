@@ -8,7 +8,8 @@ RUN yum install -y initscripts && \
     wget https://nginx.org/packages/centos/7/x86_64/RPMS/nginx-1.12.0-1.el7.ngx.x86_64.rpm && \
     yum install -y nginx-1.12.0-1.el7.ngx.x86_64.rpm
 
-EXPOSE 80
-EXPOSE 443
+COPY ./NginxConfig /etc/nginx
 
-CMD ["/sbin/nginx", "-g", "daemon off;"]
+EXPOSE 80 443
+
+CMD ["/sbin/nginx", "-c", "/etc/nginx/NginxConfig", "-g", "daemon off;"]
