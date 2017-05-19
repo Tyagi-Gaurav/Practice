@@ -34,18 +34,17 @@ object partyDance extends App {
     "M9#W3#W9",
     "M10#W10")
 
-  val ip1_size = scala.io.StdIn.readInt
-  val ip1 = Array.ofDim[String](ip1_size)
+  var uniqueSet : Set[String] = Set.empty
 
-  for (ip1_i <- 0 until ip1_size)
-    ip1(ip1_i) = scala.io.StdIn.readLine
+//  val ip1_size = scala.io.StdIn.readInt
+//  val ip1 = Array.ofDim[String](ip1_size)
+//
+//  for (ip1_i <- 0 until ip1_size)
+//    ip1(ip1_i) = scala.io.StdIn.readLine
 
-  println(doWork(ip1))
-//  println(doWork(inputB))
-//  println(doWork(inputC))
-//  println(doWork(inputD))
+  println(doWork(inputD))
 
-  def createMapForAllWomen(inputA: Array[String]) : Map[String, Set[String]]= {
+  def createMapForAllWomen(inputA: Array[String]) : Map[String, Set[String]] = {
     inputA.map(x => x.split("#"))
           .flatMap(x => x.map(y=> (y , x(0))))
           .groupBy(_._1)
@@ -55,11 +54,11 @@ object partyDance extends App {
   }
 
   def doWork(inp : Array[String]) : Int = {
-    val k = getCombination(createMapForAllWomen(ip1))
+    val k = getCombination(createMapForAllWomen(inp), List.empty)
     if (k == 0) -1 else k
   }
 
-  def getCombination(inputA: Map[String, Set[String]]) : Int = {
+  def getCombination(inputA: Map[String, Set[String]], outputComb : List[String]) : Int = {
     val (womenTaken, inDemandWomen) = inputA.partition(_._2.size == 1)
     val aloneWomen = inputA.filter(_._2.size == 0)
     val allOccupiedMen = womenTaken.flatMap(_._2).toSet
@@ -68,19 +67,26 @@ object partyDance extends App {
       0
     else if (inDemandWomen.size > 0) {
       if (womenTaken.size == 0)
-        getHeuristic(inDemandWomen)
+        getHeuristic(inDemandWomen, outputComb)
        else
-        getCombination(inDemandWomen.map(x => x._1 -> (x._2.diff(allOccupiedMen))))
-
+        getCombination(inDemandWomen.map(x => x._1 -> (x._2.diff(allOccupiedMen))),
+        outputComb ++ womenTaken.map(x => x._1 + x._2.head))
     }
-    else
-      1
+    else {
+      val finalList = (outputComb ++ womenTaken.map(x => x._1 + x._2.head)).sortWith(_ < _).foldLeft("")((x,y) => x + y)
+      if (uniqueSet.contains(finalList)) 0 else {
+        uniqueSet += finalList
+        1
+      }
+    }
   }
 
-  def getHeuristic(inDemandWomen: Map[String, Set[String]]) : Int = {
+  def getHeuristic(inDemandWomen: Map[String, Set[String]], outputComb : List[String]) : Int = {
     inDemandWomen.foldLeft(0)((a, w) =>
         a + w._2.foldLeft(0)((x , m) =>
-          x + getCombination(inDemandWomen.filter(!_._1.equals(w._1)).map(x => x._1 -> (x._2 - m)))
+          x + getCombination(
+            inDemandWomen.filter(!_._1.equals(w._1)).map(x => x._1 -> (x._2 - m)),
+            (w._1 + m) :: outputComb)
         )
     )
   }
