@@ -1,4 +1,4 @@
-package magicsquare
+package algosTest
 
 import org.scalatest.WordSpec
 

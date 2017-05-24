@@ -1,4 +1,4 @@
-package magicsquare
+package algosTest
 
 import scala.io.StdIn
 
