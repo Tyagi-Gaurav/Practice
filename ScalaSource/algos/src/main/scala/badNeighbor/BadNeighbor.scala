@@ -60,18 +60,25 @@ object BadNeighbor {
     */
   def calcDonation(d : Array[Int]) : Int = {
 
-    def m(d : Array[Int], n: Int) : Int = {
-      if (n == 0) d(0)
-      else if (n == 1) math.max(d(0), d(1))
-      else if (n == 2) math.max(d(2), m(d, 1))
-      else{
-        if (n-2 > 0 && n+1%d.size > 0)
-          math.max(d(n) + m(d, n-2), m(d, n-1))
-        else
-          math.max(d(n), m(d, n-1))
+    val size = d.size
+
+    def containsNeighbors(picked : Set[Int], n : Int) =
+      picked.contains((size + n + 1)%size) ||
+      picked.contains((size + n - 1)%size) || picked.contains(n)
+
+    def addIfNotNeighbor(picked : Set[Int], n : Int) =
+      if (containsNeighbors(picked, n)) picked else picked+n
+
+    def m(d : Array[Int], n: Int, picked : Set[Int], sum : Int) : Int = {
+      if (n > 0 && containsNeighbors(picked, n)) sum
+      else if (n == 0) {
+        if (!containsNeighbors(picked, n)) d(n)+sum else sum
       }
+      else
+        math.max(m(d, (size + n - 2) % size, addIfNotNeighbor(picked, n), sum + d(n)),
+          m(d, (size + n-1) % size, picked, sum))
     }
 
-    m(d, d.size - 1)
+    m(d, d.size - 1, Set.empty, 0)
   }
 }

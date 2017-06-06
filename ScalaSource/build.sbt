@@ -19,6 +19,13 @@ lazy val algos = (ScalaSourceProject("algos").
   )
 )
 
+lazy val scalaObjects = (ScalaSourceProject("ScalaObjects").
+  settings(
+    javaSource in Compile := baseDirectory.value / "src/main/scala",
+    javaSource in Test := baseDirectory.value / "src/test/scala"
+  )
+)
+
 lazy val simulations = (ScalaSourceProject("simulations").
   settings(
     javaSource in Compile := baseDirectory.value / "src/main/scala",
