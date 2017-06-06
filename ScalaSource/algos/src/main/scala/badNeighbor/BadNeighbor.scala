@@ -51,34 +51,26 @@ object BadNeighbor {
     *
     * Let M[n] denote the maximum donation when ith household is selected.
     *
-    * M[n] = Max (d[n] + M[n-2], if (n-2 > 0 && n+1 > 0)
-    *             M[n-1)
+    * M[0] = d(0)
+    * M(1) = max(d(0), d(1))
+    * M[n] = Max (d[n] + M[n-2], M[n-1))
     *
-    * M[n-2] = 0 when n-2 > 0
-    * It says, Max of when d[i] is selected along with M[i-2] or when d[i] is
-    * not selected, then M[i-1].
+    * Here we solve the problem twice and take the max of the two.
+    *
+    * 1st sub-problem for indexes 1 to n - 1
+    * 2nd sub-problem for indexes 0 to n - 2
+    *
+    * Since the array is circular, those elements will never be together.
     */
   def calcDonation(d : Array[Int]) : Int = {
 
-    val size = d.size
-
-    def containsNeighbors(picked : Set[Int], n : Int) =
-      picked.contains((size + n + 1)%size) ||
-      picked.contains((size + n - 1)%size) || picked.contains(n)
-
-    def addIfNotNeighbor(picked : Set[Int], n : Int) =
-      if (containsNeighbors(picked, n)) picked else picked+n
-
-    def m(d : Array[Int], n: Int, picked : Set[Int], sum : Int) : Int = {
-      if (n > 0 && containsNeighbors(picked, n)) sum
-      else if (n == 0) {
-        if (!containsNeighbors(picked, n)) d(n)+sum else sum
-      }
+    def m(d : Array[Int], l : Int, h : Int, index : Int) : Int = {
+      if (index == l) d(index)
+      else if (index == l+1) math.max(d(l), d(l+1))
       else
-        math.max(m(d, (size + n - 2) % size, addIfNotNeighbor(picked, n), sum + d(n)),
-          m(d, (size + n-1) % size, picked, sum))
+        math.max(d(index) + m(d, l ,h, index - 2), m(d, l, h, index - 1))
     }
 
-    m(d, d.size - 1, Set.empty, 0)
+    math.max(m(d, 1, d.size -1, d.size - 1), m(d, 0, d.size -2, d.size - 2))
   }
 }
