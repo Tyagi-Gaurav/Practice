@@ -2,6 +2,8 @@ package longestNonDecreasing
 
 /**
   * Given a sequence of N numbers – A[1] , A[2] , …, A[N] . Find the length of the longest non-decreasing sequence.
+  *
+  * Let state(i) be defined as longest non-decreasing sequence upto ith index.
   */
 
 object NonDecSequen extends App {

@@ -56,7 +56,8 @@ object BadNeighbor {
     * M(1) = max(d(0), d(1))
     * M[n] = Max (d[n] + M[n-2], M[n-1))
     *
-    * Here we solve the problem twice and take the max of the two.
+    * Here we solve the problem twice and take the max of the two. This is because the first and last cannot be
+    * neighbors either. Breaking the problem into 2 parts simplifies the logic and calculation.
     *
     * 1st sub-problem for indexes 1 to n - 1
     * 2nd sub-problem for indexes 0 to n - 2
