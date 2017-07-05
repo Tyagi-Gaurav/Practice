@@ -1,18 +1,24 @@
 
-def combinationsOfEqualLength(x : List[Int]) : Set[List[Int]]= x match {
+def permutationsOfEqualLength(x : List[Int]) : Set[List[Int]]= x match {
   case Nil => Set.empty
   case x :: Nil => Set(List(x))
-  case x :: xs => combinationsOfEqualLength(xs).flatMap(a => merge(x, a))
+  case x :: xs => permutationsOfEqualLength(xs).flatMap(a => merge(x, a))
 }
 
-def combinationsOfAllLengths(x : List[Int]) : Set[List[Int]]= x match {
+def permutationsOfAllLengths(x : List[Int]) : Set[List[Int]]= x match {
   case Nil => Set.empty
   case x :: Nil => Set(List(x))
   case x :: xs => {
-    val cb = combinationsOfAllLengths(xs)
+    val cb = permutationsOfAllLengths(xs)
     cb | cb.flatMap(a => merge(x, a)) | Set(List(x))
   }
 }
+
+def permutationsWithFold(x: List[Int]) : Set[List[Int]] = x.fold(Set.empty)((s, item) => {
+  val partial = List(item)
+  Set(partial) + merge()
+}
+)
 
 def merge(x : Int, ys : List[Int]) : Set[List[Int]] = {
   (for (
@@ -21,7 +27,11 @@ def merge(x : Int, ys : List[Int]) : Set[List[Int]] = {
   ) yield sp._1 ++ (x :: sp._2)).toSet
 }
 
-combinationsOfEqualLength(List(1, 2, 3))
-combinationsOfAllLengths(List(1, 2, 3))
+val testList = List(1, 2, 3)
+
+permutationsOfEqualLength(testList)
+permutationsOfAllLengths(testList)
+
+//testList.foldLeft(Set.empty)(cs, item) => )
 
 
