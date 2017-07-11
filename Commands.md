@@ -123,6 +123,10 @@ openssl s_client -connect <host>:443 -ssl3 -cert <cert> -key <key> -state -debug
 ```
 openssl s_client -connect <host_name>:443 -ssl3
 ```
+- Download a certificate from server with openssl ?
+```
+openssl s_client -debug -showcerts -connect aonlsur3auth.stable.aws.ean:443
+```
 - How to remove Bag attributes i.e the header part of a cert.pem key ?
 ```
 openssl x509 -in cert.pem -out certout.pem
