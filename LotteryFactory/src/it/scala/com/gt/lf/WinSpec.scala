@@ -25,7 +25,7 @@ class WinSpec extends FeatureSpec with AbstractIntegrationSpec with GivenWhenThe
       Then("Current winner details should be returned")
       val response = Await.result(responseFuture, 5 seconds)
       val winner = Unmarshal(response.entity)
-        .to[String].map(JsonParser(_).convertTo[Winner])
+          .to[String].map(JsonParser(_).convertTo[Winner])
 
       val dwinner = Await.result(winner, 2 seconds)
       dwinner.id shouldBe 1
