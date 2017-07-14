@@ -1,5 +1,11 @@
 
-* Create a service that returns a random value 
+
+| Story/Epic  | Description |
+|---|--- |
+| Story | Use Slick to connect service to Database                  |
+| Story | ~~Create a schema for winner on mongodb using a script.~~ |
+| Story | ~~Install mongodb on system~~                             |
+| Story | ~~Create a service that returns a random value~~          |
 
 **Overall development Plan**
 * Create something that works locally first. 
