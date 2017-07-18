@@ -17,6 +17,7 @@ class WinnerSpec extends WordSpec with ScalatestRouteTest with Routes with Match
     "returns 200 with winner name" in {
       Get("/winner") ~> routes ~> check {
         status shouldBe StatusCodes.OK
+        responseAs[String] shouldBe "winner1"
       }
     }
   }

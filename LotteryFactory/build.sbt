@@ -43,7 +43,8 @@ libraryDependencies ++= {
     "com.github.fommil" %% "spray-json-shapeless" % "1.3.0",
     "ch.megard" %% "akka-http-cors" % "0.1.11",
     "com.jason-goodwin" %% "authentikat-jwt" % "0.4.5",
-    "org.elasticsearch.client" % "x-pack-transport" % elastic4sV
+    "org.elasticsearch.client" % "x-pack-transport" % elastic4sV,
+    "org.reactivemongo" % "reactivemongo_2.11" % "0.12.5"
   )
 }
 

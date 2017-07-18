@@ -18,3 +18,9 @@
 **Questions**
 * What are the benefits of sealed traits ?
 * Copy constructor in Scala ?
+
+**Intention**
+* The more you stay on the site and explore ads, the more you earn.
+* Lottery every day based on revenue earned.
+* Lottery should be given out to only those people that have registered.
+* If you register and are not online, you don't get the lottery.

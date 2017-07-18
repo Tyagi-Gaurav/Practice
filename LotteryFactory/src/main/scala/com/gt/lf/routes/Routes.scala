@@ -30,7 +30,7 @@ trait Routes {
   val winnerRoute = path("winner") {
     get {
       complete {
-        "ok"
+        WinnerSvc.getWinner
       }
     }
   }
