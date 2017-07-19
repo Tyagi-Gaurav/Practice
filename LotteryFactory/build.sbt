@@ -44,7 +44,8 @@ libraryDependencies ++= {
     "ch.megard" %% "akka-http-cors" % "0.1.11",
     "com.jason-goodwin" %% "authentikat-jwt" % "0.4.5",
     "org.elasticsearch.client" % "x-pack-transport" % elastic4sV,
-    "org.reactivemongo" % "reactivemongo_2.11" % "0.12.5"
+    "org.reactivemongo" % "reactivemongo_2.11" % "0.12.5",
+    "joda-time" % "joda-time" % "2.9.9"
   )
 }
 
