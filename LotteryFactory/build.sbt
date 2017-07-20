@@ -40,7 +40,7 @@ libraryDependencies ++= {
     "com.sksamuel.elastic4s" %% "elastic4s-http" % elastic4sV,
     "com.sksamuel.elastic4s" %% "elastic4s-jackson" % elastic4sV,
     "com.sksamuel.elastic4s" %% "elastic4s-testkit" % elastic4sV,
-    "com.github.fommil" %% "spray-json-shapeless" % "1.3.0",
+    "com.github.fommil" %% "spray-json-shapeless" % "1.4.0",
     "ch.megard" %% "akka-http-cors" % "0.1.11",
     "com.jason-goodwin" %% "authentikat-jwt" % "0.4.5",
     "org.elasticsearch.client" % "x-pack-transport" % elastic4sV,

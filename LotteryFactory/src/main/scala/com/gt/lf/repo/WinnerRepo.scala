@@ -2,7 +2,6 @@ package com.gt.lf.repo
 
 import java.time.LocalDate
 
-import com.gt.lf.domain.app.Winner
 import com.typesafe.config.Config
 import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver}
 
@@ -11,6 +10,10 @@ import spray.json._
 import fommil.sjs.FamilyFormats._
 
 import scala.concurrent.Future
+
+sealed trait appDomain;
+
+case class Winner(id : String, value : String) extends appDomain;
 
 class WinnerRepo(config: Config) {
   val dbUri = config.getString("dbUri")

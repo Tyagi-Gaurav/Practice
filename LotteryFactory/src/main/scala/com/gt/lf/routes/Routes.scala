@@ -13,8 +13,10 @@ import com.typesafe.config.Config
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
 import ch.megard.akka.http.cors.CorsDirectives._
-import com.gt.lf.domain.ui.WinnerDecorator
+import com.gt.lf.domain.ui.WinnerDecorator._
 import com.gt.lf.repo.WinnerRepo
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+
 import spray.json._
 import fommil.sjs.FamilyFormats._
 
@@ -37,7 +39,7 @@ trait Routes {
     get {
       complete {
         WinnerRepo.getWinnerFor(LocalDate.now).map[ToResponseMarshallable] {
-          case Right(winner) => OK -> WinnerDecorator.decorate(winner).toJson
+          case Right(winner) => OK -> decorate(winner).toJson
           case Left(ex) => {
             InternalServerError
           }
