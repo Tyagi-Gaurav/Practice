@@ -2,9 +2,9 @@
 
 | Story/Epic  | Description |
 |---|--- |
-| Story | connect service to Database                               |
 | Story | use in-memory mongo for unit testing                      |
 | Story | Remove deprecated code                                    |
+| Story | ~~connect service to Database~~                           |
 | Story | ~~Create a schema for winner on mongodb using a script.~~ |
 | Story | ~~Install mongodb on system~~                             |
 | Story | ~~Create a service that returns a random value~~          |
