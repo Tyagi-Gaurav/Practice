@@ -1,19 +1,18 @@
 package com.gt.lf.repo
 
-import java.time.LocalDate
-
 import com.typesafe.config.Config
+import org.joda.time.DateTime
+import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver}
+import reactivemongo.bson.{BSONDocumentReader, Macros}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import spray.json._
-import fommil.sjs.FamilyFormats._
-
 import scala.concurrent.Future
+import reactivemongo.bson.document
 
 sealed trait appDomain;
 
-case class Winner(id : String, value : String) extends appDomain;
+case class Winner(id : String, value : String, date: String) extends appDomain;
 
 class WinnerRepo(config: Config) {
   val dbUri = config.getString("dbUri")
@@ -23,11 +22,15 @@ class WinnerRepo(config: Config) {
   val connection = parsedURI.map(driver.connection(_))
 
   val futureConnection = Future.fromTry(connection)
-  def lotteryDb : Future[DefaultDB] = futureConnection.flatMap(_.database("lottery"))
-  def winnerCollection = lotteryDb.map(_.collection("winner"))
+  def lotteryDb : Future[DefaultDB] = futureConnection.flatMap(_.database(config.getString("dbName")))
+  def winnerCollection : Future[BSONCollection] = lotteryDb.map(_.collection("winner"))
+
+  implicit def winnerReader: BSONDocumentReader[Winner] = Macros.reader[Winner]
+
+  def getWinnerFor(d : DateTime) : Future[Either[Throwable, List[Winner]]] = {
+    winnerCollection.flatMap(
+      _.find(document("date" -> d.toLocalDate.toString)).cursor[Winner]().collect[List](1))
+      .map(Right(_))
+  }
 }
 
-object WinnerRepo {
-  def getWinnerFor(d : LocalDate) : Future[Either[Throwable, Winner]] =
-    Future.successful(Right(Winner("id", "test")))
-}
