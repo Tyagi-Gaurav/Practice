@@ -16,7 +16,6 @@ case class Winner(id : String, value : String, date: String) extends appDomain;
 
 class WinnerRepo(config: Config) {
   val dbUri = config.getString("dbUri")
-
   val driver = MongoDriver(config)
   val parsedURI = MongoConnection.parseURI(dbUri)
   val connection = parsedURI.map(driver.connection(_))

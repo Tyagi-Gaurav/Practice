@@ -39,11 +39,13 @@ trait Routes {
 
   val winnerRoute = path("winner") {
     get {
-      complete {
-        winnerRepo.getWinnerFor(DateTime.now()).map[ToResponseMarshallable] {
-          case Right(winner) => OK -> decorate(winner).toJson
-          case Left(ex) => {
-            InternalServerError
+      parameters("date".as[String] ?) { (date) =>
+        complete {
+          winnerRepo.getWinnerFor(DateTime.parse(date.getOrElse(DateTime.now().toString))).map[ToResponseMarshallable] {
+            case Right(winner) => OK -> decorate(winner).toJson
+            case Left(ex) => {
+              InternalServerError
+            }
           }
         }
       }

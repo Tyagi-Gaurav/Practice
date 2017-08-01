@@ -45,7 +45,8 @@ libraryDependencies ++= {
     "com.jason-goodwin" %% "authentikat-jwt" % "0.4.5",
     "org.elasticsearch.client" % "x-pack-transport" % elastic4sV,
     "org.reactivemongo" % "reactivemongo_2.11" % "0.12.5",
-    "joda-time" % "joda-time" % "2.9.9"
+    "joda-time" % "joda-time" % "2.9.9",
+    "com.github.simplyscala" % "scalatest-embedmongo_2.11" % "0.2.4" % "test"
   )
 }
 
