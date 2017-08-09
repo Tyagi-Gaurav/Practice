@@ -30,3 +30,13 @@ rqsort' (x:xs) = rqsort' larger ++ [x] ++ rqsort' smaller
 -- Find product of a list of numbers
 prod' (x:[]) = x
 prod' (x:xs) = x * prod'(xs)
+
+-- Functions using guards
+signum' n | n < 0 = -1
+         | n == 0 = 0
+         | otherwise = 1
+
+-- Halve :: [a] -> ([a], [a]) that splits even length lists into 2 halves
+halve (xs) | length (xs) == 0 = ([],[])
+halve (xs) | length (xs) `mod` 2 == 0 = (take (length (xs) `div` 2) xs, drop (length (xs) `div` 2) xs)
+halve (xs) | otherwise = (xs,[])

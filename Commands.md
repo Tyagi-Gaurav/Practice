@@ -161,17 +161,29 @@ tcpdump src host <hostname>
 ```
 tcpdump 'tcp[13] & 4!=0'
 ```
-- Show all packets coming into the system
+- Show all packets coming into the system at a specific port.
 ```
 tcpdump -i any -X -vvvv src <src_host> and dst port <dst_port>
+```
+- Deubg SSL traffic received on a Network
+```
+ssldump -d -X port 443
 ```
 - How do I check my user ID ?
 ```
 id
 ```
-- What id systemctl does not work ?
+- What if systemctl does not work ?
 ```
 export XDG_RUNTIME_DIR=/run/<user>/<user_id>
+```
+- How to configure a service to start when the OS boots ?
+```
+sudo /sbin/chkconfig nginx on
+```
+- How to check journalctl for a given date range ?
+```
+journalctl --since "2017-08-02 05:00" --until "2017-08-02 05:30"
 ```
 ### MySQL
 - Connect to MySQL as root

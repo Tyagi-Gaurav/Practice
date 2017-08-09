@@ -6,9 +6,13 @@ val newInput = input.toList.sliding(2).collect{
 
 val newInput1 = input.zipWithIndex.filter(x => (x._2 == 0 || x._1 != input(x._2 - 1))).map(_._1)
 
+case class test(s : String)
 
+object testMe {
 
+  def apply(s : String) : test = {
+    test(s)
+  }
+}
 
-
-
-
+testMe("abc").s
