@@ -35,8 +35,7 @@ public class MaxContiguousSum {
         int currentMax = a[0];
 
         for (int i=1; i < a.length;++i) {
-            int newMax = currentMax + a[i];
-            if (newMax <= 0 || a[i] > newMax) {
+            if (needToResetCurrentMax(a[i], currentMax + a[i])) {
                 currentMax = a[i];
             } else {
                 currentMax += a[i];
@@ -48,5 +47,9 @@ public class MaxContiguousSum {
         }
 
         System.out.println(maxSoFar);
+    }
+
+    private static boolean needToResetCurrentMax(int i, int newMax) {
+        return newMax <= 0 || i > newMax;
     }
 }
