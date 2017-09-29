@@ -49,7 +49,12 @@ java -jar $env:FINDBUGS_HOME\lib\findbugs.jar -onlyAnalyze
 ```
 keytool -list -keystore <keyStoreFile>
 ```
-
+- Extract unencrypted certificate from keystore
+```
+keytool -importkeystore -srckeystore mykeystore.jks -destkeystore mykeystore.p12 -deststoretype PKCS12
+keytool -importkeystore -srckeystore mykeystore.jks -destkeystore mykeystore.p12 -deststoretype PKCS12
+openssl pkcs12 -in mykeystore.p12 -nokeys -out cert.pem
+```
 ### Networking/Hardware/OS
 - DOS: Get Process listening on a port
 ```
@@ -102,6 +107,22 @@ su <user> --shell /bin/bash -c "ulimit -l unlimited"
 traceroute -e <host> <port>
 traceroute -e -P TCP <host> <port>
 ```
+- Debug ssl in Java ?
+```
+-Djavax.net.debug=all
+```
+- Extract private key from .pfx file ?
+```
+openssl pkcs12 -in _i.dev.aws.ean.pfx -nocerts -out dev_key.pem
+```
+- Extract cert from .pfx file
+```
+openssl pkcs12 -in _i.dev.aws.ean.pfx -clcerts -nokeys -out dev_cert.pem
+```
+- How to check what's inside PKCS12 cert ?
+```
+openssl pkcs12 -info -in keyStore.p12
+```
 - How to check what's in a certificate ?
 ```
 openssl x509 -in certificate.crt -text -noout
@@ -109,6 +130,14 @@ openssl x509 -in certificate.crt -text -noout
 - How to generate SSL Certificates
 ```
 openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /tmp/self-signed.key -out /tmp/self-signed.crt
+```
+- How to verify is a certificate is signed by CA ?
+```
+openssl verify -CAfile expedia-bundle.crt _i.dev.aws.ean.crt
+```
+- How to convert RSA private Key to Private key ?
+```
+openssl pkcs8 -topk8 -inform PEM -outform PEM -in dev_key.pem -out private.key -nocrypt
 ```
 - How to check if certificate and private key match ?
 ```
@@ -142,6 +171,14 @@ package-cleanup --problems
 yum erase <package>*
 yum --setopt=tsflags=noscripts remove <package>*
 rpm -e --noscripts <package>*
+```
+- How to list installed packages using rpm ?
+```
+rpm -qa
+```
+- Uninstall using rpm ?
+```
+rpm -e <packageName>
 ```
 - Flatten out contents of a file
 ```

@@ -114,3 +114,7 @@ safeTail2 xs = if (null' xs) then xs else tail(xs)
 safeTail3 :: [a] -> [a]
 safeTail3 [] = []
 safeTail3 (x:xs) = xs
+
+-- Find the largest number under 100,000 that's divisible by 3829
+head (reverse [x | x <- [3829..100000], x `mod` 3829 == 0])
+head [x | x <- [100000,99999..], x `mod` 3829 == 0]
