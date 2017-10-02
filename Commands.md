@@ -52,7 +52,6 @@ keytool -list -keystore <keyStoreFile>
 - Extract unencrypted certificate from keystore
 ```
 keytool -importkeystore -srckeystore mykeystore.jks -destkeystore mykeystore.p12 -deststoretype PKCS12
-keytool -importkeystore -srckeystore mykeystore.jks -destkeystore mykeystore.p12 -deststoretype PKCS12
 openssl pkcs12 -in mykeystore.p12 -nokeys -out cert.pem
 ```
 ### Networking/Hardware/OS
@@ -131,7 +130,7 @@ openssl x509 -in certificate.crt -text -noout
 ```
 openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /tmp/self-signed.key -out /tmp/self-signed.crt
 ```
-- How to verify is a certificate is signed by CA ?
+- How to verify is a certificate is signed by a given CA ?
 ```
 openssl verify -CAfile expedia-bundle.crt _i.dev.aws.ean.crt
 ```
