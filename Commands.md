@@ -428,3 +428,23 @@ docker attach <container_id>
 ```
 docker exec -it <container_id_or_name> echo "Hello from container!"
 ```
+- Given a dockerFile, create an image.
+```
+docker build .
+```
+- Start Docker machine locally
+```
+docker-machine start dev
+```
+- Setup Docker Environment
+```
+eval $(docker-machine env dev)
+```
+- List all Docker images
+```
+docker images
+```
+- Remove unused images
+```
+docker images | grep -i "<none" | awk '{print $3}' | xargs docker rmi --force
+```
