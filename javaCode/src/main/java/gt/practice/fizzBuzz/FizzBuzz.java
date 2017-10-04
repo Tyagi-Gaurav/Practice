@@ -12,7 +12,10 @@ public class FizzBuzz {
 
     public String getFizzBuzzForRange(int lower, int higher) {
         List<String> fbTokens = createListOfFizzBuzzTokensUsing(lower, higher);
+        return formattedOutputUsing(fbTokens);
+    }
 
+    private String formattedOutputUsing(List<String> fbTokens) {
         return String.join(" ", fbTokens);
     }
 
@@ -25,7 +28,9 @@ public class FizzBuzz {
     private String checkFizzBuzz(int num) {
         String result = String.valueOf(num);
 
-        if (isMultipleOf.apply(num, 15))
+        if (numberContainsDigit(num ,3))
+            result = "lucky";
+        else if (isMultipleOf.apply(num, 15))
             result = "fizzbuzz";
         else if (isMultipleOf.apply(num, 5))
             result = "buzz";
@@ -33,5 +38,9 @@ public class FizzBuzz {
             result = "fizz";
 
         return result;
+    }
+
+    private boolean numberContainsDigit(int num, int digit) {
+        return String.valueOf(num).contains(String.valueOf(digit));
     }
 }
