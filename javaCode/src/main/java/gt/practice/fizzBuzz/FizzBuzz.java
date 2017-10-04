@@ -1,11 +1,14 @@
 package gt.practice.fizzBuzz;
 
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
 
 public class FizzBuzz {
+
+    private BiFunction<Integer, Integer, Boolean> isMultipleOf = (x,y) -> x % y == 0;
 
     public String getFizzBuzzForRange(int lower, int higher) {
         List<String> fbTokens = createListOfFizzBuzzTokensUsing(lower, higher);
@@ -20,17 +23,13 @@ public class FizzBuzz {
     }
 
     private String checkFizzBuzz(int num) {
-        boolean isMultipleOfFifteen = num % 15 == 0;
-        boolean isMultipleOfThree = num % 3 == 0;
-        boolean isMultipleOfFive = num % 5 == 0;
-
         String result = String.valueOf(num);
 
-        if (isMultipleOfFifteen)
+        if (isMultipleOf.apply(num, 15))
             result = "fizzbuzz";
-        else if (isMultipleOfFive)
+        else if (isMultipleOf.apply(num, 5))
             result = "buzz";
-        else if (isMultipleOfThree)
+        else if (isMultipleOf.apply(num, 3))
             result = "fizz";
 
         return result;
