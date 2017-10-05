@@ -448,3 +448,23 @@ docker images
 ```
 docker images | grep -i "<none" | awk '{print $3}' | xargs docker rmi --force
 ```
+- Remove all images
+```
+docker images -a | awk '{print $3}' | xargs docker rmi --force
+```
+- Remove unused containers
+```
+docker ps -a | grep -i "Exited" | awk '{print $1}' | xargs docker rm --force
+```
+- Create a container for an image
+```
+docker run
+```
+- Check how much memory the container is using ?
+```
+docker stats <containerId>
+```
+- Attach to a running container
+```
+docker attach <containerId>
+```
