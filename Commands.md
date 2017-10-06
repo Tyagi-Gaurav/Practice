@@ -468,3 +468,26 @@ docker stats <containerId>
 ```
 docker attach <containerId>
 ```
+- Copy file from a dead container to local machine.
+```
+docker cp <containerId>:<Src_path> .
+```
+
+### Profiling
+- How to profile application using JMX ?
+```
+"-Dcom.sun.management.jmxremote", \
+"-Dcom.sun.management.jmxremote.port=9010", \
+"-Dcom.sun.management.jmxremote.local.only=false", \
+"-Dcom.sun.management.jmxremote.authenticate=false", \
+"-Dcom.sun.management.jmxremote.ssl=false"
+```
+
+- How to run hprof for heap profiling ?
+```
+java -Xrunhprof:heap=all <class>
+```
+- Analyse heap dump using command line ?
+```
+jhat java.hprof
+```
