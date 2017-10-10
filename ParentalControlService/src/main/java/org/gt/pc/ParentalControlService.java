@@ -21,7 +21,8 @@ public class ParentalControlService implements ParentalControl {
         try {
             Optional<String> movieLevel = movieService.getParentalControlLevel(movieId);
             ParentalControlLevel currentMovieLevel =
-                    ParentalControlLevel.getFrom(movieLevel.orElseThrow(UnSupportedParentalControlLevelException::new).toUpperCase());
+                    ParentalControlLevel.getFrom(movieLevel.orElseThrow(UnSupportedParentalControlLevelException::new)
+                            .toUpperCase());
             return userLevel.isHigherThan(currentMovieLevel);
         } catch (TitleNotFoundException e) {
             throw new MovieNotFoundException(e);
