@@ -491,3 +491,7 @@ java -Xrunhprof:heap=all <class>
 ```
 jhat java.hprof
 ```
+- Linux utilities for monitoring
+```
+mpstat, sysstat, vmstats
+```

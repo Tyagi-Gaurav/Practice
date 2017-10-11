@@ -21,34 +21,35 @@
 (/) CAP - How would you achieve availability of those when a scenario is given ?
 (/) CAP - How would you achieve consistency of those when a scenario is given ?
 (/) Parental Control - Exercise in Java
-17. Find all anagrams of a word
-18. Permutations of a number
-19. Combinations of a number
-20. Java Magazine
-6. New Interfaces in Java 8
-21. Reactive MicroServices Architectures
-(X) Spanish Revise
-
-1. Directory Structure exercise in Java
-1. https://docs.oracle.com/javase/8/docs/technotes/guides/vm/gctuning/collectors.html
-2. http://blog.takipi.com/garbage-collectors-serial-vs-parallel-vs-cms-vs-the-g1-and-whats-new-in-java-8/
-3. https://www.journaldev.com/2856/java-jvm-memory-model-memory-management-in-java
-7. Changes in Java 9
-  - https://www.javaworld.com/article/3169388/java-language/java-9s-other-new-enhancements-part-2.html
-8. REST
-https://www.pcworld.com/article/2899351/everything-you-need-to-know-about-nvme.html
-20. Java Magazine
+(/) New Interfaces in Java 8
+(/) https://docs.oracle.com/javase/8/docs/technotes/guides/vm/gctuning/collectors.html
+(/) https://www.infoq.com/presentations/java-performance-guide?utm_source=infoq&utm_campaign=user_page&utm_medium=link
+(/) http://blog.takipi.com/garbage-collectors-serial-vs-parallel-vs-cms-vs-the-g1-and-whats-new-in-java-8/
+(/)
+ - Throughput
+ - Resilience
+ - Latency
+ - Failure Isolation (Bulkheading)
+ - Locality of Reference (Location Transparency)
+ - Backpressure
+(X) Event Sourcing vs CQRS
+(X) https://www.journaldev.com/2856/java-jvm-memory-model-memory-management-in-java
 
 
-9. Dropwizard
-10. Circuit Breaker
-11. Payment Service Architectures
-13. https://www.infoq.com/news/2016/10/Java-Flight-Recorder-Mission?utm_source=infoq&utm_campaign=user_page&utm_medium=link
-14. https://www.infoq.com/news/2016/10/AOT-HotSpot-OpenJDK-9?utm_source=infoq&utm_campaign=user_page&utm_medium=link
-15. https://www.infoq.com/presentations/java-performance-guide?utm_source=infoq&utm_campaign=user_page&utm_medium=link
-16. https://www.infoq.com/news/2016/09/JavaOne-2016-parallel-streams?utm_source=infoq&utm_campaign=user_page&utm_medium=link
-20. Java Magazine
+(/) Reactive MicroServices Architectures
+(/) REST
+(/) Game of Life Code in Java
+(X) Directory Structure exercise in Java
+(X) Changes in Java 9
+https://www.javaworld.com/article/3169388/java-language/java-9s-other-new-enhancements-part-2.html
+(X) https://www.pcworld.com/article/2899351/everything-you-need-to-know-about-nvme.html
+(X) For join framework Java
+(X) Other thread frameworks in Java
+(X) Find all anagrams of a word
+(X) Permutations of a number
+(X) Combinations of a number
+(X) Java Magazine
 
-
-Tuesday Morning
-20. Java Magazine
+(X) https://www.infoq.com/news/2016/10/Java-Flight-Recorder-Mission?utm_source=infoq&utm_campaign=user_page&utm_medium=link
+(X) https://www.infoq.com/news/2016/10/AOT-HotSpot-OpenJDK-9?utm_source=infoq&utm_campaign=user_page&utm_medium=link
+(X) https://www.infoq.com/news/2016/09/JavaOne-2016-parallel-streams?utm_source=infoq&utm_campaign=user_page&utm_medium=link
