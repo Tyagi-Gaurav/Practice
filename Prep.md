@@ -15,6 +15,9 @@
 | Combinations |X|X|X|
 | Permutations |X|X|X|
 | Fizz Buzz |X|X|X|
+Zip
+Interleave
+Halve an array
 
 (/) Concurrent HashMap
 (/) FailFast vs FailSafe

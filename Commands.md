@@ -477,10 +477,12 @@ docker cp <containerId>:<Src_path> .
 - How to profile application using JMX ?
 ```
 "-Dcom.sun.management.jmxremote", \
-"-Dcom.sun.management.jmxremote.port=9010", \
+"-Dcom.sun.management.jmxremote.port=8090", \
+"-Dcom.sun.management.jmxremote.rmi.port=8090", \
 "-Dcom.sun.management.jmxremote.local.only=false", \
 "-Dcom.sun.management.jmxremote.authenticate=false", \
-"-Dcom.sun.management.jmxremote.ssl=false"
+"-Dcom.sun.management.jmxremote.ssl=false", \
+"-Djava.rmi.server.hostname=192.168.99.100"
 ```
 
 - How to run hprof for heap profiling ?
