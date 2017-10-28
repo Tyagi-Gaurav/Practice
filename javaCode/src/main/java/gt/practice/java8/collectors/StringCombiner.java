@@ -1,4 +1,4 @@
-package gt.practice.collectors;
+package gt.practice.java8.collectors;
 
 public class StringCombiner {
     private final String delimiter;

@@ -1,4 +1,4 @@
-package gt.practice.collectors;
+package gt.practice.java8.collectors;
 
 import java.util.List;
 import java.util.Map;
