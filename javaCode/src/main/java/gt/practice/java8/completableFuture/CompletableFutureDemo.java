@@ -1,19 +1,20 @@
 package gt.practice.java8.completableFuture;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class CompletableFutureDemo {
     private static final ExpensiveTask expensiveTask = new ExpensiveTask();
 
     public static void main(String[] args) {
+        demoCompetableFutureWithComposeNoAsync();
+    }
+
+    private static void demoCompetableFutureWithComposeNoAsync() {
         CompletableFuture<Integer> webService1 =
                 executeWebService(500, 0)
-                .thenCompose(x -> executeWebService(5000 , x));
+                .thenCompose(x -> executeWebService(5000 , x)); //x is the result of 1st webservice.
 
-        //Call 3rd webService with result of 1 & 2 above
+        //Call 3rd webService and combine it with result of 1 & 2 above i.e. webservice1
         System.out.println(
                 executeWebService(500, 0)
                 .thenCompose(x -> executeWebService(400, x))
