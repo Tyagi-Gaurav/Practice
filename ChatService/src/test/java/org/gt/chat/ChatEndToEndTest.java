@@ -1,10 +1,15 @@
 package org.gt.chat;
 
+import akka.http.javadsl.marshallers.jackson.Jackson;
+import akka.http.javadsl.model.ContentTypes;
 import akka.http.javadsl.model.HttpRequest;
 import akka.http.javadsl.testkit.JUnitRouteTest;
 import akka.http.javadsl.testkit.TestRoute;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.test.JerseyTest;
+import akka.http.javadsl.testkit.TestRouteResult;
+import akka.http.javadsl.unmarshalling.Unmarshaller;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.gt.chat.repos.ChatMessageRepository;
 import org.gt.chat.repos.MessageRepository;
 import org.gt.chat.resource.MessageResourceAkka;
@@ -12,9 +17,11 @@ import org.gt.chat.response.Message;
 import org.gt.chat.response.Messages;
 import org.gt.chat.service.ChatMessageService;
 import org.gt.chat.service.MessageService;
-import org.junit.*;
+import org.junit.Test;
 
-import javax.ws.rs.core.Application;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,20 +32,21 @@ public class ChatEndToEndTest extends JUnitRouteTest {
     private MessageResourceAkka messageResource = new MessageResourceAkka(service);
 
     TestRoute route = testRoute(messageResource.route);
+    private ObjectMapper mapper = new ObjectMapper();
 
     @Test
-    public void getMessagesForAUser() {
-        //When
-        route.run((HttpRequest.GET("/message/users/1")))
-        .assertStatusCode(200);
+    public void getMessagesForAUser() throws IOException {
+        //Given
+        List<Message> messageList = Arrays.asList(
+                new Message("2", "Hello World", 234878234L));
+        Messages expectedMessages = new Messages(messageList);
 
-        //Then
-        /*assertThat(messages).isNotNull();
-        List<Message> messageResponseList = messages.getMessageResponseList();
-        assertThat(messageResponseList).isNotEmpty();
-        Message message = messageResponseList.get(0);
-        assertThat(message.getContent()).isEqualTo("Hello World");
-        assertThat(message.getId()).isEqualTo("2");
-        assertThat(message.getTimestamp()).isEqualTo(234878234L);*/
+        //When
+        TestRouteResult run = route.run((HttpRequest.GET("/message/users/1")));
+        run.assertStatusCode(200)
+            .assertContentType(ContentTypes.APPLICATION_JSON);
+
+        Messages entity = run.entity(Jackson.unmarshaller(Messages.class));
+        assertThat(expectedMessages).isEqualTo(entity);
     }
 }
