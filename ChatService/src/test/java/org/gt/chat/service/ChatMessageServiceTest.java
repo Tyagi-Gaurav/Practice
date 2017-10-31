@@ -5,8 +5,7 @@ import org.gt.chat.domain.MessageEntity;
 import org.gt.chat.repos.MessageRepository;
 import org.gt.chat.response.Message;
 import org.gt.chat.response.Messages;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +19,7 @@ public class ChatMessageServiceTest {
     private MessageService messageService = new ChatMessageService(repository);
 
     @Test
-    @DisplayName("should get messages for a user from repository")
-    void getMessagesForUser() {
+    public void getMessagesForUser() {
         // Given
         String userId = "1";
         MessageEntity messageEntity = new MessageEntity(

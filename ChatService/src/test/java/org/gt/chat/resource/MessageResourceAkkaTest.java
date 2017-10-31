@@ -1,37 +1,41 @@
 package org.gt.chat.resource;
 
+import akka.http.javadsl.model.HttpRequest;
+import akka.http.javadsl.testkit.JUnitRouteTest;
+import akka.http.javadsl.testkit.TestRoute;
+import org.gt.chat.resource.MessageResourceAkka;
 import org.gt.chat.response.Message;
 import org.gt.chat.response.Messages;
 import org.gt.chat.service.MessageService;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class MessageResourceTest {
+public class MessageResourceAkkaTest extends JUnitRouteTest {
     private MessageService messageService = mock(MessageService.class);
-    private MessageResource messageResource = new MessageResource(messageService);
+    private MessageResourceAkka messageResource = new MessageResourceAkka(messageService);
+    TestRoute route = testRoute(messageResource.route);
 
     @Test
-    @DisplayName("")
-    void getMessages() {
+    public void getMessagesForUser() {
         //Given
         String userId = "1";
         Message expectedMessage = new Message(
                 "2",
                 "Hello World",
                 234878234L);
+
         List<Message> messageList = new ArrayList<>();
         messageList.add(expectedMessage);
         Messages messages = new Messages(messageList);
         when(messageService.getMessagesFor(userId)).thenReturn(messages);
 
         //When & Then
-        assertThat(messageResource.getMessages("1")).isEqualTo(messages);
+        route.run(HttpRequest.GET("/message/users/1")).assertStatusCode(200);
+
     }
 }

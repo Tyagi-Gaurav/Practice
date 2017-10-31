@@ -9,6 +9,10 @@ import java.util.Objects;
 public class Messages {
     private final List<Message> messageResponseList;
 
+    public Messages() {
+        messageResponseList = null;
+    }
+
     @JsonCreator
     public Messages(@JsonProperty("messageResponses") List<Message> messageResponseList) {
         this.messageResponseList = messageResponseList;
