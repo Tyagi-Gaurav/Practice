@@ -1,5 +1,8 @@
 package org.gt.chat;
 
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import akka.actor.Props;
 import akka.http.javadsl.marshallers.jackson.Jackson;
 import akka.http.javadsl.model.ContentTypes;
 import akka.http.javadsl.model.HttpRequest;
@@ -16,6 +19,7 @@ import org.gt.chat.resource.MessageResourceAkka;
 import org.gt.chat.response.Message;
 import org.gt.chat.response.Messages;
 import org.gt.chat.service.ChatMessageService;
+import org.gt.chat.service.MessageActor;
 import org.gt.chat.service.MessageService;
 import org.junit.Test;
 
@@ -29,7 +33,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ChatEndToEndTest extends JUnitRouteTest {
     private MessageRepository repository = new ChatMessageRepository();
     private MessageService service = new ChatMessageService(repository);
-    private MessageResourceAkka messageResource = new MessageResourceAkka(service);
+    ActorSystem actorSystem = ActorSystem.create();
+    ActorRef actorRef = actorSystem.actorOf(Props.create(MessageActor.class, repository));
+    private MessageResourceAkka messageResource = new MessageResourceAkka(actorRef);
 
     TestRoute route = testRoute(messageResource.route);
     private ObjectMapper mapper = new ObjectMapper();

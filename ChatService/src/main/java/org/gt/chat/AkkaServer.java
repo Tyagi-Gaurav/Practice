@@ -1,7 +1,9 @@
 package org.gt.chat;
 
 import akka.NotUsed;
+import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
+import akka.actor.Props;
 import akka.http.javadsl.ConnectHttp;
 import akka.http.javadsl.Http;
 import akka.http.javadsl.ServerBinding;
@@ -13,6 +15,7 @@ import org.gt.chat.repos.ChatMessageRepository;
 import org.gt.chat.repos.MessageRepository;
 import org.gt.chat.resource.MessageResourceAkka;
 import org.gt.chat.service.ChatMessageService;
+import org.gt.chat.service.MessageActor;
 import org.gt.chat.service.MessageService;
 
 import java.io.IOException;
@@ -24,8 +27,11 @@ public class AkkaServer {
         final Http http = Http.get(actorSystem);
 
         MessageRepository repository = new ChatMessageRepository();
-        MessageService service = new ChatMessageService(repository);
-        MessageResourceAkka messageResource = new MessageResourceAkka(service);
+//        MessageService service = new ChatMessageService(repository);
+        ActorRef actorRef = actorSystem.actorOf(Props.create(MessageActor.class, repository));
+        MessageResourceAkka messageResource = new MessageResourceAkka(actorRef);
+
+        actorSystem.actorOf(Props.create(MessageActor.class, repository));
 
         final ActorMaterializer materializer = ActorMaterializer.create(actorSystem);
         final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow =

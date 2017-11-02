@@ -22,32 +22,32 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class MessageResourceAkkaTest extends JUnitRouteTest {
-    private MessageService messageService = mock(MessageService.class);
-    private MessageResourceAkka messageResource = new MessageResourceAkka(messageService);
-    TestRoute route = testRoute(messageResource.route);
-    private ObjectMapper mapper = new ObjectMapper();
-
-    @Test
-    public void getMessagesForUser() {
-        //Given
-        String userId = "1";
-
-        Messages messages = new Messages(Arrays.asList(
-                new Message(
-                        "2",
-                        "Hello World",
-                        234878234L)
-        ));
-
-        when(messageService.getMessagesFor(userId)).thenReturn(messages);
-
-        //When & Then
-        TestRouteResult run = route.run((HttpRequest.GET("/message/users/1")));
-        run.assertStatusCode(200)
-                .assertContentType(ContentTypes.APPLICATION_JSON);
-
-        Messages entity = run.entity(Jackson.unmarshaller(Messages.class));
-        assertThat(messages).isEqualTo(entity);
-
-    }
+//    private MessageService messageService = mock(MessageService.class);
+//    private MessageResourceAkka messageResource = new MessageResourceAkka(messageService);
+//    TestRoute route = testRoute(messageResource.route);
+//    private ObjectMapper mapper = new ObjectMapper();
+//
+//    @Test
+//    public void getMessagesForUser() {
+//        //Given
+//        String userId = "1";
+//
+//        Messages messages = new Messages(Arrays.asList(
+//                new Message(
+//                        "2",
+//                        "Hello World",
+//                        234878234L)
+//        ));
+//
+//        when(messageService.getMessagesFor(userId)).thenReturn(messages);
+//
+//        //When & Then
+//        TestRouteResult run = route.run((HttpRequest.GET("/message/users/1")));
+//        run.assertStatusCode(200)
+//                .assertContentType(ContentTypes.APPLICATION_JSON);
+//
+//        Messages entity = run.entity(Jackson.unmarshaller(Messages.class));
+//        assertThat(messages).isEqualTo(entity);
+//
+//    }
 }
