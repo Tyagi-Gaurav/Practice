@@ -38,7 +38,6 @@ public class ChatEndToEndTest extends JUnitRouteTest {
     private MessageResourceAkka messageResource = new MessageResourceAkka(actorRef);
 
     TestRoute route = testRoute(messageResource.route);
-    private ObjectMapper mapper = new ObjectMapper();
 
     @Test
     public void getMessagesForAUser() throws IOException {
