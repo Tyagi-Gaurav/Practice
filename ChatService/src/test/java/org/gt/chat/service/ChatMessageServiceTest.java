@@ -67,11 +67,23 @@ public class ChatMessageServiceTest {
             final Props props = Props.create(MessageActor.class, repository);
             final ActorRef subject = actorSystem.actorOf(props);
 
-            final TestKit probe = new TestKit(actorSystem);
+            //final TestKit probe = new TestKit(actorSystem);
             subject.tell("1", getRef());
 
             expectMsg(duration("5 second"), messages);
         }};
+
+//        new ActorTest()
+//            .with(actorSystem)
+//            .forActor(MessageActor.class)
+//            .withArguments(repository)
+//            .execute((ref, baseRef) -> {
+//                ref.tell("1", baseRef);
+//            })
+//            .expect(messages)
+//            .build();
+
     }
+
 
 }
