@@ -12,19 +12,17 @@ import org.gt.chat.response.Messages;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mockito;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 public class ChatMessageServiceTest {
     private static final FiniteDuration shutdownDuration =
             scala.concurrent.duration.Duration.apply(1L, TimeUnit.SECONDS);
-    private MessageRepository repository = mock(MessageRepository.class);
+    private MessageRepository repository = Mockito.mock(MessageRepository.class);
     static ActorSystem actorSystem;
 
     @BeforeClass
@@ -53,7 +51,7 @@ public class ChatMessageServiceTest {
         entityList.add(messageEntity);
         MessageAggregate aggregate = new MessageAggregate(entityList);
 
-        when(repository.getMessages(userId)).thenReturn(aggregate);
+        Mockito.when(repository.getMessages(userId)).thenReturn(aggregate);
 
         Message expectedMessage = new Message(
                 "2",

@@ -1,6 +1,5 @@
 package org.gt.chat.resource;
 
-import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
@@ -13,12 +12,9 @@ import akka.http.javadsl.testkit.TestRouteResult;
 import org.gt.chat.response.Message;
 import org.gt.chat.response.Messages;
 import org.junit.Test;
-import scala.concurrent.ExecutionContextExecutor;
 
 import java.util.Arrays;
-import java.util.concurrent.CompletableFuture;
 
-import static akka.pattern.PatternsCS.pipe;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class MessageResourceAkkaTest extends JUnitRouteTest {

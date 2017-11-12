@@ -4,11 +4,8 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.testkit.javadsl.TestKit;
-import org.gt.chat.repos.MessageRepository;
-import org.gt.chat.response.Messages;
 
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public class ActorTest {
     private ActorSystem actorSystem;

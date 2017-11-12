@@ -1,6 +1,7 @@
 package org.gt.chat.resource;
 
 import akka.actor.AbstractActor;
+import akka.pattern.PatternsCS;
 import org.gt.chat.response.Message;
 import org.gt.chat.response.Messages;
 import scala.concurrent.ExecutionContextExecutor;
@@ -23,7 +24,7 @@ class TestMessageActor extends AbstractActor {
                                         234878234L)
                         )));
                         ExecutionContextExecutor dispatcher = this.getContext().getSystem().dispatcher();
-                        pipe(completableFuture, dispatcher).to(getSender());
+                        PatternsCS.pipe(completableFuture, dispatcher).to(getSender());
                     })
                     .build();
         }
