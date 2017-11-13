@@ -14,15 +14,15 @@ import static org.gt.chat.scenario.ConfigVariables.HOST;
 
 @ScenarioScoped
 public class Context {
-
     @Inject
     private ScenarioConfig config;
 
+    private User user;
     private Client client = ClientBuilder.newClient();
     private Response response;
 
     public void createAuthenticatedUser() {
-        //TODO
+        user = new User("123");
     }
 
     public void requestFor(String path) {
@@ -33,5 +33,9 @@ public class Context {
 
     public Response response() {
         return response;
+    }
+
+    public User user() {
+        return user;
     }
 }

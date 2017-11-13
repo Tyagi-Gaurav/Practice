@@ -11,6 +11,6 @@ public class ScenarioConfig {
     }
 
     public String getString(ConfigVariables propertyName) {
-        return config.getString(propertyName.name());
+        return config.getString(propertyName.getName());
     }
 }

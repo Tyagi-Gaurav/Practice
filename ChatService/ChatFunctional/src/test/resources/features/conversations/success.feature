@@ -1,4 +1,3 @@
-
 Feature: Get Conversations for a user
 
 Scenario: A user is able to retrieve the conversations successfully
