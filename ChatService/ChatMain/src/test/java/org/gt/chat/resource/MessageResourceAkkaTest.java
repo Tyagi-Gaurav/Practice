@@ -9,20 +9,27 @@ import akka.http.javadsl.model.HttpRequest;
 import akka.http.javadsl.testkit.JUnitRouteTest;
 import akka.http.javadsl.testkit.TestRoute;
 import akka.http.javadsl.testkit.TestRouteResult;
-import org.gt.chat.response.Message;
-import org.gt.chat.response.Messages;
+import org.gt.chat.response.Conversation;
+import org.gt.chat.response.ConversationType;
+import org.gt.chat.response.Conversations;
 import org.junit.Test;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.TimeZone;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class MessageResourceAkkaTest extends JUnitRouteTest {
-    private final Messages expectedMessages = new Messages(Arrays.asList(
-            new Message(
+    private final Conversations expectedMessages = new Conversations(Arrays.asList(
+            new Conversation(
                     "2",
-                    "Hello World",
-                    234878234L)
+                    234878234L,
+                    ConversationType.GROUP,
+                    "groupId",
+                    "senderId",
+                    "Hello World")
     ));
     private ActorSystem actorSystem = ActorSystem.create("Test");
     private ActorRef messageActor =
@@ -33,11 +40,11 @@ public class MessageResourceAkkaTest extends JUnitRouteTest {
     @Test
     public void getMessagesForUser() {
         //When & Then
-        TestRouteResult run = route.run((HttpRequest.GET("/message/users/1")));
+        TestRouteResult run = route.run((HttpRequest.GET("/conversations/1")));
         run.assertStatusCode(200)
                 .assertContentType(ContentTypes.APPLICATION_JSON);
 
-        Messages entity = run.entity(Jackson.unmarshaller(Messages.class));
+        Conversations entity = run.entity(Jackson.unmarshaller(Conversations.class));
         assertThat(expectedMessages).isEqualTo(entity);
     }
 

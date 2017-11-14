@@ -20,7 +20,7 @@ public class MessageResourceAkka  {
     }
 
     public final  Route route = route(
-            path(segment("message").slash("users").slash(segment(compile("\\d+"))), (String value) ->
+            path(segment("conversations").slash(segment(compile("\\d+"))), (String value) ->
                 get(() ->
                    onComplete(() -> ask(messageActor, value, 1000L),
                     functionResult ->

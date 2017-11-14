@@ -1,7 +1,7 @@
 package org.gt.chat.repos;
 
-import org.gt.chat.domain.MessageAggregate;
-import org.gt.chat.domain.MessageEntity;
+import org.gt.chat.domain.ConversationAggregate;
+import org.gt.chat.domain.ConversationEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,15 +9,17 @@ import java.util.List;
 public class ChatMessageRepository implements MessageRepository {
 
     @Override
-    public MessageAggregate getMessages(String userId) {
-        MessageEntity messageEntity = new MessageEntity(
+    public ConversationAggregate getMessages(String userId) {
+        ConversationEntity messageEntity = new ConversationEntity(
                 2L,
                 "Hello World",
-                234878234L
+                234878234L,
+                "groupId",
+                "senderId"
         );
-        List<MessageEntity> entityList = new ArrayList<>();
+        List<ConversationEntity> entityList = new ArrayList<>();
         entityList.add(messageEntity);
-        MessageAggregate aggregate = new MessageAggregate(entityList);
+        ConversationAggregate aggregate = new ConversationAggregate(entityList);
         return aggregate;
     }
 }

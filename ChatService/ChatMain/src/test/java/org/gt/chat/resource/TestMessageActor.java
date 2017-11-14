@@ -2,14 +2,16 @@ package org.gt.chat.resource;
 
 import akka.actor.AbstractActor;
 import akka.pattern.PatternsCS;
-import org.gt.chat.response.Message;
-import org.gt.chat.response.Messages;
+import org.gt.chat.response.ConversationType;
+import org.gt.chat.response.Conversations;
+import org.gt.chat.response.Conversation;
 import scala.concurrent.ExecutionContextExecutor;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.TimeZone;
 import java.util.concurrent.CompletableFuture;
-
-import static akka.pattern.PatternsCS.pipe;
 
 class TestMessageActor extends AbstractActor {
 
@@ -17,11 +19,14 @@ class TestMessageActor extends AbstractActor {
         public Receive createReceive() {
             return receiveBuilder()
                     .match(String.class, userId -> {
-                        CompletableFuture<Messages> completableFuture = CompletableFuture.supplyAsync(() -> new Messages(Arrays.asList(
-                                new Message(
+                        CompletableFuture<Conversations> completableFuture = CompletableFuture.supplyAsync(() -> new Conversations(Arrays.asList(
+                                new Conversation(
                                         "2",
-                                        "Hello World",
-                                        234878234L)
+                                        234878234L,
+                                        ConversationType.GROUP,
+                                        "groupId",
+                                        "senderId",
+                                        "Hello World")
                         )));
                         ExecutionContextExecutor dispatcher = this.getContext().getSystem().dispatcher();
                         PatternsCS.pipe(completableFuture, dispatcher).to(getSender());

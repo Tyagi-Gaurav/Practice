@@ -1,7 +1,7 @@
 package org.gt.chat.repos;
 
-import org.gt.chat.domain.MessageAggregate;
+import org.gt.chat.domain.ConversationAggregate;
 
 public interface MessageRepository {
-    MessageAggregate getMessages(String userId);
+    ConversationAggregate getMessages(String userId);
 }
