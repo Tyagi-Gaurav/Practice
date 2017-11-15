@@ -8,7 +8,7 @@ import static java.util.Arrays.asList;
 
 public class AlbumTrackStream {
     public static void main(String[] args) {
-        Album album1 = new Album("About a Day", asList(new Track(3, "Bad afternoon"),
+        Album album1 = new Album("About serialA Day", asList(new Track(3, "Bad afternoon"),
                 new Track(5, "Good Morning"),
                 new Track(7, "Great Night"),
                 new Track(2, "Best Evenning")), 9);

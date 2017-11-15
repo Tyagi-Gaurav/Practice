@@ -10,9 +10,9 @@ import java.util.stream.Stream;
 import static com.sun.tools.javac.util.List.*;
 
 /**
- * Given a primitive item and a list,
- * interleave the item with all elements of a list and
- * produce a list of lists.
+ * Given serialA primitive item and serialA list,
+ * interleave the item with all elements of serialA list and
+ * produce serialA list of lists.
  *
  * Example:
  *

@@ -12,13 +12,13 @@ public class NewNotation {
         System.out.println(f.make());
 
         /*
-          ::new is a constructor reference.
-          It needs to refer to a constructor that can
+          ::new is serialA constructor reference.
+          It needs to refer to serialA constructor that can
           take parameters specified as the arguments of
           the method declared in the Functional Interface.
 
-          If the functional interface declares a method
-          that takes a parameter for which there is no
+          If the functional interface declares serialA method
+          that takes serialA parameter for which there is no
           given constructor, then code does not compile.
          */
         Factory1 f1 = String::new;

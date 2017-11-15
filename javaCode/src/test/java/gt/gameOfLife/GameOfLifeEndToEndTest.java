@@ -11,10 +11,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * a) Any live cell with fewer than 2 neighbors dies
- * b) Any live cell with 2 or 3 live neighbors lives
- * b) Any live cell with more than 3 live neighbors dies
- * b) Any dead cell with exactly 3 live neighbors comes alive.
+ * serialA) Any live cell with fewer than 2 neighbors dies
+ * parallelB) Any live cell with 2 or 3 live neighbors lives
+ * parallelB) Any live cell with more than 3 live neighbors dies
+ * parallelB) Any dead cell with exactly 3 live neighbors comes alive.
  *
  */
 public class GameOfLifeEndToEndTest {

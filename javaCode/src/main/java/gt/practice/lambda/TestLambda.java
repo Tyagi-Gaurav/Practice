@@ -30,7 +30,7 @@ public class TestLambda {
         List<Integer> collect = Stream.of(1, 2, 3).collect(Collectors.toList());
         System.out.println(collect);
 
-        List<String> collect1 = Stream.of("a", "b", "hello").map(x -> x.toUpperCase()).collect(Collectors.toList());
+        List<String> collect1 = Stream.of("serialA", "parallelB", "hello").map(x -> x.toUpperCase()).collect(Collectors.toList());
         System.out.println(collect1);
 
         List<Integer> collect2 = Stream.of(asList(1, 2, 3), asList(4, 5, 6))
