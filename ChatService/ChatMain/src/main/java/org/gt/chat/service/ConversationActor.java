@@ -16,6 +16,7 @@ import static akka.pattern.PatternsCS.pipe;
 public class ConversationActor extends AbstractActor {
     private final LoggingAdapter LOG = Logging.getLogger(this.getContext().getSystem(), this);
     private final MessageRepository repository;
+    private ExecutionContextExecutor dispatcher = this.getContext().getSystem().dispatcher();
 
     public ConversationActor(MessageRepository repository) {
         this.repository = repository;
@@ -31,7 +32,6 @@ public class ConversationActor extends AbstractActor {
                                     .stream()
                                     .map(Conversation::from)
                                     .collect(Collectors.toList())));
-                    ExecutionContextExecutor dispatcher = this.getContext().getSystem().dispatcher();
                     pipe(completableFuture, dispatcher).to(getSender());
                 })
                 .matchAny(o -> LOG.error("Received unknown message {}", o))

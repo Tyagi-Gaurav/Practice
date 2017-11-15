@@ -15,23 +15,17 @@ import org.gt.chat.resource.MessageResourceAkka;
 import org.gt.chat.response.Conversation;
 import org.gt.chat.response.ConversationType;
 import org.gt.chat.response.Conversations;
-import org.gt.chat.service.ChatMessageService;
 import org.gt.chat.service.ConversationActor;
-import org.gt.chat.service.ConversationService;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.TimeZone;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ChatEndToEndTest extends JUnitRouteTest {
     private MessageRepository repository = new ChatMessageRepository();
-    private ConversationService service = new ChatMessageService(repository);
     ActorSystem actorSystem = ActorSystem.create();
     ActorRef actorRef = actorSystem.actorOf(Props.create(ConversationActor.class, repository));
     private MessageResourceAkka messageResource = new MessageResourceAkka(actorRef);

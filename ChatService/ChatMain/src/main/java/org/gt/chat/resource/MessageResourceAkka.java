@@ -27,8 +27,8 @@ public class MessageResourceAkka  {
                         functionResult
                             .map(func(result -> complete(StatusCodes.OK, result, Jackson.marshaller())))
                             .recover(new PFBuilder<Throwable, Route>()
-                            .matchAny(ex -> complete(StatusCodes.INTERNAL_SERVER_ERROR, ex.getMessage()))
-                            .build())
+                                .matchAny(ex -> complete(StatusCodes.INTERNAL_SERVER_ERROR, ex.getMessage()))
+                                .build())
                             .get())
             )
     ));
