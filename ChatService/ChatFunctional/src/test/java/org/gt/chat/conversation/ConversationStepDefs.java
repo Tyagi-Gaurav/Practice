@@ -9,6 +9,7 @@ import org.gt.chat.domain.ConversationType;
 import org.gt.chat.domain.Conversations;
 import org.gt.chat.scenario.Context;
 
+import javax.ws.rs.core.Response;
 import java.time.LocalTime;
 import java.util.Arrays;
 
@@ -27,20 +28,22 @@ public class ConversationStepDefs {
 
     @When("^a user tries to access their conversations$")
     public void aUserTriesToAccessTheirConversations() throws Throwable {
-        context.requestFor("/features/conversations/" + context.user().getId());
+        context.requestFor("conversations/" + context.user().getId());
     }
 
     @Then("^the user should be able to receive their conversations in the response$")
     public void theUserShouldBeAbleToReceiveTheirConversationsInTheResponse() throws Throwable {
         Conversation conversation = new Conversation(
-                "id123",
-                LocalTime.now(),
-                ConversationType.GROUP,
-                "groupId123",
-                "sender123",
+                "2",
+                234878234L,
+                ConversationType.ONE2ONE,
+                "groupId",
+                "senderId",
                 "Hello World"
                 );
         Conversations conversations = new Conversations(Arrays.asList(conversation));
-        assertThat(context.response()).isEqualTo(conversations);
+        Response response = context.response();
+        assertThat(response.getStatus()).isEqualTo(200);
+        assertThat(response.readEntity(Conversations.class)).isEqualTo(conversations);
     }
 }
