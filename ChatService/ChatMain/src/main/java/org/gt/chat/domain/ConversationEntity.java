@@ -3,10 +3,12 @@ package org.gt.chat.domain;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 @AllArgsConstructor
 @EqualsAndHashCode
 @Getter
+@ToString
 public class ConversationEntity {
     private final long messageId;
     private final String content;

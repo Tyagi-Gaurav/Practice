@@ -9,8 +9,6 @@ import akka.http.javadsl.model.HttpRequest;
 import akka.http.javadsl.testkit.JUnitRouteTest;
 import akka.http.javadsl.testkit.TestRoute;
 import akka.http.javadsl.testkit.TestRouteResult;
-import org.gt.chat.repos.ChatMessageRepository;
-import org.gt.chat.repos.MessageRepository;
 import org.gt.chat.resource.MessageResourceAkka;
 import org.gt.chat.response.Conversation;
 import org.gt.chat.response.ConversationType;
@@ -25,9 +23,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ChatEndToEndTest extends JUnitRouteTest {
-    private MessageRepository repository = new ChatMessageRepository();
     ActorSystem actorSystem = ActorSystem.create();
-    ActorRef actorRef = actorSystem.actorOf(Props.create(ConversationActor.class, repository));
+    ActorRef actorRef = actorSystem.actorOf(Props.create(ConversationActor.class));
     private MessageResourceAkka messageResource = new MessageResourceAkka(actorRef);
 
     TestRoute route = testRoute(messageResource.route);

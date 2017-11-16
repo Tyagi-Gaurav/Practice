@@ -11,8 +11,6 @@ import akka.http.javadsl.model.HttpRequest;
 import akka.http.javadsl.model.HttpResponse;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
-import org.gt.chat.repos.ChatMessageRepository;
-import org.gt.chat.repos.MessageRepository;
 import org.gt.chat.resource.MessageResourceAkka;
 import org.gt.chat.service.ConversationActor;
 
@@ -24,11 +22,9 @@ public class AkkaServer {
         ActorSystem actorSystem = ActorSystem.create();
         final Http http = Http.get(actorSystem);
 
-        MessageRepository repository = new ChatMessageRepository();
-        ActorRef actorRef = actorSystem.actorOf(Props.create(ConversationActor.class, repository));
+//        MessageRepository repository = new ChatMessageRepository();
+        ActorRef actorRef = actorSystem.actorOf(Props.create(ConversationActor.class));
         MessageResourceAkka messageResource = new MessageResourceAkka(actorRef);
-
-        actorSystem.actorOf(Props.create(ConversationActor.class, repository));
 
         final ActorMaterializer materializer = ActorMaterializer.create(actorSystem);
         final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow =
