@@ -42,7 +42,7 @@ public class ChatEndToEndTest extends JUnitRouteTest {
         Conversations expectedMessages = new Conversations(conversationList);
 
         //When
-        TestRouteResult run = route.run((HttpRequest.GET("/conversations/1")));
+        TestRouteResult run = route.run((HttpRequest.GET("/conversations/2")));
         run.assertStatusCode(200)
             .assertContentType(ContentTypes.APPLICATION_JSON);
 
