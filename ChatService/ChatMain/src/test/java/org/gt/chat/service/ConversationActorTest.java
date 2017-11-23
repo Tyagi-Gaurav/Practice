@@ -3,6 +3,7 @@ package org.gt.chat.service;
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.testkit.javadsl.TestKit;
+import org.gt.chat.exception.InvalidUserException;
 import org.gt.chat.response.Conversation;
 import org.gt.chat.response.ConversationType;
 import org.gt.chat.response.Conversations;
@@ -48,8 +49,8 @@ public class ConversationActorTest extends ActorSystemTest {
                 ask1.toCompletableFuture().get();
                 fail("Should have failed");
             } catch (Exception e) {
-                assertThat(e.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
-                assertThat(e.getMessage()).isEqualTo("java.lang.IllegalArgumentException: Invalid User 193");
+                assertThat(e.getCause()).isExactlyInstanceOf(InvalidUserException.class);
+                assertThat(e.getMessage()).isEqualTo("org.gt.chat.exception.InvalidUserException: 193");
             }
 
             CompletionStage<Object> ask2 = ask(subject, "2", 5000);

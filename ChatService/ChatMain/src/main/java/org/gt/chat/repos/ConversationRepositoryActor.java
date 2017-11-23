@@ -5,6 +5,7 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import org.gt.chat.domain.ConversationAggregate;
 import org.gt.chat.domain.ConversationEntity;
+import org.gt.chat.exception.InvalidUserException;
 import scala.concurrent.ExecutionContextExecutor;
 
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ public class ConversationRepositoryActor extends AbstractActor {
                             ConversationAggregate aggregate = new ConversationAggregate(entityList);
                             return aggregate;
                         } else {
-                            throw new IllegalArgumentException("Invalid User " + userId);
+                            throw new InvalidUserException(userId);
                         }
                     });
                     pipe(conversationAggregateCompletableFuture, dispatcher).to(getSender());

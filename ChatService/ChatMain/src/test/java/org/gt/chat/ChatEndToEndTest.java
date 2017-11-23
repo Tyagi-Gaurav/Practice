@@ -9,6 +9,8 @@ import akka.http.javadsl.model.HttpRequest;
 import akka.http.javadsl.testkit.JUnitRouteTest;
 import akka.http.javadsl.testkit.TestRoute;
 import akka.http.javadsl.testkit.TestRouteResult;
+import org.gt.chat.exception.ErrorResponse;
+import org.gt.chat.exception.MessageExceptionHandler;
 import org.gt.chat.resource.MessageResourceAkka;
 import org.gt.chat.response.Conversation;
 import org.gt.chat.response.ConversationType;
@@ -23,9 +25,10 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ChatEndToEndTest extends JUnitRouteTest {
+    private MessageExceptionHandler messageExceptionHandler = new MessageExceptionHandler();
     ActorSystem actorSystem = ActorSystem.create();
     ActorRef actorRef = actorSystem.actorOf(Props.create(ConversationActor.class));
-    private MessageResourceAkka messageResource = new MessageResourceAkka(actorRef);
+    private MessageResourceAkka messageResource = new MessageResourceAkka(actorRef, messageExceptionHandler);
 
     TestRoute route = testRoute(messageResource.route);
 
@@ -48,5 +51,17 @@ public class ChatEndToEndTest extends JUnitRouteTest {
 
         Conversations entity = run.entity(Jackson.unmarshaller(Conversations.class));
         assertThat(expectedMessages).isEqualTo(entity);
+    }
+
+    @Test
+    public void return_NotFound_when_user_not_found() {
+        //When
+        TestRouteResult run = route.run((HttpRequest.GET("/conversations/345")));
+        run.assertStatusCode(404)
+              .assertContentType(ContentTypes.APPLICATION_JSON);
+
+        ErrorResponse entity = run.entity(Jackson.unmarshaller(ErrorResponse.class));
+        assertThat(entity.getCode()).isEqualTo("CHT_0001");
+        assertThat(entity.getDescription()).isEqualTo("Invalid User: 345");
     }
 }

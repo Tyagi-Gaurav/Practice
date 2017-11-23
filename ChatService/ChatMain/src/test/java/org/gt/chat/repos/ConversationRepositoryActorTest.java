@@ -5,6 +5,7 @@ import akka.actor.Props;
 import akka.testkit.javadsl.TestKit;
 import org.gt.chat.domain.ConversationAggregate;
 import org.gt.chat.domain.ConversationEntity;
+import org.gt.chat.exception.InvalidUserException;
 import org.gt.chat.util.ActorSystemTest;
 import org.junit.Test;
 
@@ -53,8 +54,8 @@ public class ConversationRepositoryActorTest extends ActorSystemTest {
                 ask.toCompletableFuture().get();
                 fail("Should have failed");
             } catch (Exception e) {
-                assertThat(e.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
-                assertThat(e.getMessage()).isEqualTo("java.lang.IllegalArgumentException: Invalid User 193");
+                assertThat(e.getCause()).isExactlyInstanceOf(InvalidUserException.class);
+                assertThat(e.getMessage()).isEqualTo("org.gt.chat.exception.InvalidUserException: 193");
             }
         }};
     }
