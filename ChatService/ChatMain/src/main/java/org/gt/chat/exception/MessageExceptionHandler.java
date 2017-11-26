@@ -3,8 +3,8 @@ package org.gt.chat.exception;
 import akka.http.javadsl.marshallers.jackson.Jackson;
 import akka.http.javadsl.model.StatusCodes;
 import akka.http.javadsl.server.ExceptionHandler;
+import com.google.inject.Singleton;
 
-import javax.inject.Singleton;
 import java.util.function.Supplier;
 
 import static akka.http.javadsl.server.Directives.complete;
