@@ -16,8 +16,8 @@
     </modules>
 
     <scm>
-        <connection>scm:git:git://github.com/Tyagi-Gaurav/Practice.git/ChatService</connection>
-        <developerConnection>scm:git:git://github.com/Tyagi-Gaurav/Practice.git/ChatService</developerConnection>
+        <connection>scm:git:https://github.com/Tyagi-Gaurav/Practice.git</connection>
+        <developerConnection>scm:git:https://github.com/Tyagi-Gaurav/Practice.git</developerConnection>
         <url>https://github.com/Tyagi-Gaurav/Practice.git</url>
     </scm>
 
@@ -67,29 +67,10 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.3</version>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.5</version>
             </plugin>
-            <!--<plugin>-->
-                <!--<groupId>org.codehaus.mojo</groupId>-->
-                <!--<artifactId>buildnumber-maven-plugin</artifactId>-->
-                <!--<version>1.4</version>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<phase>validate</phase>-->
-                        <!--<goals>-->
-                            <!--<goal>create</goal>-->
-                        <!--</goals>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-                <!--<configuration>-->
-                    <!--<doCheck>true</doCheck>-->
-                    <!--<doUpdate>true</doUpdate>-->
-                    <!--<scmConnectionUrl>scm:git:git://github.com/Tyagi-Gaurav/Practice.git</scmConnectionUrl>-->
-                    <!--<shortRevisionLength>5</shortRevisionLength>-->
-                <!--</configuration>-->
-            <!--</plugin>-->
         </plugins>
     </build>
 
