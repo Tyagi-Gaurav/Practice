@@ -10,6 +10,8 @@ import akka.http.javadsl.model.HttpRequest;
 import akka.http.javadsl.model.HttpResponse;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.gt.chat.exception.MessageExceptionHandler;
 import org.gt.chat.resource.MessageResourceAkka;
 import org.gt.chat.service.ConversationActor;
@@ -18,7 +20,8 @@ import java.io.IOException;
 
 public class AkkaServer {
     public static void main(String[] args) throws IOException {
-        ActorSystem actorSystem = ActorSystem.create();
+        Config config = ConfigFactory.load("application.conf");
+        ActorSystem actorSystem = ActorSystem.create("akka-chat-server", config);
         final Http http = Http.get(actorSystem);
 
         MessageExceptionHandler messageExceptionHandler = new MessageExceptionHandler();

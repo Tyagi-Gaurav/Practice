@@ -114,6 +114,11 @@
                 <version>${akka.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.typesafe.akka</groupId>
+                <artifactId>akka-remote_2.11</artifactId>
+                <version>${akka.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>1.16.16</version>
