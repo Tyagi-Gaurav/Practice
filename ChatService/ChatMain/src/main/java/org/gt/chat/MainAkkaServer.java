@@ -18,10 +18,10 @@ import org.gt.chat.service.ConversationActor;
 
 import java.io.IOException;
 
-public class AkkaServer {
+public class MainAkkaServer {
     public static void main(String[] args) throws IOException {
         Config config = ConfigFactory.load("application.conf");
-        ActorSystem actorSystem = ActorSystem.create("akka-chat-server", config);
+        ActorSystem actorSystem = ActorSystem.create("akka-main-server", config);
         final Http http = Http.get(actorSystem);
 
         MessageExceptionHandler messageExceptionHandler = new MessageExceptionHandler();

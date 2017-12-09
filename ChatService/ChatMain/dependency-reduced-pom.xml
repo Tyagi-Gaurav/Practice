@@ -16,7 +16,7 @@
         <artifactId>exec-maven-plugin</artifactId>
         <version>1.6.0</version>
         <configuration>
-          <mainClass>org.gt.chat.AkkaServer</mainClass>
+          <mainClass>org.gt.chat.MainAkkaServer</mainClass>
         </configuration>
       </plugin>
     </plugins>
