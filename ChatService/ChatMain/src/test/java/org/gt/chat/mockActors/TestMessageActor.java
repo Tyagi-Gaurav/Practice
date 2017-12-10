@@ -1,4 +1,4 @@
-package org.gt.chat.resource;
+package org.gt.chat.mockActors;
 
 import akka.actor.AbstractActor;
 import akka.pattern.PatternsCS;
@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.TimeZone;
 import java.util.concurrent.CompletableFuture;
 
-class TestMessageActor extends AbstractActor {
+public class TestMessageActor extends AbstractActor {
 
         @Override
         public Receive createReceive() {

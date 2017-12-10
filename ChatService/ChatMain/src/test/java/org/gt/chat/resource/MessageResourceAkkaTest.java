@@ -11,6 +11,7 @@ import akka.http.javadsl.testkit.TestRoute;
 import akka.http.javadsl.testkit.TestRouteResult;
 import org.gt.chat.exception.ErrorResponse;
 import org.gt.chat.exception.MessageExceptionHandler;
+import org.gt.chat.mockActors.TestMessageActor;
 import org.gt.chat.response.Conversation;
 import org.gt.chat.response.ConversationType;
 import org.gt.chat.response.Conversations;

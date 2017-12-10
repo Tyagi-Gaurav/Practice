@@ -4,23 +4,18 @@ import akka.actor.*;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.pf.DeciderBuilder;
-import akka.util.Timeout;
 import com.typesafe.config.Config;
 import org.gt.chat.domain.ConversationAggregate;
 import org.gt.chat.repos.ConversationRepositoryActor;
 import org.gt.chat.response.Conversation;
 import org.gt.chat.response.Conversations;
-import scala.Option;
 import scala.concurrent.ExecutionContextExecutor;
-import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
-import scala.concurrent.duration.FiniteDuration;
-import scala.util.Try;
+import scala.concurrent.java8.FuturesConvertersImpl;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static akka.actor.SupervisorStrategy.escalate;
@@ -30,25 +25,14 @@ import static akka.pattern.PatternsCS.pipe;
 
 public class ConversationActor extends AbstractActor {
     private final LoggingAdapter LOG = Logging.getLogger(this.getContext().getSystem(), this);
-    private final Config config;
     private ExecutionContextExecutor dispatcher = this.getContext().getSystem().dispatcher();
     private ActorRef repoActor;
-    private final ActorSelection selection;
-    private final Future<ActorRef> actorRefFuture;
+    private final CompletionStage<ActorRef> auditRef;
 
-    public ConversationActor() {
-        config = this.getContext().system().settings().config();
+    public ConversationActor(CompletionStage<ActorRef> actorRefCS) {
+        this.auditRef = actorRefCS;
         repoActor = this.getContext()
                 .actorOf(Props.create(ConversationRepositoryActor.class));
-        String actorSystemName = config.getString("audit.system");
-        String targetHost = config.getString("audit.host");
-        long port = config.getLong("audit.port");
-        String targetActorName = config.getString("audit.actorName");
-        selection = this.getContext()
-            .actorSelection("akka://" +
-                    actorSystemName + "@"
-                    + targetHost + ":" + port + targetActorName);
-        actorRefFuture = selection.resolveOne(Timeout.durationToTimeout(FiniteDuration.apply(5, TimeUnit.SECONDS)));
     }
 
     private static SupervisorStrategy strategy =
@@ -79,13 +63,15 @@ public class ConversationActor extends AbstractActor {
                                                 .collect(Collectors.toList())))
                 );
                     pipe(listCompletionStage, dispatcher).to(getSender());
-                    if (actorRefFuture.isCompleted()) {
-                        System.out.println("Publishing Audit Information");
-                        Try<ActorRef> actorRefTry = actorRefFuture.value().get();
-                        ActorRef actorRef = actorRefTry.get();
-                        actorRef.tell("Hello Audit", getSelf());
-                    }
-
+                    auditRef.whenCompleteAsync(((actorRef, throwable) -> {
+//                        LOG.info("Publishing Audit Information");
+//                        if (actorRef != null) {
+//                            actorRef.tell("Hello Audit", getSelf());
+//                        } else {
+//                            // TODO Increment metric.
+//                            LOG.error("Unable to publish audit event");
+//                        }
+                    }));
                 })
                 .matchAny(o -> LOG.error("Received unknown message {}", o))
                 .build();

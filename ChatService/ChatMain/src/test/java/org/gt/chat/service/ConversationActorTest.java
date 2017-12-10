@@ -8,19 +8,40 @@ import org.gt.chat.response.Conversation;
 import org.gt.chat.response.ConversationType;
 import org.gt.chat.response.Conversations;
 import org.gt.chat.util.ActorSystemTest;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+import scala.Option;
+import scala.concurrent.Future;
+import scala.util.Try;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
+import java.util.function.BiConsumer;
 
 import static akka.pattern.PatternsCS.ask;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.*;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ConversationActorTest extends ActorSystemTest {
+
+    @Mock
+    private CompletionStage<ActorRef> auditRefCompletionStage;
+
+    @Before
+    public void setUp() throws Exception {
+        when(auditRefCompletionStage.whenCompleteAsync(any(BiConsumer.class)))
+                .thenReturn(mock(CompletionStage.class));
+    }
+
     @Test
     public void getMessagesForUser() {
         // Given
@@ -28,12 +49,13 @@ public class ConversationActorTest extends ActorSystemTest {
 
         //When
         new TestKit(actorSystem) {{
-            final Props props = Props.create(ConversationActor.class);
+            final Props props = Props.create(ConversationActor.class, auditRefCompletionStage);
             final ActorRef subject = actorSystem.actorOf(props);
 
             subject.tell("2", getRef());
 
             expectMsg(duration("5 second"), conversations);
+            verify(auditRefCompletionStage).whenCompleteAsync(any(BiConsumer.class));
         }};
     }
 
@@ -41,7 +63,7 @@ public class ConversationActorTest extends ActorSystemTest {
     public void shouldNotFailWhenASuccessCallIsMadeAfterError() throws ExecutionException, InterruptedException {
         //When
         new TestKit(actorSystem) {{
-            final Props props = Props.create(ConversationActor.class);
+            final Props props = Props.create(ConversationActor.class, auditRefCompletionStage);
             final ActorRef subject = actorSystem.actorOf(props);
 
             CompletionStage<Object> ask1 = ask(subject, "193", 5000);
@@ -55,6 +77,7 @@ public class ConversationActorTest extends ActorSystemTest {
 
             CompletionStage<Object> ask2 = ask(subject, "2", 5000);
             assertThat(ask2.toCompletableFuture().get()).isEqualTo(getConversations());
+            verify(auditRefCompletionStage, times(2)).whenCompleteAsync(any(BiConsumer.class));
         }};
     }
 
@@ -62,7 +85,7 @@ public class ConversationActorTest extends ActorSystemTest {
     public void shouldRestartActorWhenItFailsWithException() {
         //When
         new TestKit(actorSystem) {{
-            final Props props = Props.create(ConversationActor.class);
+            final Props props = Props.create(ConversationActor.class, auditRefCompletionStage);
             final ActorRef subject = actorSystem.actorOf(props);
             subject.tell("", getRef());
 

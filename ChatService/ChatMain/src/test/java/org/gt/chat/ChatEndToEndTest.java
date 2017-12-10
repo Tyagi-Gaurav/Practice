@@ -11,6 +11,7 @@ import akka.http.javadsl.testkit.TestRoute;
 import akka.http.javadsl.testkit.TestRouteResult;
 import org.gt.chat.exception.ErrorResponse;
 import org.gt.chat.exception.MessageExceptionHandler;
+import org.gt.chat.mockActors.TestAuditActor;
 import org.gt.chat.resource.MessageResourceAkka;
 import org.gt.chat.response.Conversation;
 import org.gt.chat.response.ConversationType;
@@ -21,13 +22,18 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ChatEndToEndTest extends JUnitRouteTest {
     private MessageExceptionHandler messageExceptionHandler = new MessageExceptionHandler();
     ActorSystem actorSystem = ActorSystem.create();
-    ActorRef actorRef = actorSystem.actorOf(Props.create(ConversationActor.class));
+    ActorRef auditActor = actorSystem.actorOf(Props.create(TestAuditActor.class));
+    private CompletionStage<ActorRef> auditActorRef =
+            CompletableFuture.completedFuture(auditActor);
+    ActorRef actorRef = actorSystem.actorOf(Props.create(ConversationActor.class, auditActorRef));
     private MessageResourceAkka messageResource = new MessageResourceAkka(actorRef, messageExceptionHandler);
 
     TestRoute route = testRoute(messageResource.route);
