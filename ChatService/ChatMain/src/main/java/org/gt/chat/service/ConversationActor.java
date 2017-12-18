@@ -64,13 +64,13 @@ public class ConversationActor extends AbstractActor {
                 );
                     pipe(listCompletionStage, dispatcher).to(getSender());
                     auditRef.whenCompleteAsync(((actorRef, throwable) -> {
-//                        LOG.info("Publishing Audit Information");
-//                        if (actorRef != null) {
-//                            actorRef.tell("Hello Audit", getSelf());
-//                        } else {
-//                            // TODO Increment metric.
-//                            LOG.error("Unable to publish audit event");
-//                        }
+                        LOG.info("Publishing Audit Information");
+                        if (actorRef != null) {
+                            actorRef.tell("Hello Audit", getSelf());
+                        } else {
+                            // TODO Increment metric.
+                            LOG.error("Unable to publish audit event");
+                        }
                     }));
                 })
                 .matchAny(o -> LOG.error("Received unknown message {}", o))

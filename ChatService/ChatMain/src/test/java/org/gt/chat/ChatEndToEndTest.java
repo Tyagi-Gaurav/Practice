@@ -9,14 +9,18 @@ import akka.http.javadsl.model.HttpRequest;
 import akka.http.javadsl.testkit.JUnitRouteTest;
 import akka.http.javadsl.testkit.TestRoute;
 import akka.http.javadsl.testkit.TestRouteResult;
+import akka.testkit.TestProbe;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import com.typesafe.config.ConfigValueFactory;
 import org.gt.chat.exception.ErrorResponse;
 import org.gt.chat.exception.MessageExceptionHandler;
-import org.gt.chat.mockActors.TestAuditActor;
 import org.gt.chat.resource.MessageResourceAkka;
 import org.gt.chat.response.Conversation;
 import org.gt.chat.response.ConversationType;
 import org.gt.chat.response.Conversations;
 import org.gt.chat.service.ConversationActor;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -29,17 +33,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ChatEndToEndTest extends JUnitRouteTest {
     private MessageExceptionHandler messageExceptionHandler = new MessageExceptionHandler();
-    ActorSystem actorSystem = ActorSystem.create();
-    ActorRef auditActor = actorSystem.actorOf(Props.create(TestAuditActor.class));
-    private CompletionStage<ActorRef> auditActorRef =
-            CompletableFuture.completedFuture(auditActor);
-    ActorRef actorRef = actorSystem.actorOf(Props.create(ConversationActor.class, auditActorRef));
-    private MessageResourceAkka messageResource = new MessageResourceAkka(actorRef, messageExceptionHandler);
+    private TestRoute route;
+    private TestProbe testProbe;
 
-    TestRoute route = testRoute(messageResource.route);
+    @Before
+    public void setUp() throws Exception {
+        Config config = ConfigFactory.systemProperties()
+                .withValue("audit.actorname", ConfigValueFactory.fromAnyRef("/user/auditActor"));
+        ActorSystem actorSystem = ActorSystem.create("TestActorSystem", config);
+        testProbe = new TestProbe(actorSystem);
+        CompletionStage<ActorRef> auditActorRef = CompletableFuture.completedFuture(testProbe.ref());
+        ActorRef actorRef = actorSystem.actorOf(Props.create(ConversationActor.class, auditActorRef));
+        MessageResourceAkka messageResource = new MessageResourceAkka(actorRef, messageExceptionHandler);
+
+        route = testRoute(messageResource.route);
+    }
 
     @Test
     public void getConversationsForAUser() throws IOException {
+
         //Given
         List<Conversation> conversationList = Arrays.asList(
                 new Conversation("2",
@@ -57,6 +69,7 @@ public class ChatEndToEndTest extends JUnitRouteTest {
 
         Conversations entity = run.entity(Jackson.unmarshaller(Conversations.class));
         assertThat(expectedMessages).isEqualTo(entity);
+        testProbe.expectMsgClass(String.class);
     }
 
     @Test
