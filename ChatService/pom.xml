@@ -23,11 +23,11 @@
     </scm>
 
     <build>
-        <finalName>$\{project.artifactId}-$\{buildNumber}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -57,32 +57,27 @@
             </dependency>
             <dependency>
                 <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-http_2.11</artifactId>
+                <artifactId>akka-http_2.12</artifactId>
                 <version>${akka.http.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-http-jackson_2.11</artifactId>
+                <artifactId>akka-http-jackson_2.12</artifactId>
                 <version>${akka.http.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-stream_2.11</artifactId>
+                <artifactId>akka-stream_2.12</artifactId>
                 <version>${akka.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-actor_2.11</artifactId>
+                <artifactId>akka-actor_2.12</artifactId>
                 <version>${akka.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-remote_2.11</artifactId>
-                <version>${akka.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-remote_2.11</artifactId>
+                <artifactId>akka-remote_2.12</artifactId>
                 <version>${akka.version}</version>
             </dependency>
             <dependency>
@@ -91,14 +86,19 @@
                 <version>1.16.16</version>
             </dependency>
             <dependency>
+                <groupId>com.github.swagger-akka-http</groupId>
+                <artifactId>swagger-akka-http_2.12</artifactId>
+                <version>0.11.2</version>
+            </dependency>
+            <dependency>
                 <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-testkit_2.11</artifactId>
+                <artifactId>akka-testkit_2.12</artifactId>
                 <version>${akka.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-multi-node-testkit_2.11</artifactId>
+                <artifactId>akka-multi-node-testkit_2.12</artifactId>
                 <version>${akka.version}</version>
                 <scope>test</scope>
             </dependency>
@@ -128,7 +128,7 @@
             </dependency>
             <dependency>
                 <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-http-testkit_2.11</artifactId>
+                <artifactId>akka-http-testkit_2.12</artifactId>
                 <version>${akka.http.version}</version>
                 <scope>test</scope>
             </dependency>

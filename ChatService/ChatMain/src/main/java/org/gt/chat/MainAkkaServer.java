@@ -9,15 +9,14 @@ import akka.http.javadsl.ConnectHttp;
 import akka.http.javadsl.Http;
 import akka.http.javadsl.model.HttpRequest;
 import akka.http.javadsl.model.HttpResponse;
+import akka.http.javadsl.server.Route;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
-import akka.util.Timeout;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.gt.chat.exception.MessageExceptionHandler;
 import org.gt.chat.resource.MessageResourceAkka;
 import org.gt.chat.service.ConversationActor;
-import scala.concurrent.Future;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.io.IOException;
@@ -48,8 +47,9 @@ public class MainAkkaServer {
         MessageResourceAkka messageResource = new MessageResourceAkka(actorRef, messageExceptionHandler);
 
         final ActorMaterializer materializer = ActorMaterializer.create(actorSystem);
+        Route route = messageResource.getRoute();
         final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow =
-                messageResource.route.flow(actorSystem, materializer);
+                route.flow(actorSystem, materializer);
         http.bindAndHandle(routeFlow, ConnectHttp.toHost("0.0.0.0", 8080), materializer);
     }
 

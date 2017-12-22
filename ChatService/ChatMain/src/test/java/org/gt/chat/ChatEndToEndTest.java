@@ -46,7 +46,7 @@ public class ChatEndToEndTest extends JUnitRouteTest {
         ActorRef actorRef = actorSystem.actorOf(Props.create(ConversationActor.class, auditActorRef));
         MessageResourceAkka messageResource = new MessageResourceAkka(actorRef, messageExceptionHandler);
 
-        route = testRoute(messageResource.route);
+        route = testRoute(messageResource.getRoute());
     }
 
     @Test

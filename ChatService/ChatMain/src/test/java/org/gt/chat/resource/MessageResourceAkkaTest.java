@@ -9,14 +9,20 @@ import akka.http.javadsl.model.HttpRequest;
 import akka.http.javadsl.testkit.JUnitRouteTest;
 import akka.http.javadsl.testkit.TestRoute;
 import akka.http.javadsl.testkit.TestRouteResult;
+import io.swagger.annotations.ApiOperation;
 import org.gt.chat.exception.ErrorResponse;
 import org.gt.chat.exception.MessageExceptionHandler;
 import org.gt.chat.mockActors.TestMessageActor;
 import org.gt.chat.response.Conversation;
 import org.gt.chat.response.ConversationType;
 import org.gt.chat.response.Conversations;
+import org.junit.Ignore;
 import org.junit.Test;
+import scala.reflect.api.Annotations;
 
+import javax.ws.rs.Path;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,7 +42,7 @@ public class MessageResourceAkkaTest extends JUnitRouteTest {
     private ActorRef messageActor =
             actorSystem.actorOf(Props.create(TestMessageActor.class));
     private MessageResourceAkka messageResource = new MessageResourceAkka(messageActor, messageExceptionHandler);
-    TestRoute route = testRoute(messageResource.route);
+    TestRoute route = testRoute(messageResource.getRoute());
 
     @Test
     public void getMessagesForUser() {
@@ -60,5 +66,20 @@ public class MessageResourceAkkaTest extends JUnitRouteTest {
         ErrorResponse entity = run.entity(Jackson.unmarshaller(ErrorResponse.class));
         assertThat(entity.getCode()).isEqualTo("CHT_0001");
         assertThat(entity.getDescription()).isEqualTo("Invalid User: " + userId);
+    }
+
+    @Test
+    public void shouldGenerateSwaggerDocumentationForRoute() throws Exception {
+        //Given
+        Method conversationRouteMethod = messageResource.getClass().getMethod("conversationsRoute", null);
+        assertThat(conversationRouteMethod.isAnnotationPresent(Path.class)).isTrue();
+        assertThat(conversationRouteMethod.getAnnotation(Path.class).value()).isEqualTo("/conversations");
+
+        assertThat(conversationRouteMethod.isAnnotationPresent(ApiOperation.class)).isTrue();
+        assertThat(conversationRouteMethod.getAnnotation(ApiOperation.class).value()).isEqualTo("Return conversations for a user");
+        assertThat(conversationRouteMethod.getAnnotation(ApiOperation.class).code()).isEqualTo(200);
+        assertThat(conversationRouteMethod.getAnnotation(ApiOperation.class).httpMethod()).isEqualTo("GET");
+        assertThat(conversationRouteMethod.getAnnotation(ApiOperation.class).response()).isEqualTo(Conversations.class);
+        //Then
     }
 }
