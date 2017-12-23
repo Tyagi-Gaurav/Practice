@@ -7,10 +7,7 @@ import akka.http.javadsl.server.AllDirectives;
 import akka.http.javadsl.server.ExceptionHandler;
 import akka.http.javadsl.server.Route;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import io.swagger.jaxrs.Reader;
 import io.swagger.jaxrs.config.DefaultReaderConfig;
 import io.swagger.models.Swagger;
@@ -25,7 +22,7 @@ import static akka.pattern.PatternsCS.ask;
 import static java.util.regex.Pattern.compile;
 import static scala.compat.java8.JFunction.func;
 
-@Api(value = "/conversations", produces = "text/html")
+@Api(value = "Conversations", produces = "application/json")
 @Path("/")
 public class MessageResourceAkka extends AllDirectives {
     private ActorRef messageActor;
@@ -47,8 +44,11 @@ public class MessageResourceAkka extends AllDirectives {
                 () -> getFromResource("swagger-ui/index.html"));
     }
 
-    @Path("/conversations")
+    @Path("/conversations/{userId}")
     @ApiOperation(value = "Return conversations for a user", code = 200, httpMethod = "GET", response = Conversations.class)
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "userId", required = true, dataType = "integer", paramType = "path", value = "ID of user that needs conversations")
+    })
     @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Internal Server Error")
     })
