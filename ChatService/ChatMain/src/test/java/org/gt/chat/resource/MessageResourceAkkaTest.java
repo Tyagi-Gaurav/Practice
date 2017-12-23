@@ -73,7 +73,7 @@ public class MessageResourceAkkaTest extends JUnitRouteTest {
         //Given
         Method conversationRouteMethod = messageResource.getClass().getMethod("conversationsRoute", null);
         assertThat(conversationRouteMethod.isAnnotationPresent(Path.class)).isTrue();
-        assertThat(conversationRouteMethod.getAnnotation(Path.class).value()).isEqualTo("/conversations/{userid}");
+        assertThat(conversationRouteMethod.getAnnotation(Path.class).value()).isEqualTo("/conversations/{userId}");
 
         assertThat(conversationRouteMethod.isAnnotationPresent(ApiOperation.class)).isTrue();
         assertThat(conversationRouteMethod.getAnnotation(ApiOperation.class).value()).isEqualTo("Return conversations for a user");
