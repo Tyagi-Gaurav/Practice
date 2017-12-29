@@ -16,12 +16,12 @@
 ``scripts/pipeline.sh``
   - LocalPipeline
     - Build Projects
-    - Run Functional Tests
+    - Run Functional Tests (In Memory)
     - Create Target Jars
     - Provision Images for all projects
     - Provision Images for mocks
     - Run Docker Compose
-    - Kick off Functional Tests
+    - Kick off Functional Tests (Remotely to Docker)
   - ProdPipeline
     - Run Docker Compose
     - Kick off Smoke Tests  

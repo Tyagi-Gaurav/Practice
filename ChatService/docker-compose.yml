@@ -1,1 +1,26 @@
 version: '3'
+
+services:
+  main:
+    image: chat_main:master
+    deploy:
+        restart_policy:
+            condition: on-failure
+    depends_on:
+      - audit
+    ports:
+      - "${CHAT_HTTP_SERVICE_PORT}:${CHAT_HTTP_SERVICE_PORT}"
+    networks:
+      - webnet
+
+  audit:
+    image: chat_audit:master
+    deploy:
+        restart_policy:
+            condition: on-failure
+    ports:
+        - "${AUDIT_SERVICE_EXT_PORT}:${AUDIT_SERVICE_INT_PORT}"
+    networks:
+        - webnet
+networks:
+  webnet:
