@@ -2,7 +2,6 @@ package org.gt.chat;
 
 import akka.NotUsed;
 import akka.actor.ActorRef;
-import akka.actor.ActorSelection;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.http.javadsl.ConnectHttp;
@@ -14,15 +13,14 @@ import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.gt.chat.exception.MessageExceptionHandler;
 import org.gt.chat.resource.MessageResourceAkka;
 import org.gt.chat.service.ConversationActor;
-import scala.concurrent.duration.FiniteDuration;
 
 import java.io.IOException;
-import java.util.concurrent.CompletionStage;
-import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class MainAkkaServer {
     private Config config;
     private ActorSystem actorSystem;
@@ -54,17 +52,22 @@ public class MainAkkaServer {
     }
 
     private ActorRef createMessageActor() {
-        return actorSystem.actorOf(Props.create(ConversationActor.class, createAuditActor()));
+        return actorSystem.actorOf(Props.create(ConversationActor.class));
     }
 
-    private CompletionStage<ActorRef> createAuditActor() {
-        String actorSystemName = config.getString("audit.system");
-        String targetHost = config.getString("audit.host");
-        long port = config.getLong("audit.port");
-        String targetActorName = config.getString("audit.actorName");
-        ActorSelection selection = actorSystem.actorSelection("akka://" +
-                    actorSystemName + "@"
-                    + targetHost + ":" + port + targetActorName);
-        return selection.resolveOneCS(FiniteDuration.apply(5, TimeUnit.SECONDS));
-    }
+//    private CompletionStage<ActorRef> createAuditActor() {
+//        String actorSystemName = config.getString("audit.system");
+//        String targetHost = config.getString("audit.host");
+//        long port = config.getLong("audit.port");
+//        String targetActorName = config.getString("audit.actorName");
+//        String fullActorPath = "akka://" +
+//                actorSystemName + "@"
+//                + targetHost + ":" + port + targetActorName;
+//        log.info("Full Actor Path: " + fullActorPath);
+//        System.out.println("Full Actor Path: " + fullActorPath);
+//        ActorSelection selection = actorSystem.actorSelection(fullActorPath);
+//        CompletionStage<ActorRef> actorRefCompletionStage =
+//                selection.resolveOneCS(FiniteDuration.apply(5, TimeUnit.SECONDS));
+//        return actorRefCompletionStage;
+//    }
 }

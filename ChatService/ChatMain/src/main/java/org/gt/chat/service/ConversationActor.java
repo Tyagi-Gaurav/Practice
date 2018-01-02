@@ -4,14 +4,17 @@ import akka.actor.*;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.pf.DeciderBuilder;
+import akka.util.Timeout;
 import com.typesafe.config.Config;
 import org.gt.chat.domain.ConversationAggregate;
 import org.gt.chat.repos.ConversationRepositoryActor;
 import org.gt.chat.response.Conversation;
 import org.gt.chat.response.Conversations;
 import scala.concurrent.ExecutionContextExecutor;
+import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
-import scala.concurrent.java8.FuturesConvertersImpl;
+import scala.concurrent.duration.FiniteDuration;
+import scala.util.Try;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -27,10 +30,10 @@ public class ConversationActor extends AbstractActor {
     private final LoggingAdapter LOG = Logging.getLogger(this.getContext().getSystem(), this);
     private ExecutionContextExecutor dispatcher = this.getContext().getSystem().dispatcher();
     private ActorRef repoActor;
-    private final CompletionStage<ActorRef> auditRef;
+    private final Future<ActorRef> auditRef;
 
-    public ConversationActor(CompletionStage<ActorRef> actorRefCS) {
-        this.auditRef = actorRefCS;
+    public ConversationActor() {
+        this.auditRef = createAuditActor(this.getContext().getSystem().settings().config());
         repoActor = this.getContext()
                 .actorOf(Props.create(ConversationRepositoryActor.class));
     }
@@ -42,6 +45,19 @@ public class ConversationActor extends AbstractActor {
                     .match(IllegalArgumentException.class, e -> resume())
                     .matchAny(o -> escalate())
                     .build());
+
+    private Future<ActorRef> createAuditActor(Config config) {
+        String actorSystemName = config.getString("audit.system");
+        String targetHost = config.getString("audit.host");
+        long port = config.getLong("audit.port");
+        String targetActorName = config.getString("audit.actorName");
+        String fullActorPath = "akka://" +
+                actorSystemName + "@"
+                + targetHost + ":" + port + targetActorName;
+        System.out.println("Full Actor Path: " + fullActorPath);
+        ActorSelection selection = this.getContext().actorSelection(fullActorPath);
+        return selection.resolveOne(Timeout.durationToTimeout(FiniteDuration.apply(5, TimeUnit.SECONDS)));
+    }
 
     @Override
     public SupervisorStrategy supervisorStrategy() {
@@ -63,16 +79,13 @@ public class ConversationActor extends AbstractActor {
                                                 .collect(Collectors.toList())))
                 );
                     pipe(listCompletionStage, dispatcher).to(getSender());
-                    auditRef.whenCompleteAsync(((actorRef, throwable) -> {
-                        LOG.info("Publishing Audit Information");
-                        if (actorRef != null) {
-                            actorRef.tell("Hello Audit", getSelf());
-                        } else {
-                            // TODO Increment metric.
-                            LOG.error("Unable to publish audit event");
-                        }
-                    }));
-                })
+                    if (auditRef.isCompleted()) {
+                         System.out.println("Publishing Audit Information");
+                         Try<ActorRef> actorRefTry = auditRef.value().get();
+                         ActorRef actorRef = actorRefTry.get();
+                         actorRef.tell("Hello Audit", getSelf());
+                     }
+            })
                 .matchAny(o -> LOG.error("Received unknown message {}", o))
                 .build();
     }
