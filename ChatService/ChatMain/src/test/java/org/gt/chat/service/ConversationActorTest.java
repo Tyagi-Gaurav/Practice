@@ -1,5 +1,6 @@
 package org.gt.chat.service;
 
+import akka.actor.ActorContext;
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.testkit.javadsl.TestKit;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import static akka.pattern.PatternsCS.ask;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,10 +38,15 @@ public class ConversationActorTest extends ActorSystemTest {
     @Mock
     private CompletionStage<ActorRef> auditRefCompletionStage;
 
+    @Mock
+    private Function<ActorContext, CompletionStage<ActorRef>> auditProvider;
+
     @Before
     public void setUp() throws Exception {
         when(auditRefCompletionStage.whenCompleteAsync(any(BiConsumer.class)))
                 .thenReturn(mock(CompletionStage.class));
+
+        when(auditProvider.apply(any(ActorContext.class))).thenReturn(auditRefCompletionStage);
     }
 
     @Test
@@ -49,7 +56,7 @@ public class ConversationActorTest extends ActorSystemTest {
 
         //When
         new TestKit(actorSystem) {{
-            final Props props = Props.create(ConversationActor.class, auditRefCompletionStage);
+            final Props props = Props.create(ConversationActor.class, auditProvider);
             final ActorRef subject = actorSystem.actorOf(props);
 
             subject.tell("2", getRef());
@@ -63,7 +70,7 @@ public class ConversationActorTest extends ActorSystemTest {
     public void shouldNotFailWhenASuccessCallIsMadeAfterError() throws ExecutionException, InterruptedException {
         //When
         new TestKit(actorSystem) {{
-            final Props props = Props.create(ConversationActor.class, auditRefCompletionStage);
+            final Props props = Props.create(ConversationActor.class, auditProvider);
             final ActorRef subject = actorSystem.actorOf(props);
 
             CompletionStage<Object> ask1 = ask(subject, "193", 5000);

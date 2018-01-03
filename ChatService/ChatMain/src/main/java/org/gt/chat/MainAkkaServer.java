@@ -1,9 +1,7 @@
 package org.gt.chat;
 
 import akka.NotUsed;
-import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
-import akka.actor.Props;
+import akka.actor.*;
 import akka.http.javadsl.ConnectHttp;
 import akka.http.javadsl.Http;
 import akka.http.javadsl.model.HttpRequest;
@@ -17,23 +15,25 @@ import lombok.extern.slf4j.Slf4j;
 import org.gt.chat.exception.MessageExceptionHandler;
 import org.gt.chat.resource.MessageResourceAkka;
 import org.gt.chat.service.ConversationActor;
+import scala.concurrent.duration.FiniteDuration;
 
 import java.io.IOException;
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 @Slf4j
 public class MainAkkaServer {
-    private Config config;
     private ActorSystem actorSystem;
 
-    public MainAkkaServer(Config config, ActorSystem actorSystem) {
-        this.config = config;
+    public MainAkkaServer(ActorSystem actorSystem) {
         this.actorSystem = actorSystem;
     }
 
     public static void main(String[] args) throws IOException {
         Config config = ConfigFactory.load("application.conf");
         ActorSystem actorSystem = ActorSystem.create("akka-main-server", config);
-        MainAkkaServer mainAkkaServer = new MainAkkaServer(config, actorSystem);
+        MainAkkaServer mainAkkaServer = new MainAkkaServer(actorSystem);
         mainAkkaServer.initialize();
         System.out.println("Server online at http://localhost:8080/");
     }
@@ -52,22 +52,24 @@ public class MainAkkaServer {
     }
 
     private ActorRef createMessageActor() {
-        return actorSystem.actorOf(Props.create(ConversationActor.class));
+        Function<ActorContext, CompletionStage<ActorRef>> actorRefSupplier = this::createAuditActor;
+        return actorSystem.actorOf(Props.create(ConversationActor.class, actorRefSupplier));
     }
 
-//    private CompletionStage<ActorRef> createAuditActor() {
-//        String actorSystemName = config.getString("audit.system");
-//        String targetHost = config.getString("audit.host");
-//        long port = config.getLong("audit.port");
-//        String targetActorName = config.getString("audit.actorName");
-//        String fullActorPath = "akka://" +
-//                actorSystemName + "@"
-//                + targetHost + ":" + port + targetActorName;
-//        log.info("Full Actor Path: " + fullActorPath);
-//        System.out.println("Full Actor Path: " + fullActorPath);
-//        ActorSelection selection = actorSystem.actorSelection(fullActorPath);
-//        CompletionStage<ActorRef> actorRefCompletionStage =
-//                selection.resolveOneCS(FiniteDuration.apply(5, TimeUnit.SECONDS));
-//        return actorRefCompletionStage;
-//    }
+    private CompletionStage<ActorRef> createAuditActor(ActorContext context) {
+        Config config = context.system().settings().config();
+        String actorSystemName = config.getString("audit.system");
+        String targetHost = config.getString("audit.host");
+        long port = config.getLong("audit.port");
+        String targetActorName = config.getString("audit.actorName");
+        String fullActorPath = "akka://" +
+                actorSystemName + "@"
+                + targetHost + ":" + port + targetActorName;
+        log.info("Full Actor Path: " + fullActorPath);
+        System.out.println("Full Actor Path: " + fullActorPath);
+        ActorSelection selection = context.actorSelection(fullActorPath);
+        CompletionStage<ActorRef> actorRefCompletionStage =
+                selection.resolveOneCS(FiniteDuration.apply(5, TimeUnit.SECONDS));
+        return actorRefCompletionStage;
+    }
 }

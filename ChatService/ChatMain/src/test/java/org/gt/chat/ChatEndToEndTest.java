@@ -1,8 +1,6 @@
 package org.gt.chat;
 
-import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
-import akka.actor.Props;
+import akka.actor.*;
 import akka.http.javadsl.marshallers.jackson.Jackson;
 import akka.http.javadsl.model.ContentTypes;
 import akka.http.javadsl.model.HttpRequest;
@@ -26,8 +24,10 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
+import java.util.Optional;
+import java.util.concurrent.*;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,8 +42,9 @@ public class ChatEndToEndTest extends JUnitRouteTest {
                 .withValue("audit.actorname", ConfigValueFactory.fromAnyRef("/user/auditActor"));
         ActorSystem actorSystem = ActorSystem.create("TestActorSystem", config);
         testProbe = new TestProbe(actorSystem);
-        CompletionStage<ActorRef> auditActorRef = CompletableFuture.completedFuture(testProbe.ref());
-        ActorRef actorRef = actorSystem.actorOf(Props.create(ConversationActor.class, auditActorRef));
+        CompletionStage<ActorRef> completionStage = CompletableFuture.completedFuture(testProbe.ref());
+        Function<ActorContext, CompletionStage<ActorRef>> actorRefSupplier = (ac) -> completionStage;
+        ActorRef actorRef = actorSystem.actorOf(Props.create(ConversationActor.class, actorRefSupplier));
         MessageResourceAkka messageResource = new MessageResourceAkka(actorRef, messageExceptionHandler);
 
         route = testRoute(messageResource.getRoute());

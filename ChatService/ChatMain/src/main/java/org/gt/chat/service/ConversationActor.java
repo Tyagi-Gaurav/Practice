@@ -4,7 +4,6 @@ import akka.actor.*;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.pf.DeciderBuilder;
-import akka.util.Timeout;
 import com.typesafe.config.Config;
 import org.gt.chat.domain.ConversationAggregate;
 import org.gt.chat.repos.ConversationRepositoryActor;
@@ -19,6 +18,7 @@ import scala.util.Try;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static akka.actor.SupervisorStrategy.escalate;
@@ -30,10 +30,10 @@ public class ConversationActor extends AbstractActor {
     private final LoggingAdapter LOG = Logging.getLogger(this.getContext().getSystem(), this);
     private ExecutionContextExecutor dispatcher = this.getContext().getSystem().dispatcher();
     private ActorRef repoActor;
-    private final Future<ActorRef> auditRef;
+    private final CompletionStage<ActorRef> auditRef;
 
-    public ConversationActor() {
-        this.auditRef = createAuditActor(this.getContext().getSystem().settings().config());
+    public ConversationActor(Function<akka.actor.ActorContext, CompletionStage<ActorRef>> auditProvider) {
+        this.auditRef = auditProvider.apply(this.getContext());
         repoActor = this.getContext()
                 .actorOf(Props.create(ConversationRepositoryActor.class));
     }
@@ -46,7 +46,8 @@ public class ConversationActor extends AbstractActor {
                     .matchAny(o -> escalate())
                     .build());
 
-    private Future<ActorRef> createAuditActor(Config config) {
+    private CompletionStage<ActorRef> createAuditActor(ActorContext context) {
+        Config config = context.getSystem().settings().config();
         String actorSystemName = config.getString("audit.system");
         String targetHost = config.getString("audit.host");
         long port = config.getLong("audit.port");
@@ -55,8 +56,8 @@ public class ConversationActor extends AbstractActor {
                 actorSystemName + "@"
                 + targetHost + ":" + port + targetActorName;
         System.out.println("Full Actor Path: " + fullActorPath);
-        ActorSelection selection = this.getContext().actorSelection(fullActorPath);
-        return selection.resolveOne(Timeout.durationToTimeout(FiniteDuration.apply(5, TimeUnit.SECONDS)));
+        ActorSelection selection = context.actorSelection(fullActorPath);
+        return selection.resolveOneCS(FiniteDuration.apply(5, TimeUnit.SECONDS));
     }
 
     @Override
@@ -79,12 +80,10 @@ public class ConversationActor extends AbstractActor {
                                                 .collect(Collectors.toList())))
                 );
                     pipe(listCompletionStage, dispatcher).to(getSender());
-                    if (auditRef.isCompleted()) {
-                         System.out.println("Publishing Audit Information");
-                         Try<ActorRef> actorRefTry = auditRef.value().get();
-                         ActorRef actorRef = actorRefTry.get();
-                         actorRef.tell("Hello Audit", getSelf());
-                     }
+                    auditRef.whenCompleteAsync((actorRef, throwable) -> {
+                        System.out.println("Publishing Audit Information");
+                        actorRef.tell("Hello Audit", getSelf());
+                    });
             })
                 .matchAny(o -> LOG.error("Received unknown message {}", o))
                 .build();
