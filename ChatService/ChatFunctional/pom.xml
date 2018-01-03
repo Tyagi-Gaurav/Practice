@@ -17,13 +17,19 @@
         <dependency>
             <groupId>info.cukes</groupId>
             <artifactId>cucumber-java</artifactId>
-            <version>1.2.5</version>
+            <version>1.2.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>info.cukes</groupId>
+            <artifactId>cucumber-core</artifactId>
+            <version>1.2.4</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>info.cukes</groupId>
             <artifactId>cucumber-junit</artifactId>
-            <version>1.2.5</version>
+            <version>1.2.4</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -71,6 +77,11 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.gt.chat</groupId>
+            <artifactId>ChatMain</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
