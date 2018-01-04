@@ -35,7 +35,6 @@ public class MainAkkaServer {
         ActorSystem actorSystem = ActorSystem.create("akka-main-server", config);
         MainAkkaServer mainAkkaServer = new MainAkkaServer(actorSystem);
         mainAkkaServer.initialize();
-        System.out.println("Server online at http://localhost:8080/");
     }
 
     public void initialize() {
@@ -49,6 +48,7 @@ public class MainAkkaServer {
         final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow =
                 route.flow(actorSystem, materializer);
         http.bindAndHandle(routeFlow, ConnectHttp.toHost("0.0.0.0", 8080), materializer);
+        System.out.println("Server online at http://localhost:8080/");
     }
 
     private ActorRef createMessageActor() {

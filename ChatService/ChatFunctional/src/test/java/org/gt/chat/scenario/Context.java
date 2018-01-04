@@ -20,7 +20,7 @@ public class Context {
     private Response response;
 
     public void createAuthenticatedUser() {
-        user = new User("123");
+        user = new User("2");
     }
 
     public void requestFor(String path) {

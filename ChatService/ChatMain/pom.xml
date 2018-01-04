@@ -138,6 +138,7 @@
             <groupId>info.cukes</groupId>
             <artifactId>cucumber-jvm-deps</artifactId>
             <version>1.0.5</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
