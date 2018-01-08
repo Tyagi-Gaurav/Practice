@@ -46,20 +46,6 @@ public class ConversationActor extends AbstractActor {
                     .matchAny(o -> escalate())
                     .build());
 
-    private CompletionStage<ActorRef> createAuditActor(ActorContext context) {
-        Config config = context.getSystem().settings().config();
-        String actorSystemName = config.getString("audit.system");
-        String targetHost = config.getString("audit.host");
-        long port = config.getLong("audit.port");
-        String targetActorName = config.getString("audit.actorName");
-        String fullActorPath = "akka://" +
-                actorSystemName + "@"
-                + targetHost + ":" + port + targetActorName;
-        System.out.println("Full Actor Path: " + fullActorPath);
-        ActorSelection selection = context.actorSelection(fullActorPath);
-        return selection.resolveOneCS(FiniteDuration.apply(5, TimeUnit.SECONDS));
-    }
-
     @Override
     public SupervisorStrategy supervisorStrategy() {
         return strategy;

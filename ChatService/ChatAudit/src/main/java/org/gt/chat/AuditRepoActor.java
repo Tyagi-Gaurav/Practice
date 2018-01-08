@@ -15,7 +15,9 @@ public class AuditRepoActor extends AbstractActor {
 
     @Override
     public Receive createReceive() {
-        MongoCollection<Document> collection = mongoDatabase.getCollection("test");
+        String collectionName = this.getContext()
+                .getSystem().settings().config().getString("repo.collection");
+        MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
         return receiveBuilder().match(AuditEvent.class, auditEvent -> {
             Document doc = new Document("timestamp" , auditEvent.getEventPublishEpochTimeStamp())
                     .append("eventType", auditEvent.getAuditEventType());

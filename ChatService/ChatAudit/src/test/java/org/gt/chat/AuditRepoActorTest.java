@@ -3,55 +3,49 @@ package org.gt.chat;
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.testkit.javadsl.TestKit;
-import com.mongodb.MongoClient;
-import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.MongoIterable;
-import de.flapdoodle.embed.mongo.MongodExecutable;
-import de.flapdoodle.embed.mongo.MongodProcess;
-import de.flapdoodle.embed.mongo.MongodStarter;
-import de.flapdoodle.embed.mongo.config.MongodConfigBuilder;
-import de.flapdoodle.embed.mongo.config.Net;
-import de.flapdoodle.embed.mongo.distribution.Version;
-import de.flapdoodle.embed.process.runtime.Network;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import com.typesafe.config.ConfigValueFactory;
 import org.bson.Document;
 import org.gt.chat.domain.AuditEvent;
-import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.UUID;
 import java.util.concurrent.CompletionStage;
 
 import static akka.pattern.PatternsCS.ask;
-import static com.mongodb.client.model.Filters.eq;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.*;
 
+@RunWith(MockitoJUnitRunner.class)
 public class AuditRepoActorTest extends ActorSystemTest {
-    private static final MongodStarter starter = MongodStarter.getDefaultInstance();
-    private MongodExecutable _mongodExe;
-    private MongodProcess _mongod;
-    private MongoClient mongo;
+    private static final String COLLECTION_VALUE = "abc";
+    private static final String COLLECTION_KEY = "repo.collection";
+
+    @Mock
     private MongoDatabase db;
+
+    @Mock
+    private MongoCollection<Document> dbCollection;
 
     @Before
     public void setUp() throws Exception {
-        _mongodExe = starter.prepare(new MongodConfigBuilder()
-                .version(Version.Main.PRODUCTION)
-                .net(new Net("localhost", 12345, Network.localhostIsIPv6()))
-                .build());
-        _mongod = _mongodExe.start();
-
-        mongo = new MongoClient("localhost", 12345);
-        db = mongo.getDatabase("test-" + UUID.randomUUID().toString());
+        when(db.getCollection(COLLECTION_VALUE)).thenReturn(dbCollection);
+        doNothing().when(dbCollection).insertOne(any(Document.class));
     }
 
-    @After
-    public void tearDown() throws Exception {
-        _mongod.stop();
-        _mongodExe.stop();
+    @BeforeClass
+    public static void beforeSetup() {
+        Config config = ConfigFactory.systemProperties()
+                .withValue(COLLECTION_KEY, ConfigValueFactory.fromAnyRef(COLLECTION_VALUE));
+        actorSystem = actorSystem.create("Test", config);
     }
-
 
     @Test
     public void shouldStoreAuditEventInDatabase() throws Exception {
@@ -66,17 +60,10 @@ public class AuditRepoActorTest extends ActorSystemTest {
             final ActorRef subject = actorSystem.actorOf(props);
 
             CompletionStage<Object> ask = ask(subject, auditEvent, 5000);
-
             while (!ask.toCompletableFuture().isDone());
 
-            FindIterable<Document> documents = db.getCollection("test")
-                    .find(eq("timestamp",
-                            eventPublishEpochTimeStamp));
-
-            MongoIterable<AuditEvent> timestamp = documents.map(doc -> AuditEvent.builder()
-                    .eventPublishEpochTimeStamp((Long) doc.get("timestamp")).build());
-
-            assertThat(timestamp.first()).isEqualTo(auditEvent);
+            verify(db).getCollection(COLLECTION_VALUE);
+            verify(dbCollection).insertOne(any(Document.class));
         }};
     }
 }

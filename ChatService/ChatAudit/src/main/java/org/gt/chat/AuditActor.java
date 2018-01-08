@@ -1,6 +1,7 @@
 package org.gt.chat;
 
 import akka.actor.AbstractActor;
+import akka.actor.ActorRef;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import org.gt.chat.domain.AuditEvent;
@@ -14,6 +15,11 @@ import static akka.pattern.PatternsCS.pipe;
 public class AuditActor extends AbstractActor {
     private ExecutionContextExecutor dispatcher = this.getContext().getSystem().dispatcher();
     private final LoggingAdapter LOG = Logging.getLogger(this.getContext().getSystem(), this);
+    private ActorRef auditRepoRef;
+
+    public AuditActor(ActorRef auditRepoRef) {
+        this.auditRepoRef = auditRepoRef;
+    }
 
     @Override
     public Receive createReceive() {
@@ -24,6 +30,7 @@ public class AuditActor extends AbstractActor {
                             if (auditEvent.getAuditEventType() == null) {
                                 throw new InvalidAuditEventException("Invalid Audit Event: " + auditEvent.getAuditEventType());
                             }
+                            auditRepoRef.tell(auditEvent, getSender());
                             return true;
                         });
                 pipe(auditResult, dispatcher).to(getSender());

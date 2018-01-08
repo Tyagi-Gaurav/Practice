@@ -1,6 +1,9 @@
 package org.gt.chat;
 
-import akka.actor.*;
+import akka.actor.ActorContext;
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import akka.actor.Props;
 import akka.http.javadsl.marshallers.jackson.Jackson;
 import akka.http.javadsl.model.ContentTypes;
 import akka.http.javadsl.model.HttpRequest;
@@ -24,10 +27,9 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
