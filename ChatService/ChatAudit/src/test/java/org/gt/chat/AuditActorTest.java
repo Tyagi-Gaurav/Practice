@@ -1,10 +1,10 @@
-package org.gt.chat.audit;
+package org.gt.chat;
 
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.testkit.javadsl.TestKit;
-import org.gt.chat.audit.domain.AuditEvent;
-import org.gt.chat.audit.exception.InvalidAuditEventException;
+import org.gt.chat.domain.AuditEvent;
+import org.gt.chat.exception.InvalidAuditEventException;
 import org.junit.Test;
 
 import java.util.concurrent.CompletionStage;
@@ -33,7 +33,7 @@ public class AuditActorTest extends ActorSystemTest {
                 fail("Should have thrown an exception");
             } catch (Exception e) {
                 assertThat(e.getCause()).isExactlyInstanceOf(InvalidAuditEventException.class);
-                assertThat(e.getMessage()).isEqualTo("org.gt.chat.audit.exception.InvalidAuditEventException: Invalid Audit Event: null");
+                assertThat(e.getMessage()).contains("Invalid Audit Event: null");
             }
         }};
     }

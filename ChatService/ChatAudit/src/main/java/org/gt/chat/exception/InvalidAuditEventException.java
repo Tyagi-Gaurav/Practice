@@ -1,4 +1,4 @@
-package org.gt.chat.audit.exception;
+package org.gt.chat.exception;
 
 public class InvalidAuditEventException extends RuntimeException {
     public InvalidAuditEventException(String message) {

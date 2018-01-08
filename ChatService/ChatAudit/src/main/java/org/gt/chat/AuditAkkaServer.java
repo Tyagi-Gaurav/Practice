@@ -1,4 +1,4 @@
-package org.gt.chat.audit;
+package org.gt.chat;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;

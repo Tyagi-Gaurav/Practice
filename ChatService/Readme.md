@@ -12,6 +12,15 @@
 * Smoke testing the app
 ``curl -i -vvvv http://localhost:8080/conversations/2``
 
+* Build all projects
+ `mvn clean install`
+
+* Run any application outside docker
+`java -jar target/Chat<App>-1.0-SNAPSHOT-allinone.jar`
+
+* Start mongoDB
+`mongod --dbpath ~/data/db`
+
 * Pipeline basics
 ``scripts/pipeline.sh``
   - LocalPipeline

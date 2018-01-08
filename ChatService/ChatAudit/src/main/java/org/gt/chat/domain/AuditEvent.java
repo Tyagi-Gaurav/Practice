@@ -1,4 +1,4 @@
-package org.gt.chat.audit.domain;
+package org.gt.chat.domain;
 
 import lombok.*;
 

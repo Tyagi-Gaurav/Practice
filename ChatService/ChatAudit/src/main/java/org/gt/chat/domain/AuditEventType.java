@@ -1,4 +1,4 @@
-package org.gt.chat.audit.domain;
+package org.gt.chat.domain;
 
 public enum AuditEventType {
     MESSAGE_READ_EVENT

@@ -1,10 +1,10 @@
-package org.gt.chat.audit;
+package org.gt.chat;
 
 import akka.actor.AbstractActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import org.gt.chat.audit.domain.AuditEvent;
-import org.gt.chat.audit.exception.InvalidAuditEventException;
+import org.gt.chat.domain.AuditEvent;
+import org.gt.chat.exception.InvalidAuditEventException;
 import scala.concurrent.ExecutionContextExecutor;
 
 import java.util.concurrent.CompletableFuture;
