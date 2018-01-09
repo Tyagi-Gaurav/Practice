@@ -4,7 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum ConfigVariables {
-    HOST("host");
+    HOST("host"),
+    DATABASE_HOST("database.host"),
+    DATABASE_PORT("database.port");
 
     private String name;
 
