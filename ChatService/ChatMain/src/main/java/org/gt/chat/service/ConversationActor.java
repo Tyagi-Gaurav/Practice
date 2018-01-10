@@ -6,6 +6,7 @@ import akka.event.LoggingAdapter;
 import akka.japi.pf.DeciderBuilder;
 import com.typesafe.config.Config;
 import org.gt.chat.domain.ConversationAggregate;
+import org.gt.chat.domain.ConversationRequest;
 import org.gt.chat.repos.ConversationRepositoryActor;
 import org.gt.chat.response.Conversation;
 import org.gt.chat.response.Conversations;
@@ -54,12 +55,13 @@ public class ConversationActor extends AbstractActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(String.class, userId -> {
+                .match(ConversationRequest.class, conversationRequest -> {
                     CompletionStage<Conversations> listCompletionStage =
-                            ask(repoActor, userId, 1000L)
+                            ask(repoActor, conversationRequest.getUserId(), 1000L)
                             .thenCompose(x ->
                                     CompletableFuture.supplyAsync(() ->
-                                        new Conversations(((ConversationAggregate) x)
+                                        new Conversations(conversationRequest.getGlobalRequestId(),
+                                                ((ConversationAggregate) x)
                                                 .getMessageEntityList()
                                                 .stream()
                                                 .map(Conversation::from)
@@ -67,7 +69,6 @@ public class ConversationActor extends AbstractActor {
                 );
                     pipe(listCompletionStage, dispatcher).to(getSender());
                     auditRef.whenCompleteAsync((actorRef, throwable) -> {
-                        System.out.println("Publishing Audit Information");
                         actorRef.tell("Hello Audit", getSelf());
                     });
             })

@@ -15,6 +15,7 @@
         <module>ChatImage</module>
         <module>ChatAudit</module>
         <module>ChatEnv</module>
+        <module>ChatCommon</module>
     </modules>
 
     <scm>

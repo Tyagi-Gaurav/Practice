@@ -7,6 +7,7 @@ import akka.actor.Props;
 import akka.http.javadsl.marshallers.jackson.Jackson;
 import akka.http.javadsl.model.ContentTypes;
 import akka.http.javadsl.model.HttpRequest;
+import akka.http.javadsl.model.headers.ModeledCustomHeader;
 import akka.http.javadsl.testkit.JUnitRouteTest;
 import akka.http.javadsl.testkit.TestRoute;
 import akka.http.javadsl.testkit.TestRouteResult;
@@ -21,12 +22,14 @@ import org.gt.chat.response.Conversation;
 import org.gt.chat.response.ConversationType;
 import org.gt.chat.response.Conversations;
 import org.gt.chat.service.ConversationActor;
+import org.gt.chat.util.StringBasedHeader;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
@@ -37,6 +40,7 @@ public class ChatEndToEndTest extends JUnitRouteTest {
     private MessageExceptionHandler messageExceptionHandler = new MessageExceptionHandler();
     private TestRoute route;
     private TestProbe testProbe;
+    private String requestId;
 
     @Before
     public void setUp() throws Exception {
@@ -48,13 +52,13 @@ public class ChatEndToEndTest extends JUnitRouteTest {
         Function<ActorContext, CompletionStage<ActorRef>> actorRefSupplier = (ac) -> completionStage;
         ActorRef actorRef = actorSystem.actorOf(Props.create(ConversationActor.class, actorRefSupplier));
         MessageResourceAkka messageResource = new MessageResourceAkka(actorRef, messageExceptionHandler);
+        requestId = "Test-request-Id";
 
         route = testRoute(messageResource.getRoute());
     }
 
     @Test
     public void getConversationsForAUser() throws IOException {
-
         //Given
         List<Conversation> conversationList = Arrays.asList(
                 new Conversation("2",
@@ -63,10 +67,11 @@ public class ChatEndToEndTest extends JUnitRouteTest {
                         "groupId",
                         "senderId",
                         "Hello World"));
-        Conversations expectedMessages = new Conversations(conversationList);
+        Conversations expectedMessages = new Conversations(requestId, conversationList);
 
         //When
-        TestRouteResult run = route.run((HttpRequest.GET("/conversations/2")));
+        TestRouteResult run = route.run((HttpRequest.GET("/conversations/2")
+                .addHeader(new StringBasedHeader("X-request-id", requestId))));
         run.assertStatusCode(200)
             .assertContentType(ContentTypes.APPLICATION_JSON);
 
@@ -86,4 +91,5 @@ public class ChatEndToEndTest extends JUnitRouteTest {
         assertThat(entity.getCode()).isEqualTo("CHT_0001");
         assertThat(entity.getDescription()).isEqualTo("Invalid User: 345");
     }
+
 }

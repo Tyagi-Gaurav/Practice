@@ -2,6 +2,8 @@ package org.gt.chat.resource;
 
 import akka.actor.ActorRef;
 import akka.http.javadsl.marshallers.jackson.Jackson;
+import akka.http.javadsl.model.Host;
+import akka.http.javadsl.model.HttpHeader;
 import akka.http.javadsl.model.StatusCodes;
 import akka.http.javadsl.server.AllDirectives;
 import akka.http.javadsl.server.ExceptionHandler;
@@ -12,9 +14,13 @@ import io.swagger.jaxrs.Reader;
 import io.swagger.jaxrs.config.DefaultReaderConfig;
 import io.swagger.models.Swagger;
 import io.swagger.util.Json;
+import org.gt.chat.domain.ConversationRequest;
 import org.gt.chat.response.Conversations;
 
 import javax.ws.rs.Path;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static akka.http.javadsl.server.PathMatchers.segment;
@@ -44,26 +50,36 @@ public class MessageResourceAkka extends AllDirectives {
                 () -> getFromResource("swagger-ui/index.html"));
     }
 
+    final Function<HttpHeader, Optional<Object>> extractHostPort = header -> {
+        return Optional.ofNullable(header);
+    };
+
     @Path("/conversations/{userId}")
     @ApiOperation(value = "Return conversations for a user", code = 200, httpMethod = "GET", response = Conversations.class)
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userId", required = true, dataType = "integer", paramType = "path", value = "ID of user that needs conversations")
+            @ApiImplicitParam(name = "userId", required = true, dataType = "integer", paramType = "path", value = "ID of user that needs conversations")
     })
     @ApiResponses(value = {
-        @ApiResponse(code = 500, message = "Internal Server Error")
+            @ApiResponse(code = 500, message = "Internal Server Error")
     })
     public Route conversationsRoute() {
-        return path(segment("conversations").slash(segment(compile("\\d+"))), (String value) ->
-                handleExceptions(messageExceptionHandler.get(),
-                        () -> get(() ->
-                                onComplete(() -> ask(messageActor, value, 1000L),
-                                        functionResult ->
-                                                functionResult
-                                                        .map(func(result -> complete(StatusCodes.OK, result, Jackson.marshaller())))
-                                                        .get())
-                        ))
-        );
+        return optionalHeaderValueByName("X-request-id", requestId ->
+                path(segment("conversations").slash(segment(compile("\\d+"))), (String value) ->
+                        handleExceptions(messageExceptionHandler.get(),
+                                () -> get(() -> {
+                                    String requestIdString = requestId.orElse(UUID.randomUUID().toString());
+                                    ConversationRequest conversationRequest = ConversationRequest.builder()
+                                            .globalRequestId(requestIdString)
+                                            .userId(value).build();
+                                    return onComplete(() -> ask(messageActor, conversationRequest, 1000L),
+                                            functionResult ->
+                                                    functionResult
+                                                            .map(func(result -> complete(StatusCodes.OK, result, Jackson.marshaller())))
+                                                            .get());
+                                }))
+                ));
     }
+
 
     public Route getRoute() {
         return route(

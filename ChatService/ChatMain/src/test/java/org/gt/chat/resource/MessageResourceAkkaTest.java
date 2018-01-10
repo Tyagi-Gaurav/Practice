@@ -16,12 +16,10 @@ import org.gt.chat.mockActors.TestMessageActor;
 import org.gt.chat.response.Conversation;
 import org.gt.chat.response.ConversationType;
 import org.gt.chat.response.Conversations;
-import org.junit.Ignore;
+import org.gt.chat.util.StringBasedHeader;
 import org.junit.Test;
-import scala.reflect.api.Annotations;
 
 import javax.ws.rs.Path;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
@@ -29,7 +27,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class MessageResourceAkkaTest extends JUnitRouteTest {
     private MessageExceptionHandler messageExceptionHandler = new MessageExceptionHandler();
-    private final Conversations expectedMessages = new Conversations(Arrays.asList(
+    private String requestId = "Test-Request-Id";
+    private final Conversations expectedMessages = new Conversations(requestId, Arrays.asList(
             new Conversation(
                     "2",
                     234878234L,
@@ -47,12 +46,24 @@ public class MessageResourceAkkaTest extends JUnitRouteTest {
     @Test
     public void getMessagesForUser() {
         //When & Then
-        TestRouteResult run = route.run((HttpRequest.GET("/conversations/2")));
+        TestRouteResult run = route.run((HttpRequest.GET("/conversations/2")
+                .addHeader(new StringBasedHeader("X-request-Id", requestId))));
         run.assertStatusCode(200)
                 .assertContentType(ContentTypes.APPLICATION_JSON);
 
         Conversations entity = run.entity(Jackson.unmarshaller(Conversations.class));
         assertThat(expectedMessages).isEqualTo(entity);
+    }
+
+    @Test
+    public void shouldGenerateANewRequestIdWhenNoRequestIdProvided() {
+        //When & Then
+        TestRouteResult run = route.run((HttpRequest.GET("/conversations/2")));
+        run.assertStatusCode(200)
+                .assertContentType(ContentTypes.APPLICATION_JSON);
+
+        Conversations entity = run.entity(Jackson.unmarshaller(Conversations.class));
+        assertThat(entity.getGlobalRequestId()).isNotEmpty();
     }
 
     @Test

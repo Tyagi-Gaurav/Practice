@@ -2,6 +2,7 @@ package org.gt.chat.mockActors;
 
 import akka.actor.AbstractActor;
 import akka.pattern.PatternsCS;
+import org.gt.chat.domain.ConversationRequest;
 import org.gt.chat.exception.InvalidUserException;
 import org.gt.chat.response.ConversationType;
 import org.gt.chat.response.Conversations;
@@ -19,10 +20,10 @@ public class TestMessageActor extends AbstractActor {
         @Override
         public Receive createReceive() {
             return receiveBuilder()
-                    .match(String.class, userId -> {
+                    .match(ConversationRequest.class, conversationRequest -> {
                         CompletableFuture<Conversations> completableFuture = CompletableFuture.supplyAsync(() -> {
-                        if (userId.equals("2")) {
-                            return new Conversations(Arrays.asList(
+                        if (conversationRequest.getUserId().equals("2")) {
+                            return new Conversations(conversationRequest.getGlobalRequestId(), Arrays.asList(
                                     new Conversation(
                                             "2",
                                             234878234L,
@@ -32,7 +33,7 @@ public class TestMessageActor extends AbstractActor {
                                             "Hello World")
                             ));
                         } else {
-                            throw new InvalidUserException(userId);
+                            throw new InvalidUserException(conversationRequest.getUserId());
                         }});
                         ExecutionContextExecutor dispatcher = this.getContext().getSystem().dispatcher();
                         PatternsCS.pipe(completableFuture, dispatcher).to(getSender());

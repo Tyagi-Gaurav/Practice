@@ -13,5 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 public class Conversations {
+    private String globalRequestId;
     private final List<Conversation> conversationList;
 }

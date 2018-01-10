@@ -4,6 +4,7 @@ import akka.actor.ActorContext;
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.testkit.javadsl.TestKit;
+import org.gt.chat.domain.ConversationRequest;
 import org.gt.chat.exception.InvalidUserException;
 import org.gt.chat.response.Conversation;
 import org.gt.chat.response.ConversationType;
@@ -15,9 +16,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import scala.Option;
-import scala.concurrent.Future;
-import scala.util.Try;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +39,9 @@ public class ConversationActorTest extends ActorSystemTest {
     @Mock
     private Function<ActorContext, CompletionStage<ActorRef>> auditProvider;
 
+    private static final String GLOBAL_REQUEST_ID = "Test-request-Id";
+    private static final String VALID_USER_ID = "2";
+
     @Before
     public void setUp() throws Exception {
         when(auditRefCompletionStage.whenCompleteAsync(any(BiConsumer.class)))
@@ -59,7 +60,7 @@ public class ConversationActorTest extends ActorSystemTest {
             final Props props = Props.create(ConversationActor.class, auditProvider);
             final ActorRef subject = actorSystem.actorOf(props);
 
-            subject.tell("2", getRef());
+            subject.tell(userWithId("2"), getRef());
 
             expectMsg(duration("5 second"), conversations);
             verify(auditRefCompletionStage).whenCompleteAsync(any(BiConsumer.class));
@@ -73,7 +74,7 @@ public class ConversationActorTest extends ActorSystemTest {
             final Props props = Props.create(ConversationActor.class, auditProvider);
             final ActorRef subject = actorSystem.actorOf(props);
 
-            CompletionStage<Object> ask1 = ask(subject, "193", 5000);
+            CompletionStage<Object> ask1 = ask(subject, userWithId("193"), 5000);
             try {
                 ask1.toCompletableFuture().get();
                 fail("Should have failed");
@@ -82,7 +83,7 @@ public class ConversationActorTest extends ActorSystemTest {
                 assertThat(e.getMessage()).isEqualTo("org.gt.chat.exception.InvalidUserException: 193");
             }
 
-            CompletionStage<Object> ask2 = ask(subject, "2", 5000);
+            CompletionStage<Object> ask2 = ask(subject, userWithId(VALID_USER_ID), 5000);
             assertThat(ask2.toCompletableFuture().get()).isEqualTo(getConversations());
             verify(auditRefCompletionStage, times(2)).whenCompleteAsync(any(BiConsumer.class));
         }};
@@ -102,7 +103,7 @@ public class ConversationActorTest extends ActorSystemTest {
 
     private Conversations getConversations() {
         Conversation expectedMessage = new Conversation(
-                "2",
+                VALID_USER_ID,
                 234878234L,
                 ConversationType.ONE2ONE,
                 "groupId",
@@ -110,7 +111,14 @@ public class ConversationActorTest extends ActorSystemTest {
                 "Hello World");
         List<Conversation> conversationList = new ArrayList<>();
         conversationList.add(expectedMessage);
-        return new Conversations(conversationList);
+        return new Conversations(GLOBAL_REQUEST_ID, conversationList);
+    }
+
+    private ConversationRequest userWithId(String userId) {
+        return ConversationRequest
+                .builder()
+                .globalRequestId(GLOBAL_REQUEST_ID)
+                .userId(userId).build();
     }
 
 }

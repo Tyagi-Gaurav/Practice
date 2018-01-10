@@ -19,12 +19,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ConversationStepDefs {
 
     private final Context context;
-    private final ChatMainApplcationController chatMainApplcationController;
 
     @Inject
-    public ConversationStepDefs(Context context, ChatMainApplcationController chatMainApplcationController) {
+    public ConversationStepDefs(Context context) {
         this.context = context;
-        this.chatMainApplcationController = chatMainApplcationController;
     }
 
     @Given("^a user is successfully authenticated$")
@@ -48,7 +46,8 @@ public class ConversationStepDefs {
                 "senderId",
                 "Hello World"
                 );
-        Conversations conversations = new Conversations(Arrays.asList(conversation));
+        Conversations conversations = new Conversations(context.getRequestId(),
+                Arrays.asList(conversation));
         Response response = context.response();
         assertThat(response.getStatus()).isEqualTo(200);
         assertThat(response.readEntity(Conversations.class)).isEqualTo(conversations);

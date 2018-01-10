@@ -8,6 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class AuditEvent {
+    private String globalRequestId;
     private long eventPublishEpochTimeStamp;
     private AuditEventType auditEventType;
 }
