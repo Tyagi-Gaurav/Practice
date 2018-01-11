@@ -1,5 +1,7 @@
 package org.gt.chat.domain;
 
-public enum AuditEventType {
+import java.io.Serializable;
+
+public enum AuditEventType implements Serializable {
     MESSAGE_READ_EVENT
 }

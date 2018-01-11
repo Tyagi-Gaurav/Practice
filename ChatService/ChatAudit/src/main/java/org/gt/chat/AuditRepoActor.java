@@ -20,8 +20,12 @@ public class AuditRepoActor extends AbstractActor {
         MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
         return receiveBuilder().match(AuditEvent.class, auditEvent -> {
             Document doc = new Document("timestamp" , auditEvent.getEventPublishEpochTimeStamp())
-                    .append("eventType", auditEvent.getAuditEventType());
+                    .append("eventType", toString(auditEvent));
             collection.insertOne(doc);
         }).build();
+    }
+
+    private String toString(AuditEvent auditEvent) {
+        return auditEvent.getAuditEventType() != null ? auditEvent.getAuditEventType().toString() : "";
     }
 }

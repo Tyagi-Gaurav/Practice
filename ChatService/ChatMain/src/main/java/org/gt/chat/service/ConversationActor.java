@@ -5,6 +5,8 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.pf.DeciderBuilder;
 import com.typesafe.config.Config;
+import org.gt.chat.domain.AuditEvent;
+import org.gt.chat.domain.AuditEventType;
 import org.gt.chat.domain.ConversationAggregate;
 import org.gt.chat.domain.ConversationRequest;
 import org.gt.chat.repos.ConversationRepositoryActor;
@@ -26,6 +28,7 @@ import static akka.actor.SupervisorStrategy.escalate;
 import static akka.actor.SupervisorStrategy.resume;
 import static akka.pattern.PatternsCS.ask;
 import static akka.pattern.PatternsCS.pipe;
+import static org.gt.chat.domain.AuditEventType.MESSAGE_READ_EVENT;
 
 public class ConversationActor extends AbstractActor {
     private final LoggingAdapter LOG = Logging.getLogger(this.getContext().getSystem(), this);
@@ -69,7 +72,11 @@ public class ConversationActor extends AbstractActor {
                 );
                     pipe(listCompletionStage, dispatcher).to(getSender());
                     auditRef.whenCompleteAsync((actorRef, throwable) -> {
-                        actorRef.tell("Hello Audit", getSelf());
+                        actorRef.tell(AuditEvent.builder()
+                                .eventPublishEpochTimeStamp(System.currentTimeMillis())
+                                .auditEventType(MESSAGE_READ_EVENT)
+                                .globalRequestId(conversationRequest.getGlobalRequestId())
+                                .build(), getSelf());
                     });
             })
                 .matchAny(o -> LOG.error("Received unknown message {}", o))

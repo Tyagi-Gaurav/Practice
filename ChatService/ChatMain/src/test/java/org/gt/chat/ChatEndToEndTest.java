@@ -15,6 +15,7 @@ import akka.testkit.TestProbe;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigValueFactory;
+import org.gt.chat.domain.AuditEvent;
 import org.gt.chat.exception.ErrorResponse;
 import org.gt.chat.exception.MessageExceptionHandler;
 import org.gt.chat.resource.MessageResourceAkka;
@@ -77,7 +78,7 @@ public class ChatEndToEndTest extends JUnitRouteTest {
 
         Conversations entity = run.entity(Jackson.unmarshaller(Conversations.class));
         assertThat(expectedMessages).isEqualTo(entity);
-        testProbe.expectMsgClass(String.class);
+        testProbe.expectMsgClass(AuditEvent.class);
     }
 
     @Test

@@ -46,6 +46,7 @@ public class AuditActorTest extends ActorSystemTest {
     public void shouldStoreWhenAuditEventIsSupported() {
         AuditEvent auditEvent = AuditEvent
                 .builder()
+                .globalRequestId("Test-Request-id")
                 .auditEventType(AuditEventType.MESSAGE_READ_EVENT)
                 .eventPublishEpochTimeStamp(System.currentTimeMillis())
                 .build();

@@ -3,7 +3,9 @@ package org.gt.chat.service;
 import akka.actor.ActorContext;
 import akka.actor.ActorRef;
 import akka.actor.Props;
+import akka.testkit.TestProbe;
 import akka.testkit.javadsl.TestKit;
+import org.gt.chat.domain.AuditEvent;
 import org.gt.chat.domain.ConversationRequest;
 import org.gt.chat.exception.InvalidUserException;
 import org.gt.chat.response.Conversation;
@@ -19,6 +21,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 import java.util.function.BiConsumer;
@@ -41,11 +44,15 @@ public class ConversationActorTest extends ActorSystemTest {
 
     private static final String GLOBAL_REQUEST_ID = "Test-request-Id";
     private static final String VALID_USER_ID = "2";
+    private TestProbe auditTestProbe;
 
     @Before
     public void setUp() throws Exception {
+        auditTestProbe = new TestProbe(actorSystem);
+        CompletableFuture<ActorRef> actorRefCompletableFuture = new CompletableFuture<>();
+        actorRefCompletableFuture.complete(auditTestProbe.ref());
         when(auditRefCompletionStage.whenCompleteAsync(any(BiConsumer.class)))
-                .thenReturn(mock(CompletionStage.class));
+                .thenReturn(actorRefCompletableFuture);
 
         when(auditProvider.apply(any(ActorContext.class))).thenReturn(auditRefCompletionStage);
     }
