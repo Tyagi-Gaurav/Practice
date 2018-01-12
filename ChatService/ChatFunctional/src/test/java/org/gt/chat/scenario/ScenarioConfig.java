@@ -9,7 +9,7 @@ public class ScenarioConfig {
     private final Config config;
 
     public ScenarioConfig() {
-        config = ConfigFactory.load();
+        config = ConfigFactory.load("functionalTestApplication.conf");
     }
 
     public String getString(ConfigVariables propertyName) {

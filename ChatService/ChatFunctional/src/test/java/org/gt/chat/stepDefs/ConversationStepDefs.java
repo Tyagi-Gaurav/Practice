@@ -5,9 +5,9 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import cucumber.runtime.java.guice.ScenarioScoped;
-import org.gt.chat.domain.Conversation;
-import org.gt.chat.domain.ConversationType;
-import org.gt.chat.domain.Conversations;
+import org.gt.chat.main.audit.domain.TestConversation;
+import org.gt.chat.main.audit.domain.TestConversationType;
+import org.gt.chat.main.audit.domain.TestConversations;
 import org.gt.chat.scenario.Context;
 
 import javax.ws.rs.core.Response;
@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ScenarioScoped
 public class ConversationStepDefs {
-
     private final Context context;
 
     @Inject
@@ -38,18 +37,18 @@ public class ConversationStepDefs {
 
     @Then("^the user should be able to receive their conversations in the response$")
     public void theUserShouldBeAbleToReceiveTheirConversationsInTheResponse() throws Throwable {
-        Conversation conversation = new Conversation(
+        TestConversation conversation = new TestConversation(
                 "2",
                 234878234L,
-                ConversationType.ONE2ONE,
+                TestConversationType.ONE2ONE,
                 "groupId",
                 "senderId",
                 "Hello World"
                 );
-        Conversations conversations = new Conversations(context.getRequestId(),
+        TestConversations conversations = new TestConversations(context.getRequestId(),
                 Arrays.asList(conversation));
         Response response = context.response();
         assertThat(response.getStatus()).isEqualTo(200);
-        assertThat(response.readEntity(Conversations.class)).isEqualTo(conversations);
+        assertThat(response.readEntity(TestConversations.class)).isEqualTo(conversations);
     }
 }

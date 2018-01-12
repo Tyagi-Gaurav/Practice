@@ -20,7 +20,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.6.0</version>
                 <configuration>
-                    <mainClass>org.gt.chat.MainAkkaServer</mainClass>
+                    <mainClass>org.gt.chat.main.MainAkkaServer</mainClass>
                 </configuration>
             </plugin>
             <plugin>
@@ -49,7 +49,7 @@
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
-                                        <Main-Class>org.gt.chat.MainAkkaServer</Main-Class>
+                                        <Main-Class>org.gt.chat.main.MainAkkaServer</Main-Class>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>

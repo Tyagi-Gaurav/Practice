@@ -6,24 +6,29 @@ import cucumber.runtime.java.guice.ScenarioScoped;
 
 @ScenarioScoped
 public class Hooks {
-    private ChatMainApplcationController chatMainApplcationController;
+    private ChatMainApplicationController chatMainApplcationController;
+    private ChatAuditApplicationController chatAuditApplicationController;
     private DatabaseController databaseController;
 
     @Inject
-    public Hooks(ChatMainApplcationController chatMainApplcationController,
+    public Hooks(ChatMainApplicationController chatMainApplcationController,
+                 ChatAuditApplicationController chatAuditApplicationController,
                  DatabaseController databaseController) {
         this.chatMainApplcationController = chatMainApplcationController;
+        this.chatAuditApplicationController = chatAuditApplicationController;
         this.databaseController = databaseController;
     }
 
     @Before
     public void beforeAll() throws Exception {
-        chatMainApplcationController.start();
         databaseController.start();
+        chatAuditApplicationController.start();
+        chatMainApplcationController.start();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-           chatMainApplcationController.stop();
-           databaseController.stop();
+            chatMainApplcationController.stop();
+            chatAuditApplicationController.stop();
+            databaseController.stop();
         }));
     }
 }
