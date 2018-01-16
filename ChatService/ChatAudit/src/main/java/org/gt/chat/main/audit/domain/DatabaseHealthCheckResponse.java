@@ -7,8 +7,6 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
-public class HealthCheckResponse {
+public class DatabaseHealthCheckResponse {
     private String result;
-
-    private String database;
 }
