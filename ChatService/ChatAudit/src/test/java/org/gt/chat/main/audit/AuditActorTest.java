@@ -6,6 +6,8 @@ import akka.testkit.TestProbe;
 import akka.testkit.javadsl.TestKit;
 import org.gt.chat.main.audit.domain.AuditEvent;
 import org.gt.chat.main.audit.domain.AuditEventType;
+import org.gt.chat.main.audit.domain.HealthCheckRequest;
+import org.gt.chat.main.audit.domain.HealthCheckResponse;
 import org.gt.chat.main.audit.exception.InvalidAuditEventException;
 import org.junit.Test;
 
@@ -44,6 +46,7 @@ public class AuditActorTest extends ActorSystemTest {
 
     @Test
     public void shouldStoreWhenAuditEventIsSupported() {
+        //Given
         AuditEvent auditEvent = AuditEvent
                 .builder()
                 .globalRequestId("Test-Request-id")
@@ -61,6 +64,30 @@ public class AuditActorTest extends ActorSystemTest {
             try {
                 ask.toCompletableFuture().get();
                 auditRepoProbe.expectMsg(auditEvent);
+            } catch (Exception e) {
+                fail(e.getMessage());
+            }
+        }};
+    }
+
+    @Test
+    public void shouldReturnOKWhenAuditActorIsRunning() throws Exception {
+        //Given
+        HealthCheckRequest healthCheckRequest = HealthCheckRequest.builder().build();
+
+        new TestKit(actorSystem) {{
+            auditRepoProbe = new TestProbe(actorSystem);
+            final Props props = Props.create(AuditActor.class, auditRepoProbe.ref());
+            final ActorRef subject = actorSystem.actorOf(props);
+
+            //When
+            CompletionStage<Object> ask = ask(subject, healthCheckRequest, 5000);
+
+            //Then
+            try {
+                Object result = ask.toCompletableFuture().get();
+                assertThat(result).isInstanceOf(HealthCheckResponse.class);
+                assertThat(((HealthCheckResponse)result).getResult()).isEqualTo("OK");
             } catch (Exception e) {
                 fail(e.getMessage());
             }

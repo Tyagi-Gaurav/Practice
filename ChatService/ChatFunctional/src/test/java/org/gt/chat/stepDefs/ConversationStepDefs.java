@@ -5,9 +5,9 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import cucumber.runtime.java.guice.ScenarioScoped;
-import org.gt.chat.main.audit.domain.TestConversation;
-import org.gt.chat.main.audit.domain.TestConversationType;
-import org.gt.chat.main.audit.domain.TestConversations;
+import org.gt.chat.domain.main.TestConversation;
+import org.gt.chat.domain.main.TestConversationType;
+import org.gt.chat.domain.main.TestConversations;
 import org.gt.chat.scenario.Context;
 
 import javax.ws.rs.core.Response;

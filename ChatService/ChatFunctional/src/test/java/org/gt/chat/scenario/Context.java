@@ -14,17 +14,18 @@ import static org.gt.chat.scenario.ConfigVariables.HOST;
 
 @ScenarioScoped
 public class Context {
-    @Inject
     private ScenarioConfig config;
+
+    @Inject
+    public Context(ScenarioConfig config) {
+        this.config = config;
+        requestId = UUID.randomUUID().toString();
+    }
 
     private User user;
     private Client client = ClientBuilder.newClient();
     private Response response;
     private String requestId;
-
-    public Context() {
-        requestId = UUID.randomUUID().toString();
-    }
 
     public void createAuthenticatedUser() {
         user = new User("2");

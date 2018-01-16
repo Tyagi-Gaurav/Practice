@@ -1,4 +1,4 @@
-package org.gt.chat.main.audit.domain;
+package org.gt.chat.domain.main;
 
 
 import lombok.AllArgsConstructor;

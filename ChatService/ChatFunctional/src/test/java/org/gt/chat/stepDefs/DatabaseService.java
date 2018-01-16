@@ -8,8 +8,8 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoIterable;
 import cucumber.runtime.java.guice.ScenarioScoped;
 import org.bson.Document;
-import org.gt.chat.main.audit.domain.TestAuditEvent;
-import org.gt.chat.main.audit.domain.TestAuditEventType;
+import org.gt.chat.domain.audit.TestAuditEvent;
+import org.gt.chat.domain.audit.TestAuditEventType;
 import org.gt.chat.scenario.ScenarioConfig;
 
 import java.util.List;

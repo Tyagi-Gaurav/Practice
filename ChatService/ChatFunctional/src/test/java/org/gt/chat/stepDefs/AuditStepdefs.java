@@ -3,7 +3,7 @@ package org.gt.chat.stepDefs;
 import com.google.inject.Inject;
 import cucumber.api.java.en.And;
 import cucumber.runtime.java.guice.ScenarioScoped;
-import org.gt.chat.main.audit.domain.TestAuditEvent;
+import org.gt.chat.domain.audit.TestAuditEvent;
 import org.gt.chat.scenario.Context;
 
 import java.util.List;
