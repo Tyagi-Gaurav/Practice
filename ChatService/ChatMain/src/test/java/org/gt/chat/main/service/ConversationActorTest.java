@@ -7,9 +7,7 @@ import akka.testkit.TestProbe;
 import akka.testkit.javadsl.TestKit;
 import org.gt.chat.main.audit.domain.ConversationRequest;
 import org.gt.chat.main.audit.exception.InvalidUserException;
-import org.gt.chat.main.response.Conversation;
-import org.gt.chat.main.response.ConversationType;
-import org.gt.chat.main.response.Conversations;
+import org.gt.chat.main.domain.*;
 import org.gt.chat.main.util.ActorSystemTest;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -44,6 +42,7 @@ public class ConversationActorTest extends ActorSystemTest {
     private static final String GLOBAL_REQUEST_ID = "Test-request-Id";
     private static final String VALID_USER_ID = "2";
     private TestProbe auditTestProbe;
+    private static final String ACTOR_NAME = "ConversationActor";
 
     @Before
     public void setUp() throws Exception {
@@ -92,6 +91,23 @@ public class ConversationActorTest extends ActorSystemTest {
             CompletionStage<Object> ask2 = ask(subject, userWithId(VALID_USER_ID), 5000);
             assertThat(ask2.toCompletableFuture().get()).isEqualTo(getConversations());
             verify(auditRefCompletionStage, times(2)).whenCompleteAsync(any(BiConsumer.class));
+        }};
+    }
+
+    @Test
+    public void healthCheckShouldBeSuccessfulWhenActorIsRunning() throws Exception {
+        //When
+        new TestKit(actorSystem) {{
+            final Props props = Props.create(ConversationActor.class, auditProvider);
+            final ActorRef subject = actorSystem.actorOf(props);
+
+            CompletionStage<Object> ask = ask(subject, HealthCheckRequest.builder().build(), 5000);
+            Object healthCheckResult = ask.toCompletableFuture().get();
+
+            assertThat(healthCheckResult).isInstanceOf(HealthCheckResponse.class);
+            HealthCheckResponse healthCheckResponse = (HealthCheckResponse) healthCheckResult;
+            assertThat(healthCheckResponse.getName()).isEqualTo(ACTOR_NAME);
+            assertThat(healthCheckResponse.getResult()).isEqualTo("OK");
         }};
     }
 

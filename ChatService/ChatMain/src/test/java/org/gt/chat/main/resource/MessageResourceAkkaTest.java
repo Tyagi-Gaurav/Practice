@@ -10,22 +10,26 @@ import akka.http.javadsl.testkit.JUnitRouteTest;
 import akka.http.javadsl.testkit.TestRoute;
 import akka.http.javadsl.testkit.TestRouteResult;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.jaxrs.config.DefaultReaderConfig;
 import org.gt.chat.main.audit.exception.ErrorResponse;
 import org.gt.chat.main.audit.exception.MessageExceptionHandler;
+import org.gt.chat.main.domain.Conversation;
+import org.gt.chat.main.domain.ConversationType;
+import org.gt.chat.main.domain.Conversations;
 import org.gt.chat.main.mockActors.TestMessageActor;
-import org.gt.chat.main.response.Conversation;
-import org.gt.chat.main.response.ConversationType;
-import org.gt.chat.main.response.Conversations;
 import org.gt.chat.main.util.StringBasedHeader;
+import org.junit.Before;
 import org.junit.Test;
 
 import javax.ws.rs.Path;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class MessageResourceAkkaTest extends JUnitRouteTest {
+
     private MessageExceptionHandler messageExceptionHandler = new MessageExceptionHandler();
     private String requestId = "Test-Request-Id";
     private final Conversations expectedMessages = new Conversations(requestId, Arrays.asList(
@@ -37,11 +41,19 @@ public class MessageResourceAkkaTest extends JUnitRouteTest {
                     "senderId",
                     "Hello World")
     ));
-    private ActorSystem actorSystem = ActorSystem.create("Test");
+    private ActorSystem actorSystem = ActorSystem.create(UUID.randomUUID().toString());
     private ActorRef messageActor =
             actorSystem.actorOf(Props.create(TestMessageActor.class));
-    private MessageResourceAkka messageResource = new MessageResourceAkka(messageActor, messageExceptionHandler);
-    TestRoute route = testRoute(messageResource.getRoute());
+    private MessageResourceAkka messageResource;
+    private TestRoute route;
+
+    @Before
+    public void setUp() throws Exception {
+        DefaultReaderConfig readerConfig = new DefaultReaderConfig();
+        DocumentationRoute documentationRoute = new DocumentationRoute(readerConfig);
+        messageResource = new MessageResourceAkka(messageActor, messageExceptionHandler, documentationRoute);
+        route = testRoute(messageResource.getRoute());
+    }
 
     @Test
     public void getMessagesForUser() {
@@ -91,7 +103,5 @@ public class MessageResourceAkkaTest extends JUnitRouteTest {
         assertThat(conversationRouteMethod.getAnnotation(ApiOperation.class).code()).isEqualTo(200);
         assertThat(conversationRouteMethod.getAnnotation(ApiOperation.class).httpMethod()).isEqualTo("GET");
         assertThat(conversationRouteMethod.getAnnotation(ApiOperation.class).response()).isEqualTo(Conversations.class);
-
-        //Then
     }
 }

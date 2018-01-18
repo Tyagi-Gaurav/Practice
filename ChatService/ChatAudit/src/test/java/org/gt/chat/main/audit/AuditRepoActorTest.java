@@ -2,10 +2,7 @@ package org.gt.chat.main.audit;
 
 import akka.actor.ActorRef;
 import akka.actor.Props;
-import akka.testkit.TestActor;
-import akka.testkit.TestProbe;
 import akka.testkit.javadsl.TestKit;
-import com.mongodb.client.ListCollectionsIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoIterable;
@@ -14,7 +11,6 @@ import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigValueFactory;
 import org.bson.Document;
 import org.gt.chat.main.audit.domain.AuditEvent;
-import org.gt.chat.main.audit.domain.DatabaseHealthCheckResponse;
 import org.gt.chat.main.audit.domain.HealthCheckRequest;
 import org.gt.chat.main.audit.domain.HealthCheckResponse;
 import org.junit.Before;
@@ -96,8 +92,8 @@ public class AuditRepoActorTest extends ActorSystemTest {
             //Then
             try {
                 Object result = ask.toCompletableFuture().get();
-                assertThat(result).isInstanceOf(DatabaseHealthCheckResponse.class);
-                assertThat(((DatabaseHealthCheckResponse)result).getResult()).isEqualTo("OK");
+                assertThat(result).isInstanceOf(HealthCheckResponse.class);
+                assertThat(((HealthCheckResponse)result).getResult()).isEqualTo("OK");
                 verify(db).listCollectionNames();
             } catch (Exception e) {
                 fail(e.getMessage());
@@ -122,8 +118,8 @@ public class AuditRepoActorTest extends ActorSystemTest {
             //Then
             try {
                 Object result = ask.toCompletableFuture().get();
-                assertThat(result).isInstanceOf(DatabaseHealthCheckResponse.class);
-                assertThat(((DatabaseHealthCheckResponse)result).getResult()).isEqualTo(expectedFailureMessage);
+                assertThat(result).isInstanceOf(HealthCheckResponse.class);
+                assertThat(((HealthCheckResponse)result).getResult()).isEqualTo(expectedFailureMessage);
                 verify(db).listCollectionNames();
             } catch (Exception e) {
                 fail(e.getMessage());

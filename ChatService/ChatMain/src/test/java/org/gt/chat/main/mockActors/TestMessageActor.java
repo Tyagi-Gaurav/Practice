@@ -4,9 +4,9 @@ import akka.actor.AbstractActor;
 import akka.pattern.PatternsCS;
 import org.gt.chat.main.audit.domain.ConversationRequest;
 import org.gt.chat.main.audit.exception.InvalidUserException;
-import org.gt.chat.main.response.ConversationType;
-import org.gt.chat.main.response.Conversations;
-import org.gt.chat.main.response.Conversation;
+import org.gt.chat.main.domain.ConversationType;
+import org.gt.chat.main.domain.Conversations;
+import org.gt.chat.main.domain.Conversation;
 import scala.concurrent.ExecutionContextExecutor;
 
 import java.util.Arrays;

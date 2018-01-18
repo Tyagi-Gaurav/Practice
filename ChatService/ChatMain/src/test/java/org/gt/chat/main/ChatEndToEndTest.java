@@ -14,13 +14,15 @@ import akka.testkit.TestProbe;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigValueFactory;
+import io.swagger.jaxrs.config.DefaultReaderConfig;
 import org.gt.chat.main.audit.domain.AuditEvent;
 import org.gt.chat.main.audit.exception.ErrorResponse;
 import org.gt.chat.main.audit.exception.MessageExceptionHandler;
+import org.gt.chat.main.resource.DocumentationRoute;
 import org.gt.chat.main.resource.MessageResourceAkka;
-import org.gt.chat.main.response.Conversation;
-import org.gt.chat.main.response.ConversationType;
-import org.gt.chat.main.response.Conversations;
+import org.gt.chat.main.domain.Conversation;
+import org.gt.chat.main.domain.ConversationType;
+import org.gt.chat.main.domain.Conversations;
 import org.gt.chat.main.service.ConversationActor;
 import org.gt.chat.main.util.StringBasedHeader;
 import org.junit.Before;
@@ -50,7 +52,7 @@ public class ChatEndToEndTest extends JUnitRouteTest {
         CompletionStage<ActorRef> completionStage = CompletableFuture.completedFuture(testProbe.ref());
         Function<ActorContext, CompletionStage<ActorRef>> actorRefSupplier = (ac) -> completionStage;
         ActorRef actorRef = actorSystem.actorOf(Props.create(ConversationActor.class, actorRefSupplier));
-        MessageResourceAkka messageResource = new MessageResourceAkka(actorRef, messageExceptionHandler);
+        MessageResourceAkka messageResource = new MessageResourceAkka(actorRef, messageExceptionHandler, getDocumentationRoute());
         requestId = "Test-request-Id";
 
         route = testRoute(messageResource.getRoute());
@@ -89,6 +91,11 @@ public class ChatEndToEndTest extends JUnitRouteTest {
         ErrorResponse entity = run.entity(Jackson.unmarshaller(ErrorResponse.class));
         assertThat(entity.getCode()).isEqualTo("CHT_0001");
         assertThat(entity.getDescription()).isEqualTo("Invalid User: 345");
+    }
+
+    private DocumentationRoute getDocumentationRoute() {
+        DefaultReaderConfig readerConfig = new DefaultReaderConfig();
+        return new DocumentationRoute(readerConfig);
     }
 
 }

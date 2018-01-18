@@ -5,11 +5,14 @@ import akka.actor.Props;
 import akka.testkit.TestActor;
 import akka.testkit.TestProbe;
 import akka.testkit.javadsl.TestKit;
-import org.gt.chat.main.audit.domain.*;
+import org.gt.chat.main.audit.domain.AuditEvent;
+import org.gt.chat.main.audit.domain.AuditEventType;
+import org.gt.chat.main.audit.domain.HealthCheckRequest;
+import org.gt.chat.main.audit.domain.HealthCheckResponse;
 import org.gt.chat.main.audit.exception.InvalidAuditEventException;
 import org.junit.Test;
 
-import javax.xml.crypto.Data;
+import java.util.Collections;
 import java.util.concurrent.CompletionStage;
 
 import static akka.pattern.PatternsCS.ask;
@@ -81,7 +84,7 @@ public class AuditActorTest extends ActorSystemTest {
             auditRepoProbe.setAutoPilot(new TestActor.AutoPilot() {
                 @Override
                 public TestActor.AutoPilot run(ActorRef sender, Object msg) {
-                    sender.tell(DatabaseHealthCheckResponse.builder().result("OK").build()
+                    sender.tell(databaseHealthCheckResponse("OK")
                             , ActorRef.noSender());
                     return noAutoPilot();
                 }
@@ -92,7 +95,9 @@ public class AuditActorTest extends ActorSystemTest {
 
             HealthCheckResponse expectedResponse = HealthCheckResponse.builder()
                     .result("OK")
-                    .database("OK")
+                    .database(Collections.singletonList(HealthCheckResponse.builder()
+                            .name("database")
+                            .result("OK").build()))
                     .build();
 
             //Then
@@ -120,7 +125,7 @@ public class AuditActorTest extends ActorSystemTest {
             auditRepoProbe.setAutoPilot(new TestActor.AutoPilot() {
                 @Override
                 public TestActor.AutoPilot run(ActorRef sender, Object msg) {
-                    sender.tell(DatabaseHealthCheckResponse.builder().result(failureMessage).build(),
+                    sender.tell(databaseHealthCheckResponse(failureMessage),
                             ActorRef.noSender());
                     return noAutoPilot();
                 }
@@ -131,7 +136,7 @@ public class AuditActorTest extends ActorSystemTest {
 
             HealthCheckResponse expectedResponse = HealthCheckResponse.builder()
                     .result("OK")
-                    .database(failureMessage)
+                    .database(Collections.singletonList(databaseHealthCheckResponse(failureMessage)))
                     .build();
 
             //Then
@@ -144,5 +149,9 @@ public class AuditActorTest extends ActorSystemTest {
                 fail(e.getMessage());
             }
         }};
+    }
+
+    private HealthCheckResponse databaseHealthCheckResponse(String failureMessage) {
+        return HealthCheckResponse.builder().name("database").result(failureMessage).build();
     }
 }

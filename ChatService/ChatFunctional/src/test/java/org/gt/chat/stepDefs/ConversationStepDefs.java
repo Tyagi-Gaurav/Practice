@@ -32,7 +32,7 @@ public class ConversationStepDefs {
 
     @When("^a user tries to access their conversations$")
     public void aUserTriesToAccessTheirConversations() throws Throwable {
-        context.requestFor("conversations/" + context.user().getId());
+        context.requestFor("/conversations/" + context.user().getId());
     }
 
     @Then("^the user should be able to receive their conversations in the response$")

@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import cucumber.runtime.java.guice.ScenarioScoped;
-import org.gt.chat.domain.main.HealthCheck;
+import org.gt.chat.domain.main.HealthStatus;
 import org.gt.chat.scenario.Context;
 
 import javax.ws.rs.client.Client;
@@ -25,20 +25,14 @@ public class HealthCheckStepDefs {
     @Then("^the healthcheck should be successful$")
     public void theHealthcheckShouldBeSuccessful() throws Throwable {
         assertThat(context.response().getStatus()).isEqualTo(200);
-        assertThat(context.response().readEntity(String.class)).isEqualTo("OK");
-    }
+        HealthStatus actual = context.response().readEntity(HealthStatus.class);
 
-    @Then("^the healthcheck should be successful$")
-    public void theHealthcheckShouldBeSuccessfulForAuditApplication() throws Throwable {
-        assertThat(context.response().getStatus()).isEqualTo(200);
-        HealthCheck actual = context.response().readEntity(HealthCheck.class);
-
-        assertThat(actual.getMainApplication()).isEqualTo("OK");
-        assertThat(actual.getAuditServer().getStatus()).isEqualTo("OK");
+        assertThat(actual.getResult()).isEqualTo("OK");
+//        assertThat(actual.getAuditServer().getResult()).isEqualTo("OK");
     }
 
     @When("^healthcheck endpoint is accessed for main application$")
     public void healthcheckEndpointIsAccessedForMainApplication() throws Throwable {
-        context.requestFor("/healthcheck");
+        context.requestFor("/private/healthcheck");
     }
 }

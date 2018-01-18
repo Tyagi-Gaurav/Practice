@@ -5,18 +5,19 @@ import akka.actor.ActorRef;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import org.gt.chat.main.audit.domain.AuditEvent;
-import org.gt.chat.main.audit.domain.DatabaseHealthCheckResponse;
 import org.gt.chat.main.audit.domain.HealthCheckRequest;
 import org.gt.chat.main.audit.domain.HealthCheckResponse;
 import org.gt.chat.main.audit.exception.InvalidAuditEventException;
 import org.omg.CORBA.TIMEOUT;
 import scala.concurrent.ExecutionContextExecutor;
 
+import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 import static akka.pattern.PatternsCS.ask;
 import static akka.pattern.PatternsCS.pipe;
+import static java.util.Collections.singletonList;
 import static java.util.concurrent.CompletableFuture.*;
 
 public class AuditActor extends AbstractActor {
@@ -45,12 +46,12 @@ public class AuditActor extends AbstractActor {
             .match(HealthCheckRequest.class, healthCheckRequest -> {
                 CompletionStage<Object> auditRepoHealthCheckResult = ask(auditRepoRef, healthCheckRequest, 5000);
 
-                DatabaseHealthCheckResponse dbHealthCheckResponse =
-                        (DatabaseHealthCheckResponse) auditRepoHealthCheckResult.toCompletableFuture().get();
+                HealthCheckResponse dbHealthCheckResponse =
+                        (HealthCheckResponse) auditRepoHealthCheckResult.toCompletableFuture().get();
                 CompletableFuture<HealthCheckResponse> result =
                         completedFuture(HealthCheckResponse.builder()
                                 .result("OK")
-                                .database(dbHealthCheckResponse.getResult())
+                                .database(singletonList(dbHealthCheckResponse))
                                 .build());
                 pipe(result, dispatcher).to(getSender());
             })

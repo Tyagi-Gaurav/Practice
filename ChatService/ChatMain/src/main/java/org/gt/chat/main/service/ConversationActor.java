@@ -7,9 +7,11 @@ import akka.japi.pf.DeciderBuilder;
 import org.gt.chat.main.audit.domain.AuditEvent;
 import org.gt.chat.main.audit.domain.ConversationAggregate;
 import org.gt.chat.main.audit.domain.ConversationRequest;
+import org.gt.chat.main.domain.HealthCheckRequest;
+import org.gt.chat.main.domain.HealthCheckResponse;
 import org.gt.chat.main.repos.ConversationRepositoryActor;
-import org.gt.chat.main.response.Conversation;
-import org.gt.chat.main.response.Conversations;
+import org.gt.chat.main.domain.Conversation;
+import org.gt.chat.main.domain.Conversations;
 import scala.concurrent.ExecutionContextExecutor;
 import scala.concurrent.duration.Duration;
 
@@ -41,9 +43,9 @@ public class ConversationActor extends AbstractActor {
             new OneForOneStrategy(10,
                     Duration.create(1, TimeUnit.MINUTES),
                     DeciderBuilder
-                    .match(IllegalArgumentException.class, e -> resume())
-                    .matchAny(o -> escalate())
-                    .build());
+                            .match(IllegalArgumentException.class, e -> resume())
+                            .matchAny(o -> escalate())
+                            .build());
 
     @Override
     public SupervisorStrategy supervisorStrategy() {
@@ -56,15 +58,15 @@ public class ConversationActor extends AbstractActor {
                 .match(ConversationRequest.class, conversationRequest -> {
                     CompletionStage<Conversations> listCompletionStage =
                             ask(repoActor, conversationRequest.getUserId(), 1000L)
-                            .thenCompose(x ->
-                                    CompletableFuture.supplyAsync(() ->
-                                        new Conversations(conversationRequest.getGlobalRequestId(),
-                                                ((ConversationAggregate) x)
-                                                .getMessageEntityList()
-                                                .stream()
-                                                .map(Conversation::from)
-                                                .collect(Collectors.toList())))
-                );
+                                    .thenCompose(x ->
+                                            CompletableFuture.supplyAsync(() ->
+                                                    new Conversations(conversationRequest.getGlobalRequestId(),
+                                                            ((ConversationAggregate) x)
+                                                                    .getMessageEntityList()
+                                                                    .stream()
+                                                                    .map(Conversation::from)
+                                                                    .collect(Collectors.toList())))
+                                    );
                     pipe(listCompletionStage, dispatcher).to(getSender());
                     auditRef.whenCompleteAsync((actorRef, throwable) -> {
                         if (actorRef != null) {
@@ -77,7 +79,13 @@ public class ConversationActor extends AbstractActor {
                             LOG.error("Audit ActorRef not available");
                         }
                     });
-            })
+                }).match(HealthCheckRequest.class, healthCheckRequest -> {
+                    HealthCheckResponse response =
+                            HealthCheckResponse.builder().result("OK").name("ConversationActor").build();
+                    CompletionStage<HealthCheckResponse> healthCheckResponseCompletableFuture =
+                            CompletableFuture.completedFuture(response);
+                    pipe(healthCheckResponseCompletableFuture, dispatcher).to(getSender());
+                })
                 .matchAny(o -> LOG.error("Received unknown message {}", o))
                 .build();
     }

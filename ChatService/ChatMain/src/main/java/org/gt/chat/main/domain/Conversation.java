@@ -1,4 +1,4 @@
-package org.gt.chat.main.response;
+package org.gt.chat.main.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;

@@ -1,14 +1,18 @@
 package org.gt.chat.stepDefs;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import cucumber.api.java.Before;
-import cucumber.runtime.java.guice.ScenarioScoped;
 
-@ScenarioScoped
+import java.util.concurrent.atomic.AtomicBoolean;
+
+@Singleton
 public class Hooks {
     private ChatMainApplicationController chatMainApplcationController;
     private ChatAuditApplicationController chatAuditApplicationController;
     private DatabaseController databaseController;
+    private AtomicBoolean initialised = new AtomicBoolean(false);
+
 
     @Inject
     public Hooks(ChatMainApplicationController chatMainApplcationController,
@@ -21,9 +25,12 @@ public class Hooks {
 
     @Before
     public void beforeAll() throws Exception {
-        databaseController.start();
-        chatAuditApplicationController.start();
-        chatMainApplcationController.start();
+        if (!initialised.get()) {
+            databaseController.start();
+            chatAuditApplicationController.start();
+            chatMainApplcationController.start();
+            initialised.getAndSet(true);
+        }
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             chatMainApplcationController.stop();

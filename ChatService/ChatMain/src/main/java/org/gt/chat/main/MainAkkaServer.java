@@ -6,13 +6,18 @@ import akka.http.javadsl.ConnectHttp;
 import akka.http.javadsl.Http;
 import akka.http.javadsl.model.HttpRequest;
 import akka.http.javadsl.model.HttpResponse;
+import akka.http.javadsl.server.AllDirectives;
 import akka.http.javadsl.server.Route;
+import akka.http.javadsl.server.directives.RouteDirectives;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import io.swagger.jaxrs.config.DefaultReaderConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.gt.chat.main.audit.exception.MessageExceptionHandler;
+import org.gt.chat.main.resource.DocumentationRoute;
+import org.gt.chat.main.resource.HealthCheckResource;
 import org.gt.chat.main.resource.MessageResourceAkka;
 import org.gt.chat.main.service.ConversationActor;
 import scala.concurrent.duration.FiniteDuration;
@@ -41,14 +46,27 @@ public class MainAkkaServer {
         final Http http = Http.get(actorSystem);
         MessageExceptionHandler messageExceptionHandler = new MessageExceptionHandler();
         ActorRef actorRef = createMessageActor();
-        MessageResourceAkka messageResource = new MessageResourceAkka(actorRef, messageExceptionHandler);
+        DocumentationRoute documentationRoute = getDocumentationRoute();
+        MessageResourceAkka messageResource = new MessageResourceAkka(
+                actorRef,
+                messageExceptionHandler,
+                documentationRoute);
+
+        HealthCheckResource healthCheckResource = new HealthCheckResource(actorRef, documentationRoute);
 
         final ActorMaterializer materializer = ActorMaterializer.create(actorSystem);
-        Route route = messageResource.getRoute();
+
+        AllRoutes allRoutes = new AllRoutes(messageResource, healthCheckResource);
+
         final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow =
-                route.flow(actorSystem, materializer);
+                allRoutes.getRoutes().flow(actorSystem, materializer);
         http.bindAndHandle(routeFlow, ConnectHttp.toHost("0.0.0.0", 8080), materializer);
         System.out.println("Server online at http://localhost:8080/");
+    }
+
+    private DocumentationRoute getDocumentationRoute() {
+        DefaultReaderConfig readerConfig = new DefaultReaderConfig();
+        return new DocumentationRoute(readerConfig);
     }
 
     private ActorRef createMessageActor() {

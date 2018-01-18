@@ -5,14 +5,12 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.gt.chat.main.audit.domain.AuditEvent;
-import org.gt.chat.main.audit.domain.DatabaseHealthCheckResponse;
 import org.gt.chat.main.audit.domain.HealthCheckRequest;
+import org.gt.chat.main.audit.domain.HealthCheckResponse;
 import scala.concurrent.ExecutionContextExecutor;
 
-import java.util.concurrent.CompletableFuture;
-
 import static akka.pattern.PatternsCS.pipe;
-import static java.util.concurrent.CompletableFuture.*;
+import static java.util.concurrent.CompletableFuture.completedFuture;
 
 public class AuditRepoActor extends AbstractActor {
     private ExecutionContextExecutor dispatcher = this.getContext().getSystem().dispatcher();
@@ -42,8 +40,8 @@ public class AuditRepoActor extends AbstractActor {
                     } catch (Exception e) {
                         result = e.getMessage();
                     }
-                    pipe(completedFuture(DatabaseHealthCheckResponse.builder()
-                    .result(result).build()), dispatcher).to(getSender());
+                    pipe(completedFuture(HealthCheckResponse.builder()
+                    .name("database").result(result).build()), dispatcher).to(getSender());
                 })
                 .build();
     }

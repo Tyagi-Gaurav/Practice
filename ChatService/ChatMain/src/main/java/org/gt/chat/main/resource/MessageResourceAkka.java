@@ -7,14 +7,9 @@ import akka.http.javadsl.model.StatusCodes;
 import akka.http.javadsl.server.AllDirectives;
 import akka.http.javadsl.server.ExceptionHandler;
 import akka.http.javadsl.server.Route;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.annotations.*;
-import io.swagger.jaxrs.Reader;
-import io.swagger.jaxrs.config.DefaultReaderConfig;
-import io.swagger.models.Swagger;
-import io.swagger.util.Json;
 import org.gt.chat.main.audit.domain.ConversationRequest;
-import org.gt.chat.main.response.Conversations;
+import org.gt.chat.main.domain.Conversations;
 
 import javax.ws.rs.Path;
 import java.util.Optional;
@@ -30,23 +25,16 @@ import static scala.compat.java8.JFunction.func;
 @Api(value = "Conversations", produces = "application/json")
 @Path("/")
 public class MessageResourceAkka extends AllDirectives {
+    private final DocumentationRoute documentationRoute;
     private ActorRef messageActor;
     private Supplier<ExceptionHandler> messageExceptionHandler;
-    private DefaultReaderConfig readerConfig = new DefaultReaderConfig();
 
-    public MessageResourceAkka(ActorRef messageActor, Supplier<ExceptionHandler> messageExceptionHandler) {
+    public MessageResourceAkka(ActorRef messageActor,
+                               Supplier<ExceptionHandler> messageExceptionHandler,
+                               DocumentationRoute documentationRoute) {
         this.messageActor = messageActor;
         this.messageExceptionHandler = messageExceptionHandler;
-    }
-
-    private Route swaggerApiDocsRoute() {
-        return path(segment("api-docs").slash(segment("swagger.json")),
-                () -> get(() -> complete(swaggerJson())));
-    }
-
-    private Route swaggerRoute() {
-        return path(segment("swagger"),
-                () -> getFromResource("swagger-ui/index.html"));
+        this.documentationRoute = documentationRoute;
     }
 
     final Function<HttpHeader, Optional<Object>> extractHostPort = header -> {
@@ -83,19 +71,6 @@ public class MessageResourceAkka extends AllDirectives {
     public Route getRoute() {
         return route(
                 conversationsRoute(),
-                swaggerApiDocsRoute(),
-                swaggerRoute(),
-                getFromResourceDirectory("swagger-ui"));
-    }
-
-    private String swaggerJson() {
-        try {
-            final Swagger swaggerConfig = new Swagger();
-            final Reader reader = new Reader(swaggerConfig, readerConfig);
-            final Swagger swagger = reader.read(MessageResourceAkka.class);
-            return Json.pretty().writeValueAsString(swagger);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+                documentationRoute.routes());
     }
 }

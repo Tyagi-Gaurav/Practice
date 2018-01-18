@@ -1,4 +1,4 @@
-package org.gt.chat.main.audit.domain;
+package org.gt.chat.main.domain;
 
 import lombok.*;
 
@@ -13,6 +13,6 @@ public class HealthCheckResponse {
     private String name;
     private String result;
 
-    private List<HealthCheckResponse> database;
+    private List<HealthCheckResponse> dependencies;
 }
 
