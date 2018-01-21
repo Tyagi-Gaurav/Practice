@@ -4,11 +4,12 @@ import akka.actor.*;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.pf.DeciderBuilder;
+import com.google.common.collect.ImmutableList;
+import org.gt.chat.domain.HealthCheckRequest;
+import org.gt.chat.domain.HealthCheckResponse;
 import org.gt.chat.main.audit.domain.AuditEvent;
-import org.gt.chat.main.audit.domain.ConversationAggregate;
-import org.gt.chat.main.audit.domain.ConversationRequest;
-import org.gt.chat.main.domain.HealthCheckRequest;
-import org.gt.chat.main.domain.HealthCheckResponse;
+import org.gt.chat.main.domain.ConversationAggregate;
+import org.gt.chat.main.domain.ConversationRequest;
 import org.gt.chat.main.repos.ConversationRepositoryActor;
 import org.gt.chat.main.domain.Conversation;
 import org.gt.chat.main.domain.Conversations;
@@ -80,11 +81,20 @@ public class ConversationActor extends AbstractActor {
                         }
                     });
                 }).match(HealthCheckRequest.class, healthCheckRequest -> {
-                    HealthCheckResponse response =
-                            HealthCheckResponse.builder().result("OK").name("ConversationActor").build();
-                    CompletionStage<HealthCheckResponse> healthCheckResponseCompletableFuture =
-                            CompletableFuture.completedFuture(response);
-                    pipe(healthCheckResponseCompletableFuture, dispatcher).to(getSender());
+                    HealthCheckResponse healthCheckResponse = null;
+
+                    if (auditRef.toCompletableFuture().isDone()) {
+                        healthCheckResponse = ask(auditRef.toCompletableFuture().get(), healthCheckRequest, 5000)
+                                .thenCompose(result -> CompletableFuture.supplyAsync(() ->
+                                        ((HealthCheckResponse) result)))
+                                .toCompletableFuture().get();
+                    } else {
+                        healthCheckResponse = HealthCheckResponse.builder().name("audit").result("Could not find audit actor").build();
+                    }
+
+                    HealthCheckResponse result = HealthCheckResponse.builder().result("OK").name("ConversationActor")
+                            .dependencies(ImmutableList.of(healthCheckResponse)).build();
+                    pipe(CompletableFuture.completedFuture(result), dispatcher).to(getSender());
                 })
                 .matchAny(o -> LOG.error("Received unknown message {}", o))
                 .build();

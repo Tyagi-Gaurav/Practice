@@ -3,8 +3,8 @@ package org.gt.chat.main.repos;
 import akka.actor.AbstractActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import org.gt.chat.main.audit.domain.ConversationAggregate;
-import org.gt.chat.main.audit.domain.ConversationEntity;
+import org.gt.chat.main.domain.ConversationAggregate;
+import org.gt.chat.main.domain.ConversationEntity;
 import org.gt.chat.main.audit.exception.InvalidUserException;
 import scala.concurrent.ExecutionContextExecutor;
 

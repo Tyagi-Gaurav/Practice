@@ -9,8 +9,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.gt.chat.main.domain.HealthCheckRequest;
-import org.gt.chat.main.domain.HealthCheckResponse;
+import org.gt.chat.domain.HealthCheckRequest;
+import org.gt.chat.domain.HealthCheckResponse;
 
 import javax.ws.rs.Path;
 

@@ -13,8 +13,8 @@ import akka.testkit.TestProbe;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.jaxrs.config.DefaultReaderConfig;
 import org.assertj.core.api.Assertions;
-import org.gt.chat.main.domain.HealthCheckRequest;
-import org.gt.chat.main.domain.HealthCheckResponse;
+import org.gt.chat.domain.HealthCheckRequest;
+import org.gt.chat.domain.HealthCheckResponse;
 import org.junit.Before;
 import org.junit.Test;
 

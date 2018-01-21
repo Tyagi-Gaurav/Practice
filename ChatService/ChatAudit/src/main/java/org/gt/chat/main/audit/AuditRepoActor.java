@@ -4,9 +4,9 @@ import akka.actor.AbstractActor;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
+import org.gt.chat.domain.HealthCheckRequest;
+import org.gt.chat.domain.HealthCheckResponse;
 import org.gt.chat.main.audit.domain.AuditEvent;
-import org.gt.chat.main.audit.domain.HealthCheckRequest;
-import org.gt.chat.main.audit.domain.HealthCheckResponse;
 import scala.concurrent.ExecutionContextExecutor;
 
 import static akka.pattern.PatternsCS.pipe;

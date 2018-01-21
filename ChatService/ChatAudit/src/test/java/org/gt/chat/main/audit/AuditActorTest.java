@@ -5,10 +5,10 @@ import akka.actor.Props;
 import akka.testkit.TestActor;
 import akka.testkit.TestProbe;
 import akka.testkit.javadsl.TestKit;
+import org.gt.chat.domain.HealthCheckRequest;
+import org.gt.chat.domain.HealthCheckResponse;
 import org.gt.chat.main.audit.domain.AuditEvent;
 import org.gt.chat.main.audit.domain.AuditEventType;
-import org.gt.chat.main.audit.domain.HealthCheckRequest;
-import org.gt.chat.main.audit.domain.HealthCheckResponse;
 import org.gt.chat.main.audit.exception.InvalidAuditEventException;
 import org.junit.Test;
 
@@ -95,7 +95,8 @@ public class AuditActorTest extends ActorSystemTest {
 
             HealthCheckResponse expectedResponse = HealthCheckResponse.builder()
                     .result("OK")
-                    .database(Collections.singletonList(HealthCheckResponse.builder()
+                    .name("audit")
+                    .dependencies(Collections.singletonList(HealthCheckResponse.builder()
                             .name("database")
                             .result("OK").build()))
                     .build();
@@ -136,7 +137,8 @@ public class AuditActorTest extends ActorSystemTest {
 
             HealthCheckResponse expectedResponse = HealthCheckResponse.builder()
                     .result("OK")
-                    .database(Collections.singletonList(databaseHealthCheckResponse(failureMessage)))
+                    .name("audit")
+                    .dependencies(Collections.singletonList(databaseHealthCheckResponse(failureMessage)))
                     .build();
 
             //Then

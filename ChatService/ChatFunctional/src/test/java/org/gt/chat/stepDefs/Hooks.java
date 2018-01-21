@@ -29,13 +29,13 @@ public class Hooks {
             databaseController.start();
             chatAuditApplicationController.start();
             chatMainApplcationController.start();
+
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                chatMainApplcationController.stop();
+                chatAuditApplicationController.stop();
+                databaseController.stop();
+            }));
             initialised.getAndSet(true);
         }
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            chatMainApplcationController.stop();
-            chatAuditApplicationController.stop();
-            databaseController.stop();
-        }));
     }
 }

@@ -2,7 +2,7 @@ package org.gt.chat.main.mockActors;
 
 import akka.actor.AbstractActor;
 import akka.pattern.PatternsCS;
-import org.gt.chat.main.audit.domain.ConversationRequest;
+import org.gt.chat.main.domain.ConversationRequest;
 import org.gt.chat.main.audit.exception.InvalidUserException;
 import org.gt.chat.main.domain.ConversationType;
 import org.gt.chat.main.domain.Conversations;

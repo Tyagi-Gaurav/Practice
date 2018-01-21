@@ -1,7 +1,8 @@
-package org.gt.chat.main.domain;
+package org.gt.chat.domain;
 
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Builder
@@ -9,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @ToString(of = {"result"})
 @EqualsAndHashCode
-public class HealthCheckResponse {
+public class HealthCheckResponse implements Serializable {
     private String name;
     private String result;
 

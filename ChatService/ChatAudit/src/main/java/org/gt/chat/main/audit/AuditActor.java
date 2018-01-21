@@ -4,14 +4,12 @@ import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import org.gt.chat.domain.HealthCheckRequest;
+import org.gt.chat.domain.HealthCheckResponse;
 import org.gt.chat.main.audit.domain.AuditEvent;
-import org.gt.chat.main.audit.domain.HealthCheckRequest;
-import org.gt.chat.main.audit.domain.HealthCheckResponse;
 import org.gt.chat.main.audit.exception.InvalidAuditEventException;
-import org.omg.CORBA.TIMEOUT;
 import scala.concurrent.ExecutionContextExecutor;
 
-import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
@@ -51,11 +49,12 @@ public class AuditActor extends AbstractActor {
                 CompletableFuture<HealthCheckResponse> result =
                         completedFuture(HealthCheckResponse.builder()
                                 .result("OK")
-                                .database(singletonList(dbHealthCheckResponse))
+                                .name("audit")
+                                .dependencies(singletonList(dbHealthCheckResponse))
                                 .build());
                 pipe(result, dispatcher).to(getSender());
             })
-            .matchAny(o -> LOG.error("Received unknown message {}", o))
+            .matchAny(o -> LOG.error("Received unknown message {}", o.getClass().getName()))
             .build();
     }
 }

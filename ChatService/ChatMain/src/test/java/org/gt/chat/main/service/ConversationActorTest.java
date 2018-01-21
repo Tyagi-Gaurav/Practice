@@ -3,9 +3,12 @@ package org.gt.chat.main.service;
 import akka.actor.ActorContext;
 import akka.actor.ActorRef;
 import akka.actor.Props;
+import akka.testkit.TestActor;
 import akka.testkit.TestProbe;
 import akka.testkit.javadsl.TestKit;
-import org.gt.chat.main.audit.domain.ConversationRequest;
+import org.gt.chat.domain.HealthCheckRequest;
+import org.gt.chat.domain.HealthCheckResponse;
+import org.gt.chat.main.domain.ConversationRequest;
 import org.gt.chat.main.audit.exception.InvalidUserException;
 import org.gt.chat.main.domain.*;
 import org.gt.chat.main.util.ActorSystemTest;
@@ -35,6 +38,9 @@ public class ConversationActorTest extends ActorSystemTest {
 
     @Mock
     private CompletionStage<ActorRef> auditRefCompletionStage;
+
+    @Mock
+    private CompletableFuture<ActorRef> actorRefCompletableFuture;
 
     @Mock
     private Function<ActorContext, CompletionStage<ActorRef>> auditProvider;
@@ -96,8 +102,24 @@ public class ConversationActorTest extends ActorSystemTest {
 
     @Test
     public void healthCheckShouldBeSuccessfulWhenActorIsRunning() throws Exception {
+        //Given
+        HealthCheckResponse dependenciesHealthCheck =
+                HealthCheckResponse.builder().name("audit").result("OK").build();
+
+        when(auditRefCompletionStage.toCompletableFuture()).thenReturn(actorRefCompletableFuture);
+        when(actorRefCompletableFuture.get()).thenReturn(auditTestProbe.ref());
+        when(actorRefCompletableFuture.isDone()).thenReturn(true);
+
         //When
         new TestKit(actorSystem) {{
+            auditTestProbe.setAutoPilot(new TestActor.AutoPilot() {
+                @Override
+                public TestActor.AutoPilot run(ActorRef sender, Object msg) {
+                    sender.tell(dependenciesHealthCheck, ActorRef.noSender());
+                    return noAutoPilot();
+                }
+            });
+
             final Props props = Props.create(ConversationActor.class, auditProvider);
             final ActorRef subject = actorSystem.actorOf(props);
 
@@ -108,6 +130,7 @@ public class ConversationActorTest extends ActorSystemTest {
             HealthCheckResponse healthCheckResponse = (HealthCheckResponse) healthCheckResult;
             assertThat(healthCheckResponse.getName()).isEqualTo(ACTOR_NAME);
             assertThat(healthCheckResponse.getResult()).isEqualTo("OK");
+            auditTestProbe.expectMsgClass(HealthCheckRequest.class);
         }};
     }
 
@@ -134,6 +157,9 @@ public class ConversationActorTest extends ActorSystemTest {
         List<Conversation> conversationList = new ArrayList<>();
         conversationList.add(expectedMessage);
         return new Conversations(GLOBAL_REQUEST_ID, conversationList);
+
+
+
     }
 
     private ConversationRequest userWithId(String userId) {

@@ -4,6 +4,7 @@ Feature: Healthcheck for main application
     When healthcheck endpoint is accessed for main application
     Then the healthcheck should be successful
 
+
 #  Scenario: Healthcheck for main application when application when database is down
 #    When healthcheck endpoint is accessed for main application
 #    Then the healthcheck should be successful

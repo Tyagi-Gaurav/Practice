@@ -8,7 +8,7 @@ import akka.http.javadsl.server.AllDirectives;
 import akka.http.javadsl.server.ExceptionHandler;
 import akka.http.javadsl.server.Route;
 import io.swagger.annotations.*;
-import org.gt.chat.main.audit.domain.ConversationRequest;
+import org.gt.chat.main.domain.ConversationRequest;
 import org.gt.chat.main.domain.Conversations;
 
 import javax.ws.rs.Path;
