@@ -1,6 +1,7 @@
 package org.gt.chat.stepDefs;
 
 import com.google.inject.Inject;
+import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -18,10 +19,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ScenarioScoped
 public class ConversationStepDefs {
     private final Context context;
+    private DatabaseService databaseService;
 
     @Inject
-    public ConversationStepDefs(Context context) {
+    public ConversationStepDefs(Context context, DatabaseService databaseService) {
         this.context = context;
+        this.databaseService = databaseService;
     }
 
     @Given("^a user is successfully authenticated$")
@@ -50,5 +53,10 @@ public class ConversationStepDefs {
         Response response = context.response();
         assertThat(response.getStatus()).isEqualTo(200);
         assertThat(response.readEntity(TestConversations.class)).isEqualTo(conversations);
+    }
+
+    @And("^the user has some conversations available on the server$")
+    public void theUserHasSomeConversationsAvailableOnTheServer() throws Throwable {
+        databaseService.createConversationsForUser();
     }
 }

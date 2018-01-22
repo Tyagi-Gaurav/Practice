@@ -11,11 +11,13 @@ import akka.http.javadsl.server.Route;
 import akka.http.javadsl.server.directives.RouteDirectives;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
+import com.mongodb.MongoClient;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import io.swagger.jaxrs.config.DefaultReaderConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.gt.chat.main.audit.exception.MessageExceptionHandler;
+import org.gt.chat.main.repos.ConversationRepositoryActor;
 import org.gt.chat.main.resource.DocumentationRoute;
 import org.gt.chat.main.resource.HealthCheckResource;
 import org.gt.chat.main.resource.MessageResourceAkka;
@@ -71,7 +73,15 @@ public class MainAkkaServer {
 
     private ActorRef createMessageActor() {
         Function<ActorContext, CompletionStage<ActorRef>> actorRefSupplier = this::createAuditActor;
-        return actorSystem.actorOf(Props.create(ConversationActor.class, actorRefSupplier));
+        return actorSystem.actorOf(Props.create(ConversationActor.class,
+                actorRefSupplier,
+                getConversationRepositoryActor()));
+    }
+
+    private ActorRef getConversationRepositoryActor() {
+        Config config = actorSystem.settings().config();
+        return actorSystem.actorOf(Props.create(ConversationRepositoryActor.class,
+                databaseProvider(config)));
     }
 
     private CompletionStage<ActorRef> createAuditActor(ActorContext context) {
@@ -88,5 +98,11 @@ public class MainAkkaServer {
         CompletionStage<ActorRef> actorRefCompletionStage =
                 selection.resolveOneCS(FiniteDuration.apply(5, TimeUnit.SECONDS));
         return actorRefCompletionStage;
+    }
+
+    private Object databaseProvider(Config config) {
+        MongoClient mongoClient = new MongoClient(config.getString("repo.hostname"),
+                config.getInt("repo.port"));
+        return mongoClient.getDatabase(config.getString("repo.dbName"));
     }
 }

@@ -31,13 +31,15 @@ import static org.gt.chat.main.audit.domain.AuditEventType.MESSAGE_READ_EVENT;
 public class ConversationActor extends AbstractActor {
     private final LoggingAdapter LOG = Logging.getLogger(this.getContext().getSystem(), this);
     private ExecutionContextExecutor dispatcher = this.getContext().getSystem().dispatcher();
-    private ActorRef repoActor;
     private final CompletionStage<ActorRef> auditRef;
+    private ActorRef conversationRepositoryActor;
 
-    public ConversationActor(Function<akka.actor.ActorContext, CompletionStage<ActorRef>> auditProvider) {
+    public ConversationActor(
+            Function<akka.actor.ActorContext,
+            CompletionStage<ActorRef>> auditProvider,
+            ActorRef conversationRepositoryActor) {
         this.auditRef = auditProvider.apply(this.getContext());
-        repoActor = this.getContext()
-                .actorOf(Props.create(ConversationRepositoryActor.class));
+        this.conversationRepositoryActor = conversationRepositoryActor;
     }
 
     private static SupervisorStrategy strategy =
@@ -58,7 +60,7 @@ public class ConversationActor extends AbstractActor {
         return receiveBuilder()
                 .match(ConversationRequest.class, conversationRequest -> {
                     CompletionStage<Conversations> listCompletionStage =
-                            ask(repoActor, conversationRequest.getUserId(), 1000L)
+                            ask(conversationRepositoryActor, conversationRequest.getUserId(), 3000L)
                                     .thenCompose(x ->
                                             CompletableFuture.supplyAsync(() ->
                                                     new Conversations(conversationRequest.getGlobalRequestId(),

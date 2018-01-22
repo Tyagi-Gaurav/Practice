@@ -20,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -48,55 +49,64 @@ public class ConversationActorTest extends ActorSystemTest {
     private static final String GLOBAL_REQUEST_ID = "Test-request-Id";
     private static final String VALID_USER_ID = "2";
     private TestProbe auditTestProbe;
+    private TestProbe conversationRepoActorProbe;
     private static final String ACTOR_NAME = "ConversationActor";
+    private Props props;
 
     @Before
     public void setUp() throws Exception {
         auditTestProbe = new TestProbe(actorSystem);
+        conversationRepoActorProbe = new TestProbe(actorSystem);
         CompletableFuture<ActorRef> actorRefCompletableFuture = new CompletableFuture<>();
         actorRefCompletableFuture.complete(auditTestProbe.ref());
         when(auditRefCompletionStage.whenCompleteAsync(any(BiConsumer.class)))
                 .thenReturn(actorRefCompletableFuture);
 
         when(auditProvider.apply(any(ActorContext.class))).thenReturn(auditRefCompletionStage);
+
+        conversationRepoActorProbe.setAutoPilot(new TestActor.AutoPilot() {
+            @Override
+            public TestActor.AutoPilot run(ActorRef sender, Object msg) {
+                if (msg.equals("2")) {
+                    sender.tell(getConversationAggregate(), ActorRef.noSender());
+                    return noAutoPilot();
+                } else {
+                    throw new InvalidUserException(msg.toString());
+                }
+            }
+        });
+
+        props = Props.create(ConversationActor.class, auditProvider, conversationRepoActorProbe.ref());
+    }
+
+    private ConversationAggregate getConversationAggregate() {
+        return ConversationAggregate.builder()
+                .messageEntityList(Arrays.asList(
+                        ConversationEntity.builder()
+                                .content("Hello World")
+                                .groupId("groupId")
+                                .senderId("senderId")
+                                .receivedTimeStamp(234878234L)
+                                .messageId(VALID_USER_ID)
+                        .build()
+                ))
+                .build();
     }
 
     @Test
     public void getMessagesForUser() {
-        // Given
+        //Given
         Conversations conversations = getConversations();
 
         //When
         new TestKit(actorSystem) {{
-            final Props props = Props.create(ConversationActor.class, auditProvider);
             final ActorRef subject = actorSystem.actorOf(props);
 
             subject.tell(userWithId("2"), getRef());
 
             expectMsg(duration("5 second"), conversations);
             verify(auditRefCompletionStage).whenCompleteAsync(any(BiConsumer.class));
-        }};
-    }
-
-    @Test
-    public void shouldNotFailWhenASuccessCallIsMadeAfterError() throws ExecutionException, InterruptedException {
-        //When
-        new TestKit(actorSystem) {{
-            final Props props = Props.create(ConversationActor.class, auditProvider);
-            final ActorRef subject = actorSystem.actorOf(props);
-
-            CompletionStage<Object> ask1 = ask(subject, userWithId("193"), 5000);
-            try {
-                ask1.toCompletableFuture().get();
-                fail("Should have failed");
-            } catch (Exception e) {
-                assertThat(e.getCause()).isExactlyInstanceOf(InvalidUserException.class);
-                assertThat(e.getMessage()).isEqualTo("org.gt.chat.main.audit.exception.InvalidUserException: 193");
-            }
-
-            CompletionStage<Object> ask2 = ask(subject, userWithId(VALID_USER_ID), 5000);
-            assertThat(ask2.toCompletableFuture().get()).isEqualTo(getConversations());
-            verify(auditRefCompletionStage, times(2)).whenCompleteAsync(any(BiConsumer.class));
+            conversationRepoActorProbe.expectMsg("2");
         }};
     }
 
@@ -120,7 +130,6 @@ public class ConversationActorTest extends ActorSystemTest {
                 }
             });
 
-            final Props props = Props.create(ConversationActor.class, auditProvider);
             final ActorRef subject = actorSystem.actorOf(props);
 
             CompletionStage<Object> ask = ask(subject, HealthCheckRequest.builder().build(), 5000);
@@ -138,7 +147,6 @@ public class ConversationActorTest extends ActorSystemTest {
     public void shouldRestartActorWhenItFailsWithException() {
         //When
         new TestKit(actorSystem) {{
-            final Props props = Props.create(ConversationActor.class, auditRefCompletionStage);
             final ActorRef subject = actorSystem.actorOf(props);
             subject.tell("", getRef());
 
@@ -157,9 +165,6 @@ public class ConversationActorTest extends ActorSystemTest {
         List<Conversation> conversationList = new ArrayList<>();
         conversationList.add(expectedMessage);
         return new Conversations(GLOBAL_REQUEST_ID, conversationList);
-
-
-
     }
 
     private ConversationRequest userWithId(String userId) {

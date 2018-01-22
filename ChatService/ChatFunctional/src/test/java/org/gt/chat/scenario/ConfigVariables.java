@@ -8,7 +8,8 @@ public enum ConfigVariables {
     DATABASE_HOST("database.host"),
     DATABASE_PORT("database.port"),
     DATABASE_NAME("database.name"),
-    DATABASE_COLLECTION("database.collection");
+    DATABASE_AUDIT_COLLECTION("database.auditCollection"),
+    DATABASE_CONV_COLLECTION("database.conversationCollection");
 
     private String name;
 

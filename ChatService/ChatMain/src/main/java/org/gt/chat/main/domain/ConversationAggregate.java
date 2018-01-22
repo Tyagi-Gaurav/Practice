@@ -1,9 +1,6 @@
 package org.gt.chat.main.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.List;
 
@@ -11,6 +8,7 @@ import java.util.List;
 @Getter
 @ToString
 @EqualsAndHashCode
+@Builder
 public class ConversationAggregate {
     private final List<ConversationEntity> messageEntityList;
 }
