@@ -1,7 +1,6 @@
-package org.gt.chat.stepDefs;
+package org.gt.chat.stepDefs.service;
 
 import com.google.inject.Inject;
-import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
@@ -11,6 +10,8 @@ import cucumber.runtime.java.guice.ScenarioScoped;
 import org.bson.Document;
 import org.gt.chat.domain.audit.TestAuditEvent;
 import org.gt.chat.domain.audit.TestAuditEventType;
+import org.gt.chat.domain.user.TestUser;
+import org.gt.chat.main.domain.ConversationEntity;
 import org.gt.chat.scenario.ScenarioConfig;
 import org.junit.After;
 
@@ -20,11 +21,12 @@ import java.util.stream.StreamSupport;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.gt.chat.scenario.ConfigVariables.*;
 
 @ScenarioScoped
-public class DatabaseService {
+public class MockDatabaseService {
     private final MongoDatabase database;
     private final ScenarioConfig scenarioConfig;
 
@@ -40,7 +42,7 @@ public class DatabaseService {
     }
 
     @Inject
-    public DatabaseService(ScenarioConfig scenarioConfig) {
+    public MockDatabaseService(ScenarioConfig scenarioConfig) {
         this.scenarioConfig = scenarioConfig;
         MongoClient mongoClient = new MongoClient(scenarioConfig.getString(DATABASE_HOST),
                 scenarioConfig.getInt(DATABASE_PORT));
@@ -62,18 +64,24 @@ public class DatabaseService {
     }
 
     public void createConversationsForUser() {
-        MongoCollection<Document> collection = database.getCollection(scenarioConfig.getString(DATABASE_CONV_COLLECTION));
+        MongoCollection<Document> collection =
+                database.getCollection(scenarioConfig.getString(DATABASE_CONV_COLLECTION));
         collection.insertOne(
                 new Document("userId", "2")
-                    .append("messageId", "2")
-                    .append("content", "Hello World")
-                    .append("receivedTimeStamp", 234878234L)
-                    .append("groupId", "groupId")
-                    .append("senderId", "senderId")
-        );
+                        .append("messages", new Document("senderId", "senderId")
+                                .append("messageDetails", asList(
+                                        new Document("content", "Hello World")
+                                                .append("received" , true)
+                                                .append("timestamp", 234878234L)
+                                                .append("contentType", ConversationEntity.ContentTypeEntity.TEXT_PLAIN_UTF8.toString())
+                                ))));
 
         FindIterable<Document> documents = collection.find(new Document("userId", "2"));
         List<Document> fetchedDocuments = StreamSupport.stream(documents.spliterator(), false).collect(Collectors.toList());
         assertThat(fetchedDocuments.size()).isEqualTo(1);
+    }
+
+    public void createUser(TestUser testUser) {
+
     }
 }

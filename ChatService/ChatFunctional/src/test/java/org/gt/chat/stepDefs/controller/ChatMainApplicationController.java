@@ -1,4 +1,4 @@
-package org.gt.chat.stepDefs;
+package org.gt.chat.stepDefs.controller;
 
 import akka.actor.ActorSystem;
 import com.google.inject.Singleton;

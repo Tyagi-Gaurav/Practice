@@ -8,9 +8,10 @@ import akka.testkit.TestProbe;
 import akka.testkit.javadsl.TestKit;
 import org.gt.chat.domain.HealthCheckRequest;
 import org.gt.chat.domain.HealthCheckResponse;
+import org.gt.chat.main.exception.InvalidUserException;
+import org.gt.chat.main.domain.ConversationEntity;
 import org.gt.chat.main.domain.ConversationRequest;
-import org.gt.chat.main.audit.exception.InvalidUserException;
-import org.gt.chat.main.domain.*;
+import org.gt.chat.main.domain.GetConversationResponse;
 import org.gt.chat.main.util.ActorSystemTest;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -19,20 +20,17 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
-import java.util.concurrent.ExecutionException;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import static akka.pattern.PatternsCS.ask;
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ConversationActorTest extends ActorSystemTest {
@@ -68,7 +66,7 @@ public class ConversationActorTest extends ActorSystemTest {
             @Override
             public TestActor.AutoPilot run(ActorRef sender, Object msg) {
                 if (msg.equals("2")) {
-                    sender.tell(getConversationAggregate(), ActorRef.noSender());
+                    sender.tell(getConversationEntity(), ActorRef.noSender());
                     return noAutoPilot();
                 } else {
                     throw new InvalidUserException(msg.toString());
@@ -79,24 +77,10 @@ public class ConversationActorTest extends ActorSystemTest {
         props = Props.create(ConversationActor.class, auditProvider, conversationRepoActorProbe.ref());
     }
 
-    private ConversationAggregate getConversationAggregate() {
-        return ConversationAggregate.builder()
-                .messageEntityList(Arrays.asList(
-                        ConversationEntity.builder()
-                                .content("Hello World")
-                                .groupId("groupId")
-                                .senderId("senderId")
-                                .receivedTimeStamp(234878234L)
-                                .messageId(VALID_USER_ID)
-                        .build()
-                ))
-                .build();
-    }
-
     @Test
     public void getMessagesForUser() {
         //Given
-        Conversations conversations = getConversations();
+        GetConversationResponse conversations = getExpectedConversations();
 
         //When
         new TestKit(actorSystem) {{
@@ -154,17 +138,35 @@ public class ConversationActorTest extends ActorSystemTest {
         }};
     }
 
-    private Conversations getConversations() {
-        Conversation expectedMessage = new Conversation(
-                VALID_USER_ID,
-                234878234L,
-                ConversationType.ONE2ONE,
-                "groupId",
-                "senderId",
-                "Hello World");
-        List<Conversation> conversationList = new ArrayList<>();
-        conversationList.add(expectedMessage);
-        return new Conversations(GLOBAL_REQUEST_ID, conversationList);
+    private GetConversationResponse getExpectedConversations() {
+        return GetConversationResponse.builder()
+                .globalRequestId(GLOBAL_REQUEST_ID)
+                .userId(VALID_USER_ID)
+                .messages(GetConversationResponse.Messages.builder()
+                        .senderId("senderId")
+                        .messageDetails(asList(GetConversationResponse.MessageDetail.builder()
+                                .received(true)
+                                .timestamp(234878234L)
+                                .content("Hello World")
+                                .contentType(GetConversationResponse.ContentType.TEXT_PLAIN_UTF8)
+                                .build()))
+                        .build())
+                .build();
+    }
+
+    private ConversationEntity getConversationEntity() {
+        return ConversationEntity.builder()
+                .userId(VALID_USER_ID)
+                .messages(ConversationEntity.Messages.builder()
+                        .senderId("senderId")
+                        .messageDetails(asList(ConversationEntity.MessageDetailEntity.builder()
+                                .received(true)
+                                .timestamp(234878234L)
+                                .content("Hello World")
+                                .contentType(ConversationEntity.ContentTypeEntity.TEXT_PLAIN_UTF8)
+                                .build()))
+                        .build())
+                .build();
     }
 
     private ConversationRequest userWithId(String userId) {

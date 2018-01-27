@@ -1,4 +1,4 @@
-package org.gt.chat.main.audit.exception;
+package org.gt.chat.main.exception;
 
 import akka.http.javadsl.marshallers.jackson.Jackson;
 import akka.http.javadsl.model.StatusCodes;

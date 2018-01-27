@@ -7,7 +7,7 @@ import akka.event.LoggingAdapter;
 import org.gt.chat.domain.HealthCheckRequest;
 import org.gt.chat.domain.HealthCheckResponse;
 import org.gt.chat.main.audit.domain.AuditEvent;
-import org.gt.chat.main.audit.exception.InvalidAuditEventException;
+import org.gt.chat.main.exception.InvalidAuditEventException;
 import scala.concurrent.ExecutionContextExecutor;
 
 import java.util.concurrent.CompletableFuture;

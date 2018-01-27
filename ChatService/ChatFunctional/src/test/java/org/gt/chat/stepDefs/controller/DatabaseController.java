@@ -1,4 +1,4 @@
-package org.gt.chat.stepDefs;
+package org.gt.chat.stepDefs.controller;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

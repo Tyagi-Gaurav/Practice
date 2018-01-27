@@ -6,25 +6,27 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import cucumber.runtime.java.guice.ScenarioScoped;
-import org.gt.chat.domain.main.TestConversation;
-import org.gt.chat.domain.main.TestConversationType;
-import org.gt.chat.domain.main.TestConversations;
+
+
+import org.gt.chat.domain.main.TestGetConversationsResponse;
 import org.gt.chat.scenario.Context;
+import org.gt.chat.stepDefs.service.MockDatabaseService;
 
 import javax.ws.rs.core.Response;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.gt.chat.domain.main.TestGetConversationsResponse.TestContentType.TEXT_PLAIN_UTF8;
 
 @ScenarioScoped
 public class ConversationStepDefs {
     private final Context context;
-    private DatabaseService databaseService;
+    private MockDatabaseService mockDatabaseService;
 
     @Inject
-    public ConversationStepDefs(Context context, DatabaseService databaseService) {
+    public ConversationStepDefs(Context context, MockDatabaseService mockDatabaseService) {
         this.context = context;
-        this.databaseService = databaseService;
+        this.mockDatabaseService = mockDatabaseService;
     }
 
     @Given("^a user is successfully authenticated$")
@@ -40,23 +42,29 @@ public class ConversationStepDefs {
 
     @Then("^the user should be able to receive their conversations in the response$")
     public void theUserShouldBeAbleToReceiveTheirConversationsInTheResponse() throws Throwable {
-        TestConversation conversation = new TestConversation(
-                "2",
-                234878234L,
-                TestConversationType.ONE2ONE,
-                "groupId",
-                "senderId",
-                "Hello World"
-                );
-        TestConversations conversations = new TestConversations(context.getRequestId(),
-                Arrays.asList(conversation));
+        TestGetConversationsResponse conversation = TestGetConversationsResponse.builder()
+                .globalRequestId(context.getRequestId())
+                .userId("2")
+                .messages(TestGetConversationsResponse.TestMessages.builder()
+                        .senderId("senderId")
+                        .messageDetails(Arrays.asList(
+                                TestGetConversationsResponse.TestMessageDetail.builder()
+                                        .content("Hello World")
+                                        .timestamp(234878234L)
+                                        .contentType(TEXT_PLAIN_UTF8)
+                                        .received(true)
+                                        .build()
+                        ))
+                        .build())
+                .build();
+
         Response response = context.response();
         assertThat(response.getStatus()).isEqualTo(200);
-        assertThat(response.readEntity(TestConversations.class)).isEqualTo(conversations);
+        assertThat(response.readEntity(TestGetConversationsResponse.class)).isEqualTo(conversation);
     }
 
     @And("^the user has some conversations available on the server$")
     public void theUserHasSomeConversationsAvailableOnTheServer() throws Throwable {
-        databaseService.createConversationsForUser();
+        mockDatabaseService.createConversationsForUser();
     }
 }

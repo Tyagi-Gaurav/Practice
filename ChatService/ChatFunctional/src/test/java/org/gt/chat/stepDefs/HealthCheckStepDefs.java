@@ -1,16 +1,11 @@
 package org.gt.chat.stepDefs;
 
 import com.google.inject.Inject;
-import cucumber.api.PendingException;
-import cucumber.api.java.en.And;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import cucumber.runtime.java.guice.ScenarioScoped;
 import org.gt.chat.domain.main.HealthStatus;
 import org.gt.chat.scenario.Context;
-
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 
 import java.util.List;
 

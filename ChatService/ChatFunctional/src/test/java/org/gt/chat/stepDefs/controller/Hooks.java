@@ -1,8 +1,11 @@
-package org.gt.chat.stepDefs;
+package org.gt.chat.stepDefs.controller;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import cucumber.api.java.Before;
+import org.gt.chat.stepDefs.controller.ChatAuditApplicationController;
+import org.gt.chat.stepDefs.controller.ChatMainApplicationController;
+import org.gt.chat.stepDefs.controller.DatabaseController;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

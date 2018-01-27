@@ -1,4 +1,4 @@
-package org.gt.chat.main.audit.exception;
+package org.gt.chat.main.exception;
 
 public class InvalidUserException extends RuntimeException {
     public InvalidUserException(String message) {

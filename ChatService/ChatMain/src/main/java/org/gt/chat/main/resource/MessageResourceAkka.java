@@ -9,7 +9,7 @@ import akka.http.javadsl.server.ExceptionHandler;
 import akka.http.javadsl.server.Route;
 import io.swagger.annotations.*;
 import org.gt.chat.main.domain.ConversationRequest;
-import org.gt.chat.main.domain.Conversations;
+import org.gt.chat.main.domain.GetConversationResponse;
 
 import javax.ws.rs.Path;
 import java.util.Optional;
@@ -22,7 +22,7 @@ import static akka.pattern.PatternsCS.ask;
 import static java.util.regex.Pattern.compile;
 import static scala.compat.java8.JFunction.func;
 
-@Api(value = "Conversations", produces = "application/json")
+@Api(value = "GetConversationResponse", produces = "application/json")
 @Path("/")
 public class MessageResourceAkka extends AllDirectives {
     private final DocumentationRoute documentationRoute;
@@ -37,12 +37,8 @@ public class MessageResourceAkka extends AllDirectives {
         this.documentationRoute = documentationRoute;
     }
 
-    final Function<HttpHeader, Optional<Object>> extractHostPort = header -> {
-        return Optional.ofNullable(header);
-    };
-
     @Path("/conversations/{userId}")
-    @ApiOperation(value = "Return conversations for a user", code = 200, httpMethod = "GET", response = Conversations.class)
+    @ApiOperation(value = "Return conversations for a user", code = 200, httpMethod = "GET", response = GetConversationResponse.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", required = true, dataType = "integer", paramType = "path", value = "ID of user that needs conversations")
     })

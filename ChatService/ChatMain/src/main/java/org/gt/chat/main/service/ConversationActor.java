@@ -1,6 +1,9 @@
 package org.gt.chat.main.service;
 
-import akka.actor.*;
+import akka.actor.AbstractActor;
+import akka.actor.ActorRef;
+import akka.actor.OneForOneStrategy;
+import akka.actor.SupervisorStrategy;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.pf.DeciderBuilder;
@@ -8,11 +11,9 @@ import com.google.common.collect.ImmutableList;
 import org.gt.chat.domain.HealthCheckRequest;
 import org.gt.chat.domain.HealthCheckResponse;
 import org.gt.chat.main.audit.domain.AuditEvent;
-import org.gt.chat.main.domain.ConversationAggregate;
+import org.gt.chat.main.domain.ConversationEntity;
 import org.gt.chat.main.domain.ConversationRequest;
-import org.gt.chat.main.repos.ConversationRepositoryActor;
-import org.gt.chat.main.domain.Conversation;
-import org.gt.chat.main.domain.Conversations;
+import org.gt.chat.main.domain.GetConversationResponse;
 import scala.concurrent.ExecutionContextExecutor;
 import scala.concurrent.duration.Duration;
 
@@ -59,17 +60,27 @@ public class ConversationActor extends AbstractActor {
     public Receive createReceive() {
         return receiveBuilder()
                 .match(ConversationRequest.class, conversationRequest -> {
-                    CompletionStage<Conversations> listCompletionStage =
+                    CompletionStage<GetConversationResponse> listCompletionStage =
                             ask(conversationRepositoryActor, conversationRequest.getUserId(), 3000L)
                                     .thenCompose(x ->
                                             CompletableFuture.supplyAsync(() ->
-                                                    new Conversations(conversationRequest.getGlobalRequestId(),
-                                                            ((ConversationAggregate) x)
-                                                                    .getMessageEntityList()
-                                                                    .stream()
-                                                                    .map(Conversation::from)
-                                                                    .collect(Collectors.toList())))
-                                    );
+                                                    GetConversationResponse.builder()
+                                                            .globalRequestId(conversationRequest.getGlobalRequestId())
+                                                            .userId(conversationRequest.getUserId())
+                                                            .messages(GetConversationResponse.Messages.builder()
+                                                                    .senderId(((ConversationEntity) x).getMessages().getSenderId())
+                                                                    .messageDetails(((ConversationEntity) x).getMessages().getMessageDetails()
+                                                                            .stream().map(cemd ->
+                                                                                    GetConversationResponse.MessageDetail.builder()
+                                                                                            .content(cemd.getContent())
+                                                                                            .contentType(GetConversationResponse.ContentType.valueOf(
+                                                                                                    cemd.getContentType().toString()))
+                                                                                            .received(cemd.isReceived())
+                                                                                            .timestamp(cemd.getTimestamp())
+                                                                                            .build()).collect(Collectors.toList()))
+                                                                    .build())
+                                                            .build()
+                                    ));
                     pipe(listCompletionStage, dispatcher).to(getSender());
                     auditRef.whenCompleteAsync((actorRef, throwable) -> {
                         if (actorRef != null) {

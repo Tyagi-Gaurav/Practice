@@ -9,7 +9,7 @@ import org.gt.chat.domain.HealthCheckRequest;
 import org.gt.chat.domain.HealthCheckResponse;
 import org.gt.chat.main.audit.domain.AuditEvent;
 import org.gt.chat.main.audit.domain.AuditEventType;
-import org.gt.chat.main.audit.exception.InvalidAuditEventException;
+import org.gt.chat.main.exception.InvalidAuditEventException;
 import org.junit.Test;
 
 import java.util.Collections;
