@@ -63,11 +63,11 @@ public class MockDatabaseService {
                 .collect(Collectors.toList());
     }
 
-    public void createConversationsForUser() {
+    public void createConversationsForUser(String userId) {
         MongoCollection<Document> collection =
                 database.getCollection(scenarioConfig.getString(DATABASE_CONV_COLLECTION));
         collection.insertOne(
-                new Document("userId", "2")
+                new Document("userId", userId)
                         .append("messages", new Document("senderId", "senderId")
                                 .append("messageDetails", asList(
                                         new Document("content", "Hello World")
@@ -76,12 +76,18 @@ public class MockDatabaseService {
                                                 .append("contentType", ConversationEntity.ContentTypeEntity.TEXT_PLAIN_UTF8.toString())
                                 ))));
 
-        FindIterable<Document> documents = collection.find(new Document("userId", "2"));
+        FindIterable<Document> documents = collection.find(new Document("userId", userId));
         List<Document> fetchedDocuments = StreamSupport.stream(documents.spliterator(), false).collect(Collectors.toList());
         assertThat(fetchedDocuments.size()).isEqualTo(1);
     }
 
     public void createUser(TestUser testUser) {
+        MongoCollection<Document> userCollection =
+                database.getCollection(scenarioConfig.getString(DATABASE_USER_COLLECTION));
 
+        userCollection.insertOne(new Document("userid", testUser.getUserId())
+                .append("firstName", testUser.getFirstName())
+                .append("lastName", testUser.getLastName())
+                .append("userName", testUser.getUserName()));
     }
 }

@@ -2,9 +2,11 @@ package org.gt.chat.scenario;
 
 import com.google.inject.Inject;
 import cucumber.runtime.java.guice.ScenarioScoped;
+import org.gt.chat.domain.main.TestPostConversationRequest;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -15,6 +17,7 @@ import static org.gt.chat.scenario.ConfigVariables.HOST;
 @ScenarioScoped
 public class Context {
     private ScenarioConfig config;
+    private Object responseObject;
 
     @Inject
     public Context(ScenarioConfig config) {
@@ -22,16 +25,11 @@ public class Context {
         requestId = UUID.randomUUID().toString();
     }
 
-    private User user;
     private Client client = ClientBuilder.newClient();
     private Response response;
     private String requestId;
 
-    public void createAuthenticatedUser() {
-        user = new User("2");
-    }
-
-    public void requestFor(String path) {
+    public void getRequestFor(String path) {
         response = client.target(config.getString(HOST) + path)
                 .request(MediaType.APPLICATION_JSON)
                 .header("X-request-id", requestId)
@@ -46,7 +44,23 @@ public class Context {
         return response;
     }
 
-    public User user() {
-        return user;
+    public void postRequestFor(String path, TestPostConversationRequest conversationRequest) {
+        response = client.target(config.getString(HOST) + path)
+                .request(MediaType.APPLICATION_JSON)
+                .header("X-request-id", requestId)
+                .post(Entity.entity(conversationRequest, MediaType.APPLICATION_JSON));
+    }
+
+    public <T> T readResponse(Class<T> targetClass) {
+        responseObject = response.readEntity(targetClass);
+        return (T) responseObject;
+    }
+
+    public Object getResponseObject() {
+        return responseObject;
+    }
+
+    public Response getResponse() {
+        return response;
     }
 }

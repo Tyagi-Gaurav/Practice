@@ -2,7 +2,6 @@ package org.gt.chat.main.resource;
 
 import akka.actor.ActorRef;
 import akka.http.javadsl.marshallers.jackson.Jackson;
-import akka.http.javadsl.model.HttpHeader;
 import akka.http.javadsl.model.StatusCodes;
 import akka.http.javadsl.server.AllDirectives;
 import akka.http.javadsl.server.ExceptionHandler;
@@ -12,9 +11,7 @@ import org.gt.chat.main.domain.ConversationRequest;
 import org.gt.chat.main.domain.GetConversationResponse;
 
 import javax.ws.rs.Path;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static akka.http.javadsl.server.PathMatchers.segment;
@@ -45,9 +42,9 @@ public class MessageResourceAkka extends AllDirectives {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
-    public Route conversationsRoute() {
+    public Route getConversationsRoute() {
         return optionalHeaderValueByName("X-request-id", requestId ->
-                path(segment("conversations").slash(segment(compile("\\d+"))), (String value) ->
+                path(segment("conversations").slash(segment(compile(".*"))), (String value) ->
                         handleExceptions(messageExceptionHandler.get(),
                                 () -> get(() -> {
                                     String requestIdString = requestId.orElse(UUID.randomUUID().toString());
@@ -66,7 +63,7 @@ public class MessageResourceAkka extends AllDirectives {
 
     public Route getRoute() {
         return route(
-                conversationsRoute(),
+                getConversationsRoute(),
                 documentationRoute.routes());
     }
 }

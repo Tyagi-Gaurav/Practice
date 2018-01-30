@@ -5,11 +5,13 @@ import akka.actor.ActorSystem;
 import akka.http.javadsl.marshallers.jackson.Jackson;
 import akka.http.javadsl.model.ContentTypes;
 import akka.http.javadsl.model.HttpRequest;
+import akka.http.javadsl.model.RequestEntity;
 import akka.http.javadsl.testkit.JUnitRouteTest;
 import akka.http.javadsl.testkit.TestRoute;
 import akka.http.javadsl.testkit.TestRouteResult;
 import akka.testkit.TestActor;
 import akka.testkit.TestProbe;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.jaxrs.config.DefaultReaderConfig;
 import org.gt.chat.main.exception.ErrorResponse;
@@ -20,6 +22,7 @@ import org.gt.chat.main.util.StringBasedHeader;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import sun.jvm.hotspot.runtime.ObjectMonitor;
 
 import javax.ws.rs.Path;
 import java.lang.reflect.Method;
@@ -93,6 +96,17 @@ public class MessageResourceAkkaTest extends JUnitRouteTest {
         assertThat(entity.getGlobalRequestId()).isNotEmpty();
     }
 
+    @Test
+    public void shouldSendMessageFromOneUserToAnother() throws Exception {
+        //Given
+        ObjectMapper objectMapper = new ObjectMapper();
+        TestRouteResult run = route.run((HttpRequest.POST("/conversations").withEntity()));
+
+        //When
+
+        //Then
+    }
+
     @Ignore
     public void shouldThrowExceptionWhenUserNotFound() {
         //Given
@@ -117,7 +131,7 @@ public class MessageResourceAkkaTest extends JUnitRouteTest {
     @Test
     public void shouldGenerateSwaggerDocumentationForRoute() throws Exception {
         //Given
-        Method conversationRouteMethod = messageResource.getClass().getMethod("conversationsRoute", null);
+        Method conversationRouteMethod = messageResource.getClass().getMethod("getConversationsRoute", null);
         assertThat(conversationRouteMethod.isAnnotationPresent(Path.class)).isTrue();
         assertThat(conversationRouteMethod.getAnnotation(Path.class).value()).isEqualTo("/conversations/{userId}");
 

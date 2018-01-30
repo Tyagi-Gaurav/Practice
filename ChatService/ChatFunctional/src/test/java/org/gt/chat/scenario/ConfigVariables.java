@@ -9,7 +9,8 @@ public enum ConfigVariables {
     DATABASE_PORT("database.port"),
     DATABASE_NAME("database.name"),
     DATABASE_AUDIT_COLLECTION("database.auditCollection"),
-    DATABASE_CONV_COLLECTION("database.conversationCollection");
+    DATABASE_CONV_COLLECTION("database.conversationCollection"),
+    DATABASE_USER_COLLECTION("database.userCollection");
 
     private String name;
 

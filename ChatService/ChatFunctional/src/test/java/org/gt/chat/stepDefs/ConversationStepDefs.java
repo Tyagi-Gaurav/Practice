@@ -1,6 +1,7 @@
 package org.gt.chat.stepDefs;
 
 import com.google.inject.Inject;
+import cucumber.api.PendingException;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -9,42 +10,48 @@ import cucumber.runtime.java.guice.ScenarioScoped;
 
 
 import org.gt.chat.domain.main.TestGetConversationsResponse;
+import org.gt.chat.domain.main.TestMessageContentType;
+import org.gt.chat.domain.main.TestPostConversationRequest;
 import org.gt.chat.scenario.Context;
 import org.gt.chat.stepDefs.service.MockDatabaseService;
+import org.gt.chat.stepDefs.service.MockUserService;
 
 import javax.ws.rs.core.Response;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.gt.chat.domain.main.TestGetConversationsResponse.TestContentType.TEXT_PLAIN_UTF8;
+import static org.gt.chat.domain.main.TestMessageContentType.TEXT_PLAIN_UTF8;
 
 @ScenarioScoped
 public class ConversationStepDefs {
     private final Context context;
     private MockDatabaseService mockDatabaseService;
+    private MockUserService mockUserService;
 
     @Inject
-    public ConversationStepDefs(Context context, MockDatabaseService mockDatabaseService) {
+    public ConversationStepDefs(Context context,
+                                MockDatabaseService mockDatabaseService,
+                                MockUserService mockUserService) {
         this.context = context;
         this.mockDatabaseService = mockDatabaseService;
+        this.mockUserService = mockUserService;
     }
 
-    @Given("^a user is successfully authenticated$")
-    public void aUserIsSuccessfullyAuthenticated() throws Throwable {
+    @Given("^user (.*) is successfully authenticated$")
+    public void aUserIsSuccessfullyAuthenticated(String userName) throws Throwable {
         //TODO Implement Me.
-        context.createAuthenticatedUser();
     }
 
-    @When("^a user tries to access their conversations$")
-    public void aUserTriesToAccessTheirConversations() throws Throwable {
-        context.requestFor("/conversations/" + context.user().getId());
+    @When("^user (.*) tries to access their conversations$")
+    public void aUserTriesToAccessTheirConversations(String userName) throws Throwable {
+        context.getRequestFor("/conversations/" + mockUserService.getUserIdFor(userName));
     }
 
-    @Then("^the user should be able to receive their conversations in the response$")
-    public void theUserShouldBeAbleToReceiveTheirConversationsInTheResponse() throws Throwable {
+    @Then("^the user (.*) should be able to receive their conversations in the response$")
+    public void theUserShouldBeAbleToReceiveTheirConversationsInTheResponse(String userName) throws Throwable {
         TestGetConversationsResponse conversation = TestGetConversationsResponse.builder()
                 .globalRequestId(context.getRequestId())
-                .userId("2")
+                .userId(mockUserService.getUserIdFor(userName))
                 .messages(TestGetConversationsResponse.TestMessages.builder()
                         .senderId("senderId")
                         .messageDetails(Arrays.asList(
@@ -58,13 +65,40 @@ public class ConversationStepDefs {
                         .build())
                 .build();
 
-        Response response = context.response();
-        assertThat(response.getStatus()).isEqualTo(200);
-        assertThat(response.readEntity(TestGetConversationsResponse.class)).isEqualTo(conversation);
+        TestGetConversationsResponse responseEntity =
+                context.readResponse(TestGetConversationsResponse.class);
+        assertThat(context.getResponse().getStatus()).isEqualTo(200);
+        assertThat(responseEntity).isEqualTo(conversation);
     }
 
-    @And("^the user has some conversations available on the server$")
-    public void theUserHasSomeConversationsAvailableOnTheServer() throws Throwable {
-        mockDatabaseService.createConversationsForUser();
+    @And("^the user (.*) has some conversations available on the server$")
+    public void theUserHasSomeConversationsAvailableOnTheServer(String userName) throws Throwable {
+        mockDatabaseService.createConversationsForUser(mockUserService.getUserIdFor(userName));
+    }
+
+    @When("^user (.*) sends a message '(.*)' to user (.*) successfully$")
+    public void userAliceTriesToSendAMessageToUserBob(String userA, String message, String userB) throws Throwable {
+        TestPostConversationRequest conversationRequest =
+                TestPostConversationRequest.builder()
+                        .senderId(mockUserService.getUserIdFor(userA))
+                        .recipientUserId(mockUserService.getUserIdFor(userB))
+                        .messageDetail(TestPostConversationRequest.TestMessageDetail.builder()
+                                .content(message)
+                                .contentType(TestMessageContentType.TEXT_PLAIN_UTF8)
+                                .build())
+                        .build();
+        context.postRequestFor("/conversations/", conversationRequest);
+        assertThat(context.getResponse().getStatus()).isEqualTo(202);
+    }
+
+    @Then("^user (.*) should be able to receive the message '(.*)' from (.*)$")
+    public void userBobShouldBeAbleToReceiveTheConversation(String recipient, String message, String sender) throws Throwable {
+        TestGetConversationsResponse responseEntity =
+                context.readResponse(TestGetConversationsResponse.class);
+        assertThat(context.getResponse().getStatus()).isEqualTo(200);
+        assertThat(responseEntity.getUserId()).isEqualTo(mockUserService.getUserIdFor(recipient));
+        assertThat(responseEntity.getMessages()).isNotNull();
+        assertThat(responseEntity.getMessages().getSenderId()).isEqualTo(mockUserService.getUserIdFor(sender));
+        
     }
 }

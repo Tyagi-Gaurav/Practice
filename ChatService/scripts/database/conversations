@@ -1,0 +1,23 @@
+User:
+  userid: "",
+  messages: {
+    senderId : "",
+    messageDetails : [ {
+      "content" : "",
+      "contentType" : "",
+      "sent" : "true/false"
+      "timestamp" : ""
+      }
+    ]
+  },
+  "group" : [{
+    "groupId" : "",
+    messages : [
+    {
+      "content" : "",
+      "contentType" : "",
+      "sent" : "true/false"
+      "timestamp" : "",
+      "sender" : ""
+      }]
+  }]

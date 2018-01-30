@@ -45,6 +45,6 @@ public class HealthCheckStepDefs {
 
     @When("^healthcheck endpoint is accessed for main application$")
     public void healthcheckEndpointIsAccessedForMainApplication() throws Throwable {
-        context.requestFor("/private/healthcheck");
+        context.getRequestFor("/private/healthcheck");
     }
 }
