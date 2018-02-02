@@ -11,9 +11,11 @@ import com.google.common.collect.ImmutableList;
 import org.gt.chat.domain.HealthCheckRequest;
 import org.gt.chat.domain.HealthCheckResponse;
 import org.gt.chat.main.audit.domain.AuditEvent;
+import org.gt.chat.main.domain.ContentType;
 import org.gt.chat.main.domain.ConversationEntity;
-import org.gt.chat.main.domain.ConversationRequest;
-import org.gt.chat.main.domain.GetConversationResponse;
+import org.gt.chat.main.domain.api.ConversationRequest;
+import org.gt.chat.main.domain.api.GetConversationResponse;
+import org.gt.chat.main.domain.dto.ConversationSaveDTO;
 import scala.concurrent.ExecutionContextExecutor;
 import scala.concurrent.duration.Duration;
 
@@ -73,7 +75,7 @@ public class ConversationActor extends AbstractActor {
                                                                             .stream().map(cemd ->
                                                                                     GetConversationResponse.MessageDetail.builder()
                                                                                             .content(cemd.getContent())
-                                                                                            .contentType(GetConversationResponse.ContentType.valueOf(
+                                                                                            .contentType(ContentType.valueOf(
                                                                                                     cemd.getContentType().toString()))
                                                                                             .received(cemd.isReceived())
                                                                                             .timestamp(cemd.getTimestamp())
@@ -94,7 +96,7 @@ public class ConversationActor extends AbstractActor {
                         }
                     });
                 }).match(HealthCheckRequest.class, healthCheckRequest -> {
-                    HealthCheckResponse healthCheckResponse = null;
+                    HealthCheckResponse healthCheckResponse;
 
                     if (auditRef.toCompletableFuture().isDone()) {
                         healthCheckResponse = ask(auditRef.toCompletableFuture().get(), healthCheckRequest, 5000)
@@ -108,6 +110,12 @@ public class ConversationActor extends AbstractActor {
                     HealthCheckResponse result = HealthCheckResponse.builder().result("OK").name("ConversationActor")
                             .dependencies(ImmutableList.of(healthCheckResponse)).build();
                     pipe(CompletableFuture.completedFuture(result), dispatcher).to(getSender());
+                })
+                .match(ConversationSaveDTO.class, conversationSaveDTO -> {
+                    CompletionStage<Object> saveConversationStage =
+                            ask(conversationRepositoryActor, conversationSaveDTO, 3000L);
+
+                    pipe(saveConversationStage, dispatcher).to(getSender());
                 })
                 .matchAny(o -> LOG.error("Received unknown message {}", o))
                 .build();

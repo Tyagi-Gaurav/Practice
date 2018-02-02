@@ -2,7 +2,7 @@ package org.gt.chat.scenario;
 
 import com.google.inject.Inject;
 import cucumber.runtime.java.guice.ScenarioScoped;
-import org.gt.chat.domain.main.TestPostConversationRequest;
+import org.gt.chat.domain.main.TestSendConversationRequest;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -44,7 +44,7 @@ public class Context {
         return response;
     }
 
-    public void postRequestFor(String path, TestPostConversationRequest conversationRequest) {
+    public void postRequestFor(String path, TestSendConversationRequest conversationRequest) {
         response = client.target(config.getString(HOST) + path)
                 .request(MediaType.APPLICATION_JSON)
                 .header("X-request-id", requestId)

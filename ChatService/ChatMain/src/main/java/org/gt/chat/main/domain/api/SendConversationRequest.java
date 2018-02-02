@@ -1,23 +1,24 @@
-package org.gt.chat.domain.main;
+package org.gt.chat.main.domain.api;
 
 import lombok.*;
+import org.gt.chat.main.domain.ContentType;
 
 @EqualsAndHashCode
 @Getter
 @AllArgsConstructor
 @ToString
 @Builder
-public class TestPostConversationRequest {
+public class SendConversationRequest {
     private String senderId;
     private String recipientUserId;
-    private TestMessageDetail messageDetail;
+    private SendMessageDetail messageDetail;
 
     @Builder
     @EqualsAndHashCode
     @ToString
     @Getter
-    public static class TestMessageDetail {
+    public static class SendMessageDetail {
         private String content;
-        private TestMessageContentType contentType;
+        private ContentType contentType;
     }
 }

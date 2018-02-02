@@ -1,7 +1,6 @@
 package org.gt.chat.stepDefs;
 
 import com.google.inject.Inject;
-import cucumber.api.PendingException;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -11,12 +10,11 @@ import cucumber.runtime.java.guice.ScenarioScoped;
 
 import org.gt.chat.domain.main.TestGetConversationsResponse;
 import org.gt.chat.domain.main.TestMessageContentType;
-import org.gt.chat.domain.main.TestPostConversationRequest;
+import org.gt.chat.domain.main.TestSendConversationRequest;
 import org.gt.chat.scenario.Context;
 import org.gt.chat.stepDefs.service.MockDatabaseService;
 import org.gt.chat.stepDefs.service.MockUserService;
 
-import javax.ws.rs.core.Response;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -78,11 +76,11 @@ public class ConversationStepDefs {
 
     @When("^user (.*) sends a message '(.*)' to user (.*) successfully$")
     public void userAliceTriesToSendAMessageToUserBob(String userA, String message, String userB) throws Throwable {
-        TestPostConversationRequest conversationRequest =
-                TestPostConversationRequest.builder()
+        TestSendConversationRequest conversationRequest =
+                TestSendConversationRequest.builder()
                         .senderId(mockUserService.getUserIdFor(userA))
                         .recipientUserId(mockUserService.getUserIdFor(userB))
-                        .messageDetail(TestPostConversationRequest.TestMessageDetail.builder()
+                        .messageDetail(TestSendConversationRequest.TestMessageDetail.builder()
                                 .content(message)
                                 .contentType(TestMessageContentType.TEXT_PLAIN_UTF8)
                                 .build())

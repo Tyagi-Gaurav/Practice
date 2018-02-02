@@ -6,12 +6,15 @@ import akka.actor.Props;
 import akka.testkit.TestActor;
 import akka.testkit.TestProbe;
 import akka.testkit.javadsl.TestKit;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.gt.chat.domain.HealthCheckRequest;
 import org.gt.chat.domain.HealthCheckResponse;
+import org.gt.chat.main.domain.ContentType;
+import org.gt.chat.main.domain.dto.ConversationSaveDTO;
 import org.gt.chat.main.exception.InvalidUserException;
 import org.gt.chat.main.domain.ConversationEntity;
-import org.gt.chat.main.domain.ConversationRequest;
-import org.gt.chat.main.domain.GetConversationResponse;
+import org.gt.chat.main.domain.api.ConversationRequest;
+import org.gt.chat.main.domain.api.GetConversationResponse;
 import org.gt.chat.main.util.ActorSystemTest;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -127,6 +130,29 @@ public class ConversationActorTest extends ActorSystemTest {
         }};
     }
 
+    @Test
+    public void saveConversationForUserInDatabase() throws Exception {
+        //given
+        conversationRepoActorProbe.setAutoPilot(new TestActor.AutoPilot() {
+            @Override
+            public TestActor.AutoPilot run(ActorRef sender, Object msg) {
+                sender.tell(Boolean.TRUE, ActorRef.noSender());
+                return noAutoPilot();
+            }
+        });
+
+        //when
+        new TestKit(actorSystem) {{
+            final ActorRef subject = actorSystem.actorOf(props);
+
+            ConversationSaveDTO msg = saveDTO();
+            subject.tell(msg, getRef());
+
+            expectMsg(Boolean.TRUE);
+            conversationRepoActorProbe.expectMsg(msg);
+        }};
+    }
+
     @Ignore
     public void shouldRestartActorWhenItFailsWithException() {
         //When
@@ -148,7 +174,7 @@ public class ConversationActorTest extends ActorSystemTest {
                                 .received(true)
                                 .timestamp(234878234L)
                                 .content("Hello World")
-                                .contentType(GetConversationResponse.ContentType.TEXT_PLAIN_UTF8)
+                                .contentType(ContentType.TEXT_PLAIN_UTF8)
                                 .build()))
                         .build())
                 .build();
@@ -174,6 +200,10 @@ public class ConversationActorTest extends ActorSystemTest {
                 .builder()
                 .globalRequestId(GLOBAL_REQUEST_ID)
                 .userId(userId).build();
+    }
+
+    private ConversationSaveDTO saveDTO() {
+        return ConversationSaveDTO.builder().build();
     }
 
 }

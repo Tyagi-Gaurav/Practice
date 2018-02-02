@@ -1,4 +1,4 @@
-package org.gt.chat.main.domain;
+package org.gt.chat.main.domain.api;
 
 import lombok.*;
 

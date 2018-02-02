@@ -9,6 +9,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoIterable;
 import com.typesafe.config.Config;
 import org.bson.Document;
+import org.gt.chat.main.domain.dto.ConversationSaveDTO;
 import org.gt.chat.main.exception.InvalidUserException;
 import org.gt.chat.main.domain.ConversationEntity;
 import scala.concurrent.ExecutionContextExecutor;
@@ -85,6 +86,18 @@ public class ConversationRepositoryActor extends AbstractActor {
                         }
                     });
                     pipe(conversationAggregateCompletableFuture, dispatcher).to(getSender());
+                })
+                .match(ConversationSaveDTO.class, conversationSaveDTO -> {
+                    MongoCollection<Document> collection = mongoDatabase.getCollection(config.getString("repo.collection"));
+//                    collection.findOneAndUpdate(
+//                            new Document("userId", conversationSaveDTO.getSenderId())
+//                            .append("messages.senderId", conversationSaveDTO.getRecipientId()),
+//                            new Document("$push", new Document("messages.$.messageDetails",
+//                                    new Document("content", conversationSaveDTO.getMessage().getContent()).
+//                                    append("contentType", conversationSaveDTO.getMessage().getContentType().toString())
+//                                    .append("received", true)
+//                                    .append()
+//                            );
                 })
                 .matchAny(o -> {
                     LOG.error("Error Occurred");

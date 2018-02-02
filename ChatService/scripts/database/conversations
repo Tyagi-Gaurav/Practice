@@ -1,11 +1,11 @@
-User:
+Conversations:
   userid: "",
   messages: {
     senderId : "",
     messageDetails : [ {
       "content" : "",
       "contentType" : "",
-      "sent" : "true/false"
+      "received" : "true/false"
       "timestamp" : ""
       }
     ]
@@ -16,8 +16,20 @@ User:
     {
       "content" : "",
       "contentType" : "",
-      "sent" : "true/false"
+      "received" : "true/false"
       "timestamp" : "",
       "sender" : ""
       }]
   }]
+
+
+Conversations:
+  senderId: "",
+  recipientId : "",
+  groupId : "",
+  messageDetails : {
+      "content" : "",
+      "contentType" : "",
+      "timestamp" : ""
+  }
+

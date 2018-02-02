@@ -69,12 +69,12 @@ public class MockDatabaseService {
         collection.insertOne(
                 new Document("userId", userId)
                         .append("messages", new Document("senderId", "senderId")
-                                .append("messageDetails", asList(
+                                .append("messageDetails",
                                         new Document("content", "Hello World")
-                                                .append("received" , true)
+                                                .append("received", true)
                                                 .append("timestamp", 234878234L)
                                                 .append("contentType", ConversationEntity.ContentTypeEntity.TEXT_PLAIN_UTF8.toString())
-                                ))));
+                                )));
 
         FindIterable<Document> documents = collection.find(new Document("userId", userId));
         List<Document> fetchedDocuments = StreamSupport.stream(documents.spliterator(), false).collect(Collectors.toList());

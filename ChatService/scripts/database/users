@@ -3,4 +3,5 @@
     "firstName" : "",
     "lastName" : "",
     "userName" : ""
+    "isGroup" : true/false
 }

@@ -2,18 +2,23 @@ package org.gt.chat.main.resource;
 
 import akka.actor.ActorRef;
 import akka.http.javadsl.marshallers.jackson.Jackson;
+import akka.http.javadsl.model.HttpEntity;
 import akka.http.javadsl.model.StatusCodes;
 import akka.http.javadsl.server.AllDirectives;
 import akka.http.javadsl.server.ExceptionHandler;
 import akka.http.javadsl.server.Route;
+import akka.http.javadsl.unmarshalling.Unmarshaller;
 import io.swagger.annotations.*;
-import org.gt.chat.main.domain.ConversationRequest;
-import org.gt.chat.main.domain.GetConversationResponse;
+import org.gt.chat.main.domain.api.ConversationRequest;
+import org.gt.chat.main.domain.api.GetConversationResponse;
+import org.gt.chat.main.domain.api.SendConversationRequest;
+import org.gt.chat.main.domain.dto.ConversationSaveDTO;
 
 import javax.ws.rs.Path;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import static akka.http.javadsl.model.StatusCodes.ACCEPTED;
 import static akka.http.javadsl.server.PathMatchers.segment;
 import static akka.pattern.PatternsCS.ask;
 import static java.util.regex.Pattern.compile;
@@ -60,10 +65,33 @@ public class MessageResourceAkka extends AllDirectives {
                 ));
     }
 
+    public Route postConversationsRoute() {
+        final Unmarshaller<HttpEntity, SendConversationRequest> unmarshaller = Jackson.unmarshaller(SendConversationRequest.class);
+
+        return optionalHeaderValueByName("X-request-id", requestId ->
+                path(segment("conversations"), () ->
+                    handleExceptions(messageExceptionHandler.get(),
+                            () -> post(() ->
+                                    entity(unmarshaller, sendConversation ->
+                                            onComplete(() ->
+                                                ask(messageActor, ConversationSaveDTO.builder()
+                                                        .senderId(sendConversation.getSenderId())
+                                                        .recipientId(sendConversation.getRecipientUserId())
+                                                        .message(ConversationSaveDTO.MessageDetail.builder()
+                                                                .contentType(sendConversation.getMessageDetail().getContentType())
+                                                                .content(sendConversation.getMessageDetail().getContent())
+                                                                .build())
+                                                        .build(), 1000L),
+                                                functionResult -> functionResult.map(func(result ->
+                                                        complete(StatusCodes.ACCEPTED, result, Jackson.marshaller()))).get()
+                            )))
+        )));
+    }
 
     public Route getRoute() {
         return route(
                 getConversationsRoute(),
+                postConversationsRoute(),
                 documentationRoute.routes());
     }
 }

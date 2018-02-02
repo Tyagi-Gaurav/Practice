@@ -1,6 +1,7 @@
-package org.gt.chat.main.domain;
+package org.gt.chat.main.domain.api;
 
 import lombok.*;
+import org.gt.chat.main.domain.ContentType;
 
 import java.util.List;
 
@@ -24,19 +25,6 @@ public class GetConversationResponse {
         private ContentType contentType;
         private boolean received;
         private long timestamp;
-    }
-
-    @Getter
-    public enum ContentType {
-        APPLICATION_JSON("application/json"),
-        TEXT_PLAIN_UTF8("text/plain-utf8"),
-        APPLICATION_OCTET_STREAM("application/octet-stream");
-
-        private String value;
-
-        ContentType(String value) {
-            this.value = value;
-        }
     }
 
     @Builder

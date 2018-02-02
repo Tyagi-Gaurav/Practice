@@ -8,15 +8,19 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoIterable;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigValueFactory;
 import org.bson.Document;
+import org.gt.chat.main.domain.ContentType;
 import org.gt.chat.main.domain.ConversationEntity;
+import org.gt.chat.main.domain.dto.ConversationSaveDTO;
 import org.gt.chat.main.exception.InvalidUserException;
 import org.gt.chat.main.util.ActorSystemTest;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -81,7 +85,7 @@ public class ConversationRepositoryActorTest extends ActorSystemTest {
             Object[] arguments = invocationOnMock.getArguments();
             Function argument = (Function<Document, ConversationEntity>) arguments[0];
 
-            Object apply = argument.apply(getDocument());
+            Object apply = argument.apply(getSearchDocument());
             assertThat(apply).isEqualTo(expectedConversationEntity);
             return mongoIterable;
         });
@@ -150,6 +154,33 @@ public class ConversationRepositoryActorTest extends ActorSystemTest {
         }};
     }
 
+    @Ignore
+    public void shouldSaveConversationFromOneUserToAnother() throws Exception {
+        //given
+        new TestKit(actorSystem) {{
+            final Props props = Props.create(ConversationRepositoryActor.class, db);
+            final ActorRef subject = actorSystem.actorOf(props);
+
+            ConversationSaveDTO msg = saveDTO();
+            subject.tell(msg, getRef());
+
+            verify(dbCollection).find(new Document("userId", msg.getSenderId()));
+            verify(dbCollection).insertOne(any(Document.class));
+            expectMsg(Boolean.TRUE);
+        }};
+    }
+
+    private ConversationSaveDTO saveDTO() {
+        return ConversationSaveDTO.builder()
+                .senderId("a")
+                .recipientId("a")
+                .message(ConversationSaveDTO.MessageDetail.builder()
+                        .contentType(ContentType.APPLICATION_JSON)
+                        .content("Hello World")
+                        .build())
+                .build();
+    }
+
     private ConversationEntity getConversationEntity() {
         return ConversationEntity.builder()
                 .userId(VALID_USER_ID)
@@ -165,7 +196,7 @@ public class ConversationRepositoryActorTest extends ActorSystemTest {
                 .build();
     }
 
-    private Document getDocument() {
+    private Document getSearchDocument() {
         return new Document("userId", VALID_USER_ID)
                 .append("messages", new Document("senderId", "senderId")
                         .append("messageDetails", asList(

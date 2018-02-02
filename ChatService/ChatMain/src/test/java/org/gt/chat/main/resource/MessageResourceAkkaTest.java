@@ -5,7 +5,6 @@ import akka.actor.ActorSystem;
 import akka.http.javadsl.marshallers.jackson.Jackson;
 import akka.http.javadsl.model.ContentTypes;
 import akka.http.javadsl.model.HttpRequest;
-import akka.http.javadsl.model.RequestEntity;
 import akka.http.javadsl.testkit.JUnitRouteTest;
 import akka.http.javadsl.testkit.TestRoute;
 import akka.http.javadsl.testkit.TestRouteResult;
@@ -14,15 +13,17 @@ import akka.testkit.TestProbe;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.jaxrs.config.DefaultReaderConfig;
+import org.gt.chat.main.domain.ContentType;
+import org.gt.chat.main.domain.api.SendConversationRequest;
+import org.gt.chat.main.domain.dto.ConversationSaveDTO;
 import org.gt.chat.main.exception.ErrorResponse;
 import org.gt.chat.main.exception.InvalidUserException;
 import org.gt.chat.main.exception.MessageExceptionHandler;
-import org.gt.chat.main.domain.GetConversationResponse;
+import org.gt.chat.main.domain.api.GetConversationResponse;
 import org.gt.chat.main.util.StringBasedHeader;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import sun.jvm.hotspot.runtime.ObjectMonitor;
 
 import javax.ws.rs.Path;
 import java.lang.reflect.Method;
@@ -46,7 +47,7 @@ public class MessageResourceAkkaTest extends JUnitRouteTest {
                             .received(true)
                             .timestamp(234878234L)
                             .content("Hello World")
-                            .contentType(GetConversationResponse.ContentType.TEXT_PLAIN_UTF8)
+                            .contentType(ContentType.TEXT_PLAIN_UTF8)
                             .build()))
                     .build())
             .build();
@@ -98,13 +99,43 @@ public class MessageResourceAkkaTest extends JUnitRouteTest {
 
     @Test
     public void shouldSendMessageFromOneUserToAnother() throws Exception {
-        //Given
-        ObjectMapper objectMapper = new ObjectMapper();
-        TestRouteResult run = route.run((HttpRequest.POST("/conversations").withEntity()));
-
         //When
+        ObjectMapper objectMapper = new ObjectMapper();
+        TestRouteResult run = route.run((HttpRequest.POST("/conversations")
+                .withEntity(ContentTypes.APPLICATION_JSON, objectMapper.writeValueAsString(SendConversationRequest.builder()
+                        .senderId("a")
+                        .recipientUserId("b")
+                        .messageDetail(SendConversationRequest.SendMessageDetail.builder()
+                                .content("Hello World")
+                                .contentType(ContentType.APPLICATION_JSON)
+                                .build())
+                        .build()))
+
+        ));
+
+        ConversationSaveDTO expectedDTO = ConversationSaveDTO.builder()
+                .senderId("a")
+                .recipientId("b")
+                .message(ConversationSaveDTO.MessageDetail.builder()
+                        .content("Hello World")
+                        .contentType(ContentType.APPLICATION_JSON)
+                        .build())
+                .build();
 
         //Then
+        run.assertStatusCode(202);
+        messageActor.expectMsg(expectedDTO);
+    }
+
+    @Test
+    public void shouldThrowErrorWhenContentTypeDoesNotMatch() throws Exception {
+        //When
+        ObjectMapper objectMapper = new ObjectMapper();
+        TestRouteResult run = route.run((HttpRequest.POST("/conversations")
+                .withEntity(objectMapper.writeValueAsString(SendConversationRequest.builder().build()))));
+
+        //Then
+        run.assertStatusCode(415);
     }
 
     @Ignore
@@ -152,7 +183,7 @@ public class MessageResourceAkkaTest extends JUnitRouteTest {
                                 .received(true)
                                 .timestamp(234878234L)
                                 .content("Hello World")
-                                .contentType(GetConversationResponse.ContentType.TEXT_PLAIN_UTF8)
+                                .contentType(ContentType.TEXT_PLAIN_UTF8)
                                 .build()))
                         .build())
                 .build();
