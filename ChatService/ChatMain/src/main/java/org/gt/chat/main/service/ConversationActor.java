@@ -16,9 +16,11 @@ import org.gt.chat.main.domain.ConversationEntity;
 import org.gt.chat.main.domain.api.ConversationRequest;
 import org.gt.chat.main.domain.api.GetConversationResponse;
 import org.gt.chat.main.domain.dto.ConversationSaveDTO;
+import org.gt.chat.main.repos.ConversationRepository;
 import scala.concurrent.ExecutionContextExecutor;
 import scala.concurrent.duration.Duration;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
@@ -35,14 +37,14 @@ public class ConversationActor extends AbstractActor {
     private final LoggingAdapter LOG = Logging.getLogger(this.getContext().getSystem(), this);
     private ExecutionContextExecutor dispatcher = this.getContext().getSystem().dispatcher();
     private final CompletionStage<ActorRef> auditRef;
-    private ActorRef conversationRepositoryActor;
+    private ConversationRepository conversationRepository;
 
     public ConversationActor(
             Function<akka.actor.ActorContext,
             CompletionStage<ActorRef>> auditProvider,
-            ActorRef conversationRepositoryActor) {
+            ConversationRepository conversationRepository) {
         this.auditRef = auditProvider.apply(this.getContext());
-        this.conversationRepositoryActor = conversationRepositoryActor;
+        this.conversationRepository = conversationRepository;
     }
 
     private static SupervisorStrategy strategy =
@@ -62,28 +64,25 @@ public class ConversationActor extends AbstractActor {
     public Receive createReceive() {
         return receiveBuilder()
                 .match(ConversationRequest.class, conversationRequest -> {
-                    CompletionStage<GetConversationResponse> listCompletionStage =
-                            ask(conversationRepositoryActor, conversationRequest.getUserId(), 3000L)
-                                    .thenCompose(x ->
-                                            CompletableFuture.supplyAsync(() ->
-                                                    GetConversationResponse.builder()
-                                                            .globalRequestId(conversationRequest.getGlobalRequestId())
-                                                            .userId(conversationRequest.getUserId())
-                                                            .messages(GetConversationResponse.Messages.builder()
-                                                                    .senderId(((ConversationEntity) x).getMessages().getSenderId())
-                                                                    .messageDetails(((ConversationEntity) x).getMessages().getMessageDetails()
-                                                                            .stream().map(cemd ->
-                                                                                    GetConversationResponse.MessageDetail.builder()
-                                                                                            .content(cemd.getContent())
-                                                                                            .contentType(ContentType.valueOf(
-                                                                                                    cemd.getContentType().toString()))
-                                                                                            .received(cemd.isReceived())
-                                                                                            .timestamp(cemd.getTimestamp())
-                                                                                            .build()).collect(Collectors.toList()))
-                                                                    .build())
-                                                            .build()
-                                    ));
-                    pipe(listCompletionStage, dispatcher).to(getSender());
+                    List<ConversationEntity> conversationsFor =
+                            conversationRepository.getConversationsFor(conversationRequest.getUserId());
+
+                    GetConversationResponse build = GetConversationResponse.builder()
+                            .globalRequestId(conversationRequest.getGlobalRequestId())
+                            .messageDetails(
+                                    conversationsFor.stream()
+                                        .map(x -> GetConversationResponse.MessageDetail.builder()
+                                                .content(x.getContent())
+                                                .senderId(x.getSenderId())
+                                                .recipientId(x.getRecipientId())
+                                                .contentType(ContentType.valueOf(x.getContentType().toString()))
+                                                .received(x.isReceived())
+                                                .timestamp(x.getTimestamp())
+                                                .build())
+                                        .collect(Collectors.toList()))
+                            .build();
+
+                    pipe(CompletableFuture.completedFuture(build), dispatcher).to(getSender());
                     auditRef.whenCompleteAsync((actorRef, throwable) -> {
                         if (actorRef != null) {
                             actorRef.tell(AuditEvent.builder()
@@ -112,10 +111,10 @@ public class ConversationActor extends AbstractActor {
                     pipe(CompletableFuture.completedFuture(result), dispatcher).to(getSender());
                 })
                 .match(ConversationSaveDTO.class, conversationSaveDTO -> {
-                    CompletionStage<Object> saveConversationStage =
-                            ask(conversationRepositoryActor, conversationSaveDTO, 3000L);
+//                    CompletionStage<Object> saveConversationStage =
+//                            ask(conversationRepositoryActor, conversationSaveDTO, 3000L);
 
-                    pipe(saveConversationStage, dispatcher).to(getSender());
+//                    pipe(saveConversationStage, dispatcher).to(getSender());
                 })
                 .matchAny(o -> LOG.error("Received unknown message {}", o))
                 .build();

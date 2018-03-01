@@ -33,3 +33,14 @@ Conversations:
       "timestamp" : ""
   }
 
+
+{
+    {"senderId" : "2", "recipientId" : "3", messageDetails : {"content" : "Hi", contentType: "text/plain-utf8", timestamp : "1517645197"}}
+    {"senderId" : "3", "recipientId" : "2", messageDetails : {"content" : "Hi", contentType: "text/plain-utf8", timestamp : "1517645222"}}
+    {"senderId" : "2", "recipientId" : "3", messageDetails : {"content" : "How are you ?", contentType: "text/plain-utf8", timestamp : "1517645246"}}
+    {"senderId" : "3", "recipientId" : "2", messageDetails : {"content" : "Good. How are you ?", contentType: "text/plain-utf8", timestamp : "1517645264"}}
+    {"senderId" : "3", "recipientId" : "4", messageDetails : {"content" : "Good. How are you ?", contentType: "text/plain-utf8", timestamp : "1517645264"}}
+    {"senderId" : "4", "recipientId" : "5", messageDetails : {"content" : "Good. How are you 5 ?", contentType: "text/plain-utf8", timestamp : "1517663493"}}
+}
+
+db.conversationCollection.find({"$or" : [{"senderId" : "3"}, {"recipientId" : "3"}]})

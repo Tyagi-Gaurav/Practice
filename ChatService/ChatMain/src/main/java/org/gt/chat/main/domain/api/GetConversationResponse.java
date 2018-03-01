@@ -12,36 +12,18 @@ import java.util.List;
 @Builder
 public class GetConversationResponse {
     private String globalRequestId;
-    private String userId;
-    private Messages messages;
-    private MessageCategoryGroup group;
+    private List<MessageDetail> messageDetails;
 
     @Builder
     @EqualsAndHashCode
     @ToString
     @Getter
     public static class MessageDetail {
+        private String senderId;
+        private String recipientId;
+        private boolean received;
         private String content;
         private ContentType contentType;
-        private boolean received;
         private long timestamp;
-    }
-
-    @Builder
-    @EqualsAndHashCode
-    @ToString
-    @Getter
-    public static class Messages {
-        private String senderId;
-        private List<MessageDetail> messageDetails;
-    }
-
-    @Builder
-    @EqualsAndHashCode
-    @ToString
-    @Getter
-    public static class MessageCategoryGroup {
-        private String groupId;
-        private List<MessageDetail> messages;
     }
 }

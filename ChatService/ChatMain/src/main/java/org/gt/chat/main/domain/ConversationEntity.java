@@ -3,6 +3,7 @@ package org.gt.chat.main.domain;
 import lombok.*;
 
 import java.util.List;
+import java.util.Map;
 
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -10,19 +11,12 @@ import java.util.List;
 @ToString
 @Builder
 public class ConversationEntity {
-    private String userId;
-    private Messages messages;
-
-    @Builder
-    @EqualsAndHashCode
-    @ToString
-    @Getter
-    public static class MessageDetailEntity {
-        private String content;
-        private ContentTypeEntity contentType;
-        private boolean received;
-        private long timestamp;
-    }
+    private String senderId;
+    private String recipientId;
+    private boolean received;
+    private String content;
+    private ContentTypeEntity contentType;
+    private long timestamp;
 
     @Getter
     public enum ContentTypeEntity {
@@ -35,14 +29,5 @@ public class ConversationEntity {
         ContentTypeEntity(String value) {
             this.value = value;
         }
-    }
-
-    @Builder
-    @EqualsAndHashCode
-    @ToString
-    @Getter
-    public static class Messages {
-        private String senderId;
-        private List<MessageDetailEntity> messageDetails;
     }
 }

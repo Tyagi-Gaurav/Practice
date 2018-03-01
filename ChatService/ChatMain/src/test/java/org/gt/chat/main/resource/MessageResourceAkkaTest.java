@@ -14,12 +14,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.jaxrs.config.DefaultReaderConfig;
 import org.gt.chat.main.domain.ContentType;
+import org.gt.chat.main.domain.api.GetConversationResponse;
 import org.gt.chat.main.domain.api.SendConversationRequest;
 import org.gt.chat.main.domain.dto.ConversationSaveDTO;
 import org.gt.chat.main.exception.ErrorResponse;
 import org.gt.chat.main.exception.InvalidUserException;
 import org.gt.chat.main.exception.MessageExceptionHandler;
-import org.gt.chat.main.domain.api.GetConversationResponse;
 import org.gt.chat.main.util.StringBasedHeader;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -34,22 +34,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class MessageResourceAkkaTest extends JUnitRouteTest {
     private final String GLOBAL_REQUEST_ID = "global-request-id";
-    private final String VALID_USER_ID = "valid-user-id";
 
     private MessageExceptionHandler messageExceptionHandler = new MessageExceptionHandler();
     private String requestId = "Test-Request-Id";
     private final GetConversationResponse expectedMessages = GetConversationResponse.builder()
-            .userId(VALID_USER_ID)
             .globalRequestId(GLOBAL_REQUEST_ID)
-            .messages(GetConversationResponse.Messages.builder()
-                    .senderId("senderId")
-                    .messageDetails(asList(GetConversationResponse.MessageDetail.builder()
-                            .received(true)
-                            .timestamp(234878234L)
-                            .content("Hello World")
-                            .contentType(ContentType.TEXT_PLAIN_UTF8)
-                            .build()))
-                    .build())
+            .messageDetails(asList(GetConversationResponse.MessageDetail.builder()
+                .senderId("senderId")
+                .recipientId("recipientId")
+                .received(true)
+                .timestamp(234878234L)
+                .content("Hello World")
+                .contentType(ContentType.TEXT_PLAIN_UTF8)
+                .build()))
             .build();
 
     private ActorSystem actorSystem = ActorSystem.create(UUID.randomUUID().toString());
@@ -82,8 +79,8 @@ public class MessageResourceAkkaTest extends JUnitRouteTest {
         run.assertStatusCode(200)
                 .assertContentType(ContentTypes.APPLICATION_JSON);
 
-        GetConversationResponse entity = run.entity(Jackson.unmarshaller(GetConversationResponse.class));
-        assertThat(expectedMessages).isEqualTo(entity);
+        GetConversationResponse response = run.entity(Jackson.unmarshaller(GetConversationResponse.class));
+        assertThat(expectedMessages).isEqualTo(response);
     }
 
     @Test
@@ -176,16 +173,14 @@ public class MessageResourceAkkaTest extends JUnitRouteTest {
     private GetConversationResponse getExpectedConversations() {
         return GetConversationResponse.builder()
                 .globalRequestId(GLOBAL_REQUEST_ID)
-                .userId(VALID_USER_ID)
-                .messages(GetConversationResponse.Messages.builder()
+                .messageDetails(asList(GetConversationResponse.MessageDetail.builder()
                         .senderId("senderId")
-                        .messageDetails(asList(GetConversationResponse.MessageDetail.builder()
-                                .received(true)
-                                .timestamp(234878234L)
-                                .content("Hello World")
-                                .contentType(ContentType.TEXT_PLAIN_UTF8)
-                                .build()))
-                        .build())
+                        .recipientId("recipientId")
+                        .received(true)
+                        .timestamp(234878234L)
+                        .content("Hello World")
+                        .contentType(ContentType.TEXT_PLAIN_UTF8)
+                        .build()))
                 .build();
     }
 }

@@ -14,7 +14,7 @@ import com.typesafe.config.ConfigFactory;
 import io.swagger.jaxrs.config.DefaultReaderConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.gt.chat.main.exception.MessageExceptionHandler;
-import org.gt.chat.main.repos.ConversationRepositoryActor;
+import org.gt.chat.main.repos.ConversationRepository;
 import org.gt.chat.main.resource.DocumentationRoute;
 import org.gt.chat.main.resource.HealthCheckResource;
 import org.gt.chat.main.resource.MessageResourceAkka;
@@ -77,7 +77,7 @@ public class MainAkkaServer {
 
     private ActorRef getConversationRepositoryActor() {
         Config config = actorSystem.settings().config();
-        return actorSystem.actorOf(Props.create(ConversationRepositoryActor.class,
+        return actorSystem.actorOf(Props.create(ConversationRepository.class,
                 databaseProvider(config)));
     }
 
