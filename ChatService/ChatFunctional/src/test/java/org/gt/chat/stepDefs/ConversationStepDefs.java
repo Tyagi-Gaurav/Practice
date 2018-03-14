@@ -17,6 +17,7 @@ import org.gt.chat.stepDefs.service.MockUserService;
 
 import java.util.Arrays;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.gt.chat.domain.main.TestMessageContentType.TEXT_PLAIN_UTF8;
 
@@ -47,26 +48,23 @@ public class ConversationStepDefs {
 
     @Then("^the user (.*) should be able to receive their conversations in the response$")
     public void theUserShouldBeAbleToReceiveTheirConversationsInTheResponse(String userName) throws Throwable {
-        TestGetConversationsResponse conversation = TestGetConversationsResponse.builder()
+        TestGetConversationsResponse expectedConversation = TestGetConversationsResponse.builder()
                 .globalRequestId(context.getRequestId())
-                .userId(mockUserService.getUserIdFor(userName))
-                .messages(TestGetConversationsResponse.TestMessages.builder()
+                .messageDetails(asList(TestGetConversationsResponse.TestMessageDetail.builder()
                         .senderId("senderId")
-                        .messageDetails(Arrays.asList(
-                                TestGetConversationsResponse.TestMessageDetail.builder()
-                                        .content("Hello World")
-                                        .timestamp(234878234L)
-                                        .contentType(TEXT_PLAIN_UTF8)
-                                        .received(true)
-                                        .build()
+                        .recipientId(mockUserService.getUserIdFor(userName))
+                        .content("Hello World")
+                         .timestamp(234878234L)
+                         .contentType(TEXT_PLAIN_UTF8)
+                         .received(true)
+                         .build()
                         ))
-                        .build())
                 .build();
 
         TestGetConversationsResponse responseEntity =
                 context.readResponse(TestGetConversationsResponse.class);
         assertThat(context.getResponse().getStatus()).isEqualTo(200);
-        assertThat(responseEntity).isEqualTo(conversation);
+        assertThat(responseEntity).isEqualTo(expectedConversation);
     }
 
     @And("^the user (.*) has some conversations available on the server$")
@@ -94,9 +92,9 @@ public class ConversationStepDefs {
         TestGetConversationsResponse responseEntity =
                 context.readResponse(TestGetConversationsResponse.class);
         assertThat(context.getResponse().getStatus()).isEqualTo(200);
-        assertThat(responseEntity.getUserId()).isEqualTo(mockUserService.getUserIdFor(recipient));
-        assertThat(responseEntity.getMessages()).isNotNull();
-        assertThat(responseEntity.getMessages().getSenderId()).isEqualTo(mockUserService.getUserIdFor(sender));
+        assertThat(responseEntity.getMessageDetails()).isNotNull();
+        assertThat(responseEntity.getMessageDetails().get(0).getRecipientId()).isEqualTo(mockUserService.getUserIdFor(recipient));
+        assertThat(responseEntity.getMessageDetails().get(0).getSenderId()).isEqualTo(mockUserService.getUserIdFor(sender));
         
     }
 }

@@ -9,6 +9,7 @@ import akka.http.javadsl.model.HttpResponse;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
 import com.mongodb.MongoClient;
+import com.mongodb.client.MongoDatabase;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import io.swagger.jaxrs.config.DefaultReaderConfig;
@@ -75,10 +76,9 @@ public class MainAkkaServer {
                 getConversationRepositoryActor()));
     }
 
-    private ActorRef getConversationRepositoryActor() {
+    private ConversationRepository getConversationRepositoryActor() {
         Config config = actorSystem.settings().config();
-        return actorSystem.actorOf(Props.create(ConversationRepository.class,
-                databaseProvider(config)));
+        return new ConversationRepository(databaseProvider(config), config);
     }
 
     private CompletionStage<ActorRef> createAuditActor(ActorContext context) {
@@ -97,7 +97,7 @@ public class MainAkkaServer {
         return actorRefCompletionStage;
     }
 
-    private Object databaseProvider(Config config) {
+    private MongoDatabase databaseProvider(Config config) {
         MongoClient mongoClient = new MongoClient(config.getString("repo.hostname"),
                 config.getInt("repo.port"));
         return mongoClient.getDatabase(config.getString("repo.dbName"));

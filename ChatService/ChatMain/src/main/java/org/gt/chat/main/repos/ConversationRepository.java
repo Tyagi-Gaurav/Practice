@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static java.util.Arrays.asList;
+
 
 @Slf4j
 public class ConversationRepository {
@@ -26,8 +28,8 @@ public class ConversationRepository {
 
     public List<ConversationEntity> getConversationsFor(String userId) {
         MongoCollection<Document> collection = mongoDatabase.getCollection(config.getString("repo.collection"));
-        FindIterable<Document> conversations = collection.find(new Document("$or",
-                                new Document(new Document("recipientId", userId).append("senderId", userId))));
+        FindIterable<Document> conversations = collection.find(new Document("$or",asList(
+                                new Document("recipientId", userId), new Document("senderId", userId))));
 
         MongoIterable<ConversationEntity> conversationEntityIterable =
             conversations.map(document -> {

@@ -67,16 +67,13 @@ public class MockDatabaseService {
         MongoCollection<Document> collection =
                 database.getCollection(scenarioConfig.getString(DATABASE_CONV_COLLECTION));
         collection.insertOne(
-                new Document("userId", userId)
-                        .append("messages", new Document("senderId", "senderId")
-                                .append("messageDetails",
-                                        new Document("content", "Hello World")
-                                                .append("received", true)
-                                                .append("timestamp", 234878234L)
-                                                .append("contentType", ConversationEntity.ContentTypeEntity.TEXT_PLAIN_UTF8.toString())
-                                )));
+                new Document("recipientId", userId)
+                    .append("senderId", "senderId")
+                    .append("content", "Hello World")
+                    .append("timestamp", 234878234L)
+                    .append("contentType", ConversationEntity.ContentTypeEntity.TEXT_PLAIN_UTF8.toString()));
 
-        FindIterable<Document> documents = collection.find(new Document("userId", userId));
+        FindIterable<Document> documents = collection.find(new Document("recipientId", userId));
         List<Document> fetchedDocuments = StreamSupport.stream(documents.spliterator(), false).collect(Collectors.toList());
         assertThat(fetchedDocuments.size()).isEqualTo(1);
     }

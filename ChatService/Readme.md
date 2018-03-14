@@ -9,6 +9,7 @@
 
 * Shutdown the application 
 ``scrips/cleanup.sh``
+
 * Smoke testing the app
 ``curl -i -vvvv http://localhost:8080/conversations/2``
 
@@ -18,7 +19,7 @@
 * Run any application outside docker
 `java -jar target/Chat<App>-1.0-SNAPSHOT-allinone.jar`
 
-* Start mongoDB
+* Start mongoDB locally
 `mongod --dbpath ~/data/db`
 
 * Pipeline basics
