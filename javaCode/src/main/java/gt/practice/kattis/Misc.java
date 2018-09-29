@@ -1,28 +1,41 @@
 package gt.practice.kattis;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class Misc {
-    public static void main(String[] args) {
-        List<Long> longs = readFromConsole();
 
-        Long reduce = longs.stream()
-                .map(x -> (long) Math.pow(x / 10, x % 10))
-                .reduce(0L, (s, x) -> s + x);
+    public static void main(String[] args) throws InterruptedException {
+        try(Scanner scanner = new Scanner(System.in)) {
+            int p = scanner.nextInt();
+            int t = scanner.nextInt();
 
-        System.out.println(reduce);
+            int result = 0;
+
+            for (int i = 0; i < p ; i++) {
+                int count = 0;
+                for (int j = 0; j < t; j++) {
+                    String tc = scanner.next();
+
+                    if (isLower(tc)) count ++;
+                }
+
+                if (count == t) {
+                    result ++;
+                }
+            }
+
+            System.out.println(result);
+        }
     }
 
-    private static List<Long> readFromConsole() {
-        Scanner sc = new Scanner(System.in);
-        long N = sc.nextLong();
-        List<Long> inputs = new ArrayList<>();
+    private static boolean isLower(String tc) {
+        long count1 = tc.chars()
+                .filter(x -> x >= 65 && x <= 90)
+                .count();
 
-        for (int i =0; i < N;++i)
-            inputs.add(sc.nextLong());
+        long count2 = tc.chars().skip(1).filter(x -> x >= 65 && x <= 90)
+                .count();
 
-        return inputs;
+        return count1 == 0 || count2 == 0;
     }
 }
