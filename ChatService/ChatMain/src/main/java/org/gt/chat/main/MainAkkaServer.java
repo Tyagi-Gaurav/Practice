@@ -23,9 +23,12 @@ import org.gt.chat.main.service.ConversationActor;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 @Slf4j
 public class MainAkkaServer {
@@ -78,7 +81,11 @@ public class MainAkkaServer {
 
     private ConversationRepository getConversationRepositoryActor() {
         Config config = actorSystem.settings().config();
-        return new ConversationRepository(databaseProvider(config), config);
+        return new ConversationRepository(databaseProvider(config), config, timeProvider());
+    }
+
+    private Supplier<LocalDateTime> timeProvider() {
+        return LocalDateTime::now;
     }
 
     private CompletionStage<ActorRef> createAuditActor(ActorContext context) {

@@ -497,3 +497,9 @@ jhat java.hprof
 ```
 mpstat, sysstat, vmstats
 ```
+
+### kubernetes
+- How to check cluster information with K8
+```
+kubectl cluster-info
+```

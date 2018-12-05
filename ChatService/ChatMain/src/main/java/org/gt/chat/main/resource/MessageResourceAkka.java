@@ -18,7 +18,6 @@ import javax.ws.rs.Path;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import static akka.http.javadsl.model.StatusCodes.ACCEPTED;
 import static akka.http.javadsl.server.PathMatchers.segment;
 import static akka.pattern.PatternsCS.ask;
 import static java.util.regex.Pattern.compile;
@@ -65,6 +64,7 @@ public class MessageResourceAkka extends AllDirectives {
                 ));
     }
 
+    @Path("/conversations")
     public Route postConversationsRoute() {
         final Unmarshaller<HttpEntity, SendConversationRequest> unmarshaller = Jackson.unmarshaller(SendConversationRequest.class);
 
@@ -77,10 +77,8 @@ public class MessageResourceAkka extends AllDirectives {
                                                 ask(messageActor, ConversationSaveDTO.builder()
                                                         .senderId(sendConversation.getSenderId())
                                                         .recipientId(sendConversation.getRecipientUserId())
-                                                        .message(ConversationSaveDTO.MessageDetail.builder()
-                                                                .contentType(sendConversation.getMessageDetail().getContentType())
-                                                                .content(sendConversation.getMessageDetail().getContent())
-                                                                .build())
+                                                        .contentType(sendConversation.getContentType())
+                                                        .content(sendConversation.getContent())
                                                         .build(), 1000L),
                                                 functionResult -> functionResult.map(func(result ->
                                                         complete(StatusCodes.ACCEPTED, result, Jackson.marshaller()))).get()

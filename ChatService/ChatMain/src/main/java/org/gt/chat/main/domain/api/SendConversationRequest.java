@@ -11,14 +11,6 @@ import org.gt.chat.main.domain.ContentType;
 public class SendConversationRequest {
     private String senderId;
     private String recipientUserId;
-    private SendMessageDetail messageDetail;
-
-    @Builder
-    @EqualsAndHashCode
-    @ToString
-    @Getter
-    public static class SendMessageDetail {
-        private String content;
-        private ContentType contentType;
-    }
+    private String content;
+    private ContentType contentType;
 }

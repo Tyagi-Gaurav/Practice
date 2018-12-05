@@ -1,15 +1,15 @@
 
-* Test Conversation actor for sending audit event.
-* Separate Front End and BackEnd
-* Replace static port names with ENVIRONMENT VARIABLES in config
-* lookup on the remote actor
-* Sending message to a remote actor
-* Watching a remote actor
-* Testing when a dependency is not up yet
-* Multi-JVM testing
-* Establish local deployment for running functional tests
-* Establish live deployment
-* SSL between remoting actors
+Prioritised Tasks
+-
+* Post Conversations.
+* Run audit and conversations in separate JVMs and access via API
+* Run Audit in JVM and conversations in docker
+* Run Audit in docker and conversations in docker using docker-compose
+* Automate the pipeline with build and then docker-compose.
+
+
+Non-prioritised Tasks
+-
 * Actors Healthcheck
 * UI to view application status
 * UI to demo stuff

@@ -111,10 +111,7 @@ public class ConversationActor extends AbstractActor {
                     pipe(CompletableFuture.completedFuture(result), dispatcher).to(getSender());
                 })
                 .match(ConversationSaveDTO.class, conversationSaveDTO -> {
-//                    CompletionStage<Object> saveConversationStage =
-//                            ask(conversationRepositoryActor, conversationSaveDTO, 3000L);
-
-//                    pipe(saveConversationStage, dispatcher).to(getSender());
+                    conversationRepository.saveConversation(ConversationEntity.builder().build());
                 })
                 .matchAny(o -> LOG.error("Received unknown message {}", o))
                 .build();

@@ -102,21 +102,16 @@ public class MessageResourceAkkaTest extends JUnitRouteTest {
                 .withEntity(ContentTypes.APPLICATION_JSON, objectMapper.writeValueAsString(SendConversationRequest.builder()
                         .senderId("a")
                         .recipientUserId("b")
-                        .messageDetail(SendConversationRequest.SendMessageDetail.builder()
-                                .content("Hello World")
-                                .contentType(ContentType.APPLICATION_JSON)
-                                .build())
-                        .build()))
-
+                        .content("Hello World")
+                        .contentType(ContentType.APPLICATION_JSON)
+                            .build()))
         ));
 
         ConversationSaveDTO expectedDTO = ConversationSaveDTO.builder()
                 .senderId("a")
                 .recipientId("b")
-                .message(ConversationSaveDTO.MessageDetail.builder()
-                        .content("Hello World")
-                        .contentType(ContentType.APPLICATION_JSON)
-                        .build())
+                .content("Hello World")
+                .contentType(ContentType.APPLICATION_JSON)
                 .build();
 
         //Then

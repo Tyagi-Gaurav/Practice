@@ -12,12 +12,14 @@ import org.gt.chat.main.domain.ContentType;
 import org.gt.chat.main.domain.ConversationEntity;
 import org.gt.chat.main.domain.api.ConversationRequest;
 import org.gt.chat.main.domain.api.GetConversationResponse;
+import org.gt.chat.main.domain.api.SendConversationRequest;
 import org.gt.chat.main.domain.dto.ConversationSaveDTO;
 import org.gt.chat.main.repos.ConversationRepository;
 import org.gt.chat.main.util.ActorSystemTest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -120,30 +122,26 @@ public class ConversationActorTest extends ActorSystemTest {
             auditTestProbe.expectMsgClass(HealthCheckRequest.class);
         }};
     }
-//
-//    @Test
-//    public void saveConversationForUserInDatabase() throws Exception {
-//        //given
-//        conversationRepoActorProbe.setAutoPilot(new TestActor.AutoPilot() {
-//            @Override
-//            public TestActor.AutoPilot run(ActorRef sender, Object msg) {
-//                sender.tell(Boolean.TRUE, ActorRef.noSender());
-//                return noAutoPilot();
-//            }
-//        });
-//
-//        //when
-//        new TestKit(actorSystem) {{
-//            final ActorRef subject = actorSystem.actorOf(props);
-//
-//            ConversationSaveDTO msg = saveDTO();
-//            subject.tell(msg, getRef());
-//
-//            expectMsg(Boolean.TRUE);
-//            conversationRepoActorProbe.expectMsg(msg);
-//        }};
-//    }
-//
+
+    @Test
+    public void saveConversationForUserInDatabase() throws Exception {
+        //when
+        new TestKit(actorSystem) {{
+            final ActorRef subject = actorSystem.actorOf(props);
+
+            ConversationSaveDTO msg = saveDTO();
+            subject.tell(msg, getRef());
+
+            ArgumentCaptor<ConversationEntity> argumentCaptor =
+                    ArgumentCaptor.forClass(ConversationEntity.class);
+            verify(conversationRepository).saveConversation(argumentCaptor.capture());
+            ConversationEntity conversationEntity = argumentCaptor.getValue();
+
+            assertThat(conversationEntity.getContent()).
+                    isEqualTo(msg.getContent());
+        }};
+    }
+
 
     private GetConversationResponse getExpectedConversations() {
         return GetConversationResponse.builder()
@@ -178,7 +176,9 @@ public class ConversationActorTest extends ActorSystemTest {
     }
 
     private ConversationSaveDTO saveDTO() {
-        return ConversationSaveDTO.builder().build();
+        return ConversationSaveDTO.builder()
+                .content("Hello World")
+                .build();
     }
 
 }

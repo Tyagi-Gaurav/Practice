@@ -15,4 +15,3 @@ Conversations: {
     {"senderId" : "4", "recipientId" : "5", "content" : "Good. How are you 5 ?", contentType: "text/plain-utf8", timestamp : "1517663493"}
 }
 
-db.conversationCollection.find({"$or" : [{"senderId" : "3"}, {"recipientId" : "3"}]})
