@@ -1,0 +1,38 @@
+plugins {
+    id 'java'
+}
+
+group 'Practice'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+    }
+    test {
+        java {
+            srcDirs = ['test']
+        }
+    }
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class' : 'org.gt.ToDoApp'
+    }
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    annotationProcessor "org.immutables:value:2.7.3"
+    compile "org.immutables:value-annotations:2.7.3"
+    compile "org.immutables:builder:2.7.3"
+}
