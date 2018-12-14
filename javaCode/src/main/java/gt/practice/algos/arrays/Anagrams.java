@@ -1,9 +1,7 @@
 package gt.practice.algos.arrays;
 
-import java.lang.reflect.Array;
-import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -17,8 +15,8 @@ public class Anagrams {
     private List<String> find(String str) {
         Stream<Character> characterStream = str.chars().mapToObj(i -> (char)i);
         ArrayList<String> collect = characterStream
-                .collect(ArrayList<String>::new,
-                        (BiConsumer<ArrayList<String>, Character>) (strings, character) -> {
+                .collect(ArrayList::new,
+                        (strings, character) -> {
                             List<String> interleave = interleave(strings, character);
                             strings.clear();
                             strings.addAll(interleave);
@@ -37,7 +35,7 @@ public class Anagrams {
     }
 
     private static List<String> interleave(List<String> input, Character ch) {
-        List<String> collect = null;
+        List<String> collect;
 
         if (input.size() == 0) {
             collect = new ArrayList<>();
