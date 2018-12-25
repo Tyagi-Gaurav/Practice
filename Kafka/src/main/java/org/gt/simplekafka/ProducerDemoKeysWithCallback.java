@@ -1,6 +1,9 @@
 package org.gt.simplekafka;
 
-import org.apache.kafka.clients.producer.*;
+import org.apache.kafka.clients.producer.Callback;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,8 +11,8 @@ import org.slf4j.LoggerFactory;
 import java.util.Objects;
 import java.util.Properties;
 
-public class ProducerDemoWithCallback {
-    private static final Logger logger = LoggerFactory.getLogger(ProducerDemoWithCallback.class);
+public class ProducerDemoKeysWithCallback {
+    private static final Logger logger = LoggerFactory.getLogger(ProducerDemoKeysWithCallback.class);
 
     public static void main(String[] args) {
         //Create Producer Properties
@@ -42,10 +45,12 @@ public class ProducerDemoWithCallback {
             }
         };
 
-        for (int i = 0; i < 10; i++) {
-            ProducerRecord<String, String> producerRecord =
-                    new ProducerRecord<>("first_topic", "Hello World " + i);
-            kafkaProducer.send(producerRecord, callback);
+        for (int i = 1; i <= 10; i++) {
+            String topic = "first_topic";
+            String value = "Hello World " + i;
+            String key = "id_" + i;
+
+            kafkaProducer.send(new ProducerRecord<>(topic, key, value), callback);
         }
 
 
