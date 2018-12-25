@@ -503,3 +503,48 @@ mpstat, sysstat, vmstats
 ```
 kubectl cluster-info
 ```
+### Zookeeper & Kafka
+- How to start Zookeeper
+```
+zookeeper-server-start config/zookeeper.properties
+```
+- How to start Kafka
+```
+kafka-server-start config/server.properties
+```
+- How to list kafka topics
+```
+kafka-topics --zookeeper 127.0.0.1:2181 --list
+```
+- Create a kafka topic
+```
+kafka-topics --zookeeper 127.0.0.1:2181 --topic first_topic --create --partitions <partCount> --replication-factor <rf>
+```
+- Describe a topic
+```
+kafka-topics --zookeeper 127.0.0.1:2181 --topic first_topic --describe
+```
+- Deleting a topic
+```
+kafka-topics --zookeeper 127.0.0.1:2181 --topic second_topic --delete
+```
+- kafka console producer
+```
+kafka-console-producer --broker-list 127.0.0.1:9092 --topic first_topic --producer-property acks=all
+```
+- kafka console consumer
+```
+kafka-console-consumer --bootstrap-server 127.0.0.1:9092 --topic first_topic --from-beginning
+```
+- List all consumer groups
+```
+kafka-consumer-groups --bootstrap-server 127.0.0.1:9092 --list
+```
+- Describe consumer groups
+```
+kafka-consumer-groups --bootstrap-server 127.0.0.1:9092 --topic first_topic --group my_first_application
+```
+- How do you reset offsets?
+```
+kafka-consumer-groups --bootstrap-server 127.0.0.1:9092 --topic first_topic --group my_first_application
+```
