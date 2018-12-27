@@ -1,5 +1,6 @@
 package org.gt.simplekafka.consumer;
 
+import com.google.gson.JsonParser;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -37,15 +38,26 @@ public class ElasticsearchConsumer {
         while (true) {
             ConsumerRecords<String, String> consumerRecords = kafkaConsumer.poll(Duration.ofMillis(100));
             for (ConsumerRecord consumerRecord : consumerRecords) {
+                //2 strategies for generating Ids.
+                // kafka generic Id
+                /*String id = String.format("%s_%s_%s"
+                        , consumerRecord.topic(),
+                        consumerRecord.partition(),
+                        consumerRecord.offset());*/
+
+                String id = extractIdFromTweets(consumerRecord.value().toString());
+
                 // Insert data into elasticsearch
                 IndexRequest indexRequest =
-                        new IndexRequest("twitter", "tweets")
-                                .source(consumerRecord.value(), XContentType.JSON);
+                        new IndexRequest(
+                                "twitter",
+                                "tweets",
+                                id // This makes consumer idempotent
+                        ).source(consumerRecord.value(), XContentType.JSON);
 
                 IndexResponse indexResponse = restClient.index(indexRequest, RequestOptions.DEFAULT);
 
-                String id = indexResponse.getId();
-                logger.info("id: {}", id);
+                logger.info("id: {}", indexResponse.getId());
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -55,6 +67,11 @@ public class ElasticsearchConsumer {
         }
 
         //restClient.close();
+    }
+
+    private static String extractIdFromTweets(String value) {
+        JsonParser jsonParser = new JsonParser();
+        return jsonParser.parse(value).getAsJsonObject().get("id_str").getAsString();
     }
 
     public static KafkaConsumer<String, String> createKafkaConsumer(String topic) {
