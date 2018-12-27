@@ -10,7 +10,9 @@ import com.twitter.hbc.core.processor.StringDelimitedProcessor;
 import com.twitter.hbc.httpclient.BasicClient;
 import com.twitter.hbc.httpclient.auth.Authentication;
 import com.twitter.hbc.httpclient.auth.OAuth1;
-import org.apache.kafka.clients.producer.*;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +31,7 @@ public class TwitterProducer {
     private String consumerSecret = "";
     private String token = "";
     private String tokenSecret = "";
-    private List<String> terms = Lists.newArrayList("kafka");
+    private List<String> terms = Lists.newArrayList("bitcoin", "politics", "cricket");
 
     public TwitterProducer() {
     }
@@ -95,6 +97,11 @@ public class TwitterProducer {
         properties.setProperty(ProducerConfig.ACKS_CONFIG, "all");
         properties.setProperty(ProducerConfig.RETRIES_CONFIG, String.valueOf(Integer.MAX_VALUE));
         properties.setProperty(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, "5");
+
+        //High Throughput Settings (at the expense of bit latency and CPU Usage)
+        properties.setProperty(ProducerConfig.LINGER_MS_CONFIG, "20");
+        properties.setProperty(ProducerConfig.BATCH_SIZE_CONFIG, Integer.toString(32 * 1024)); //32 kb
+        properties.setProperty(ProducerConfig.COMPRESSION_TYPE_CONFIG, "snappy");
 
         //Create Producer
         return new KafkaProducer<>(properties);
