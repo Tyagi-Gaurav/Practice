@@ -37,6 +37,9 @@ public class ElasticsearchConsumer {
         //poll for data
         while (true) {
             ConsumerRecords<String, String> consumerRecords = kafkaConsumer.poll(Duration.ofMillis(100));
+
+            logger.info("Received {} records", consumerRecords.count());
+
             for (ConsumerRecord consumerRecord : consumerRecords) {
                 //2 strategies for generating Ids.
                 // kafka generic Id
@@ -45,6 +48,7 @@ public class ElasticsearchConsumer {
                         consumerRecord.partition(),
                         consumerRecord.offset());*/
 
+                logger.info("Message Received: " + consumerRecord.value());
                 String id = extractIdFromTweets(consumerRecord.value().toString());
 
                 // Insert data into elasticsearch
@@ -59,11 +63,15 @@ public class ElasticsearchConsumer {
 
                 logger.info("id: {}", indexResponse.getId());
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(10);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
+
+            logger.info("Committing offsets");
+            kafkaConsumer.commitSync();
+            logger.info("Offsets have been committed");
         }
 
         //restClient.close();
@@ -86,6 +94,8 @@ public class ElasticsearchConsumer {
         properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        properties.setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
+        properties.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "10");
 
         //Create Consumer
         KafkaConsumer<String, String> kafkaConsumer = new KafkaConsumer<>(properties);
