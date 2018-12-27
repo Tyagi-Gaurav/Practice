@@ -548,3 +548,16 @@ kafka-consumer-groups --bootstrap-server 127.0.0.1:9092 --topic first_topic --gr
 ```
 kafka-consumer-groups --bootstrap-server 127.0.0.1:9092 --topic first_topic --group my_first_application
 ```
+### Elasticsearch
+- How to check cluster health?
+```
+GET /_cat/health?v
+```
+- List Nodes of ES cluster
+```
+GET /_cat/nodes?v
+```
+- List all indices
+```
+GET /_cat/indices?v
+```
