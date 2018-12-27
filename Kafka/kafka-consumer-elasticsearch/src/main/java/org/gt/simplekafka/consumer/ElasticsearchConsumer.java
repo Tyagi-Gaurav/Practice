@@ -10,8 +10,9 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
@@ -38,7 +39,10 @@ public class ElasticsearchConsumer {
         while (true) {
             ConsumerRecords<String, String> consumerRecords = kafkaConsumer.poll(Duration.ofMillis(100));
 
-            logger.info("Received {} records", consumerRecords.count());
+            int recordCount = consumerRecords.count();
+            logger.info("Received {} records", recordCount);
+
+            BulkRequest bulkRequest = new BulkRequest();
 
             for (ConsumerRecord consumerRecord : consumerRecords) {
                 //2 strategies for generating Ids.
@@ -59,19 +63,17 @@ public class ElasticsearchConsumer {
                                 id // This makes consumer idempotent
                         ).source(consumerRecord.value(), XContentType.JSON);
 
-                IndexResponse indexResponse = restClient.index(indexRequest, RequestOptions.DEFAULT);
-
-                logger.info("id: {}", indexResponse.getId());
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                bulkRequest.add(indexRequest);
             }
 
-            logger.info("Committing offsets");
-            kafkaConsumer.commitSync();
-            logger.info("Offsets have been committed");
+
+            if (recordCount > 0) {
+                BulkResponse bulkResponse = restClient.bulk(bulkRequest, RequestOptions.DEFAULT);
+
+                logger.info("Committing offsets");
+                kafkaConsumer.commitSync();
+                logger.info("Offsets have been committed");
+            }
         }
 
         //restClient.close();
@@ -95,7 +97,7 @@ public class ElasticsearchConsumer {
         properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         properties.setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
-        properties.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "10");
+        properties.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "100");
 
         //Create Consumer
         KafkaConsumer<String, String> kafkaConsumer = new KafkaConsumer<>(properties);
