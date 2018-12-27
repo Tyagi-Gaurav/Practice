@@ -542,11 +542,11 @@ kafka-consumer-groups --bootstrap-server 127.0.0.1:9092 --list
 ```
 - Describe consumer groups
 ```
-kafka-consumer-groups --bootstrap-server 127.0.0.1:9092 --topic first_topic --group my_first_application
+kafka-consumer-groups --bootstrap-server 127.0.0.1:9092 --topic first_topic --group my_first_application --describe
 ```
 - How do you reset offsets?
 ```
-kafka-consumer-groups --bootstrap-server 127.0.0.1:9092 --topic first_topic --group my_first_application
+kafka-consumer-groups --bootstrap-server 127.0.0.1:9092 --topic first_topic --group my_first_application --reset-offsets --execute --to-earliest
 ```
 ### Elasticsearch
 - How to check cluster health?
