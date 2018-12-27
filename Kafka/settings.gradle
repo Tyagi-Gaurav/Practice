@@ -3,4 +3,5 @@ include 'kafkaBasics'
 include 'kafka-producer-twitter'
 include 'kafka-consumer-elasticsearch'
 include 'kafka-connect'
+include 'kafka-filter-tweets'
 
