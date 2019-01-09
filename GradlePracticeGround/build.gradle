@@ -1,0 +1,39 @@
+plugins {
+    id 'java'
+}
+
+group 'MyGradle'
+version '1.0-SNAPSHOT'
+
+setDescription("Gradle Practice ground")
+println "Description of project $name:" + project.description
+
+//Extra Properties (Could be injected via gradle.properties as well)
+project.ext.myProp = "myValue"
+ext {
+    someOtherProp = 123
+}
+
+assert myProp == "myValue"
+println project.someOtherProp
+ext.someOtherProp = 567
+
+//Setting project version
+project.version = "1.0-SNAPSHOT"
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+//TaskActions
+task printVersion {
+    doLast {
+        println "Version: $version"
+    }
+}

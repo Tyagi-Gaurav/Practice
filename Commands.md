@@ -520,6 +520,10 @@ kafka-topics --zookeeper 127.0.0.1:2181 --list
 ```
 kafka-topics --zookeeper 127.0.0.1:2181 --topic first_topic --create --partitions <partCount> --replication-factor <rf>
 ```
+- Create a kafka topic with log compaction
+```
+kafka-topics --zookeeper localhost:2181 --topic employee-salary --create --partitions 1 --replication-factor 1 --config cleanup.policy=compact --config min.cleanable.dirty.ratio=0.001 --config segment.ms=5000
+```
 - Describe a topic
 ```
 kafka-topics --zookeeper 127.0.0.1:2181 --topic first_topic --describe
