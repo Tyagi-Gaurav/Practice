@@ -32,11 +32,86 @@ dependencies {
 }
 
 //TaskActions
-task printVersion(group: "versioning", description: "Prints project version") {
+task first {
+    doLast({ println "first" })
+}
+task second {
+    doLast({ println "second" })
+}
+
+task printVersion(group: "versioning", description: "Prints project version", dependsOn: [second, first]) {
     doFirst {
         println "Before reading the project version"
     }
     .doLast {
         logger.quiet "Version: $version"
     }
+}
+
+task third(dependsOn: [printVersion]) {
+    doLast({ println "third" })
+}
+
+//Adding Arbitrary code
+version = new ProjectVersion(0, 1)
+
+class ProjectVersion {
+    Integer major
+    Integer minor
+    Boolean release
+
+    ProjectVersion(Integer major, Integer minor) {
+        this(major, minor, Boolean.FALSE)
+    }
+
+    ProjectVersion(Integer major, Integer minor, Boolean release) {
+        this.major = major
+        this.minor = minor
+        this.release = release
+    }
+
+
+    @Override
+    String toString() {
+        return "$major.$minor${release ? "" : "-SNAPSHOT"}"
+    }
+}
+
+ext.versionFile = file('version.properties')
+
+//Task Configuration (Defined without the left shift operators).
+// These blocks are executed even before task action.
+task loadVersion {
+    project.version = readVersion()
+}
+
+ProjectVersion readVersion() {
+    logger.quiet("Reading the version file")
+
+    if (!versionFile.exists()) {
+        throw new GradleException("Required version file ($versionFile.canonicalPath) does not exist")
+    }
+
+    Properties versionProperties = new Properties()
+
+    versionFile.withInputStream {
+        stream -> versionProperties.load(stream)
+    }
+
+    new ProjectVersion(versionProperties.major.toInteger(),
+            versionProperties.minor.toInteger(), versionProperties.release.toBoolean())
+}
+
+//Declaring tasks input and output
+task makeReleaseVersion(group: "versioning", description: "Makes project a release version.") {
+    //Configuration Phase
+    inputs.property ("release", version.release)
+    outputs.file versionFile
+
+    doLast({
+        version.release = true
+        ant.propertyfile(file: versionFile) {
+            entry(key: "release", type: "string", operation: "=", value: "true")
+        }
+    })
 }
