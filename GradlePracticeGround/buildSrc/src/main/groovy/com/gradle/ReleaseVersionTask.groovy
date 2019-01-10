@@ -1,5 +1,8 @@
-package org.gradle
+package com.gradle
 
+import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
 class ReleaseVersionTask extends DefaultTask {

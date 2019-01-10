@@ -1,6 +1,8 @@
 plugins {
-    id 'java'
+    id 'groovy'
 }
+
+import com.gradle.*
 
 group 'MyGradle'
 version '1.0-SNAPSHOT'
@@ -104,7 +106,15 @@ ProjectVersion readVersion() {
             versionProperties.minor.toInteger(), versionProperties.release.toBoolean())
 }
 
+
+task makeReleaseVersion(type : ReleaseVersionTask) {
+    release = version.release
+    destFile = versionFile
+}
+
+
 //Declaring tasks input and output
+/*
 task makeReleaseVersion(group: "versioning", description: "Makes project a release version.") {
     //Configuration Phase
     inputs.property ("release", version.release)
@@ -116,4 +126,4 @@ task makeReleaseVersion(group: "versioning", description: "Makes project a relea
             entry(key: "release", type: "string", operation: "=", value: "true")
         }
     })
-}
+}*/
