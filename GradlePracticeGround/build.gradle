@@ -107,7 +107,7 @@ ProjectVersion readVersion() {
 }
 
 
-task makeReleaseVersion(type : ReleaseVersionTask) {
+task makeReleaseVersion(type: ReleaseVersionTask) {
     release = version.release
     destFile = versionFile
 }
@@ -117,7 +117,7 @@ task createDistribution(type: Zip, dependsOn: makeReleaseVersion) {
         into 'src'
     }
 
-    from (rootDir) {
+    from(rootDir) {
         include versionFile.name //Adds version file to zip
     }
 }
@@ -134,17 +134,27 @@ task release(dependsOn: backupReleaseDistribution) {
     }
 }
 
-//Declaring tasks input and output
-/*
-task makeReleaseVersion(group: "versioning", description: "Makes project a release version.") {
-    //Configuration Phase
-    inputs.property ("release", version.release)
-    outputs.file versionFile
+//Adding task rules
+tasks.addRule("Pattern: increment<Classifier>Version - Increments the project version classifier.") {
+    String taskName ->
+        if (taskName.startsWith("increment") && taskName.endsWith("Version")) {
+            task(taskName) {
+                String classifer = (taskName - "increment" - "version").toLowerCase() //Extracting classifier
+                String currentVersion = version.toString()
 
-    doLast({
-        version.release = true
-        ant.propertyfile(file: versionFile) {
-            entry(key: "release", type: "string", operation: "=", value: "true")
+                switch (classifer) {
+                    case "major": ++version.major
+                        break
+                    case "minor": ++version.minor
+                        break
+                    default: throw new GradleException("Invalid version type $classifier. Allowed Types: ['Major','Minor']")
+                }
+
+                String newVersion = version.toString()
+                logger.info "Incrementing $classifer project version: $currentVersion -> $newVersion"
+                ant.propertyFile(file: versionFile) {
+                    entry(key: classifier, type: "int", operation: "+", value: 1)
+                }
+            }
         }
-    })
-}*/
+}
