@@ -1,2 +1,3 @@
 rootProject.name = 'GradlePracticeGround'
-
+include "model"
+include "repository", "web"

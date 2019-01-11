@@ -21,6 +21,10 @@ configurations {
     cargo {
         description = "Classpath for Cargo Ant Tasks."
         visible = false
+        resolutionStrategy {
+            //failOnVersionConflict()
+            cacheDynamicVersionsFor 0, "seconds"
+        }
     }
 }
 
@@ -42,8 +46,14 @@ sourceCompatibility = 1.8
 repositories {
     mavenCentral()
     maven {
+        name "Spring repository"
         url "http://repo.spring.io/libs-release"
     }
+
+    /*
+    Declaring repositories from a flat directory
+    flatDir(dir : "${System.properties['user.home']}/libs/cargo", name: "Local Libs Directory")
+     */
 }
 
 jar {
@@ -60,7 +70,7 @@ dependencies {
 //        exclude group: "xml-apis", module: "xml-apis"
 //    }
     //Declaring file dependencies
-    cargo fileTree(dir : "${System.properties['user.home']}/libs/cargo", includeg: '*.jar')
+    cargo fileTree(dir : "${System.properties['user.home']}/libs/cargo", include: '*.jar')
     cargo "xml-apis:xml-apis:2.0.2"
     compile group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
     providedCompile 'javax.servlet:servlet-api:2.5'
@@ -205,3 +215,9 @@ task copyDependenciesToLocalDir(type: Copy) {
 //
 //    zipUrlInstaller(installUrl: "http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.32/bin/apache-tomcat-7.0.32.zip")
 //}
+
+task printDependencies {
+    doLast {
+        configurations.getByName("cargo").each { println (it) }
+    }
+}
