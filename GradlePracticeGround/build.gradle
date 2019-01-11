@@ -1,5 +1,8 @@
 plugins {
     id 'groovy'
+    id 'java'
+    id 'war'
+    id 'org.gretty' version '2.2.0'
 }
 
 import com.gradle.*
@@ -27,12 +30,24 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
+    maven {
+        url "http://repo.spring.io/libs-release"
+    }
+}
+
+jar {
+    manifest {
+        attributes "Main-Class" : "com.manning.gia.todo.ToDoApp"
+    }
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
+    providedCompile 'javax.servlet:servlet-api:2.5'
+    runtime 'javax.servlet:jstl:1.1.2'
     implementation gradleApi()
     implementation localGroovy()
+    testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
 //TaskActions
@@ -59,28 +74,6 @@ task third(dependsOn: [printVersion]) {
 //Adding Arbitrary code
 version = new ProjectVersion(0, 1)
 
-class ProjectVersion {
-    Integer major
-    Integer minor
-    Boolean release
-
-    ProjectVersion(Integer major, Integer minor) {
-        this(major, minor, Boolean.FALSE)
-    }
-
-    ProjectVersion(Integer major, Integer minor, Boolean release) {
-        this.major = major
-        this.minor = minor
-        this.release = release
-    }
-
-
-    @Override
-    String toString() {
-        return "$major.$minor${release ? "" : "-SNAPSHOT"}"
-    }
-}
-
 ext.versionFile = file('version.properties')
 
 //Task Configuration (Defined without the left shift operators).
@@ -89,7 +82,7 @@ task loadVersion {
     project.version = readVersion()
 }
 
-ProjectVersion readVersion() {
+ProjectVersion readVersion() { //Invoked in Configuration Phase
     logger.quiet("Reading the version file")
 
     if (!versionFile.exists()) {
@@ -158,3 +151,17 @@ tasks.addRule("Pattern: increment<Classifier>Version - Increments the project ve
             }
         }
 }
+//Hooking into task execution graph
+gradle.taskGraph.whenReady { TaskExecutionGraph taskExecutionGraph ->
+    if (taskExecutionGraph.hasTask(release)) {
+        if (!version.release) {
+            version.release = true
+            ant.propertyfile(file: versionFile) {
+                entry(key: "release", type: "string", operation: "=", value: "true")
+            }
+        }
+    }
+}
+
+def releaseVersionListener = new ReleaseVersionListener()
+gradle.taskGraph.addTaskExecutionGraphListener(releaseVersionListener)
