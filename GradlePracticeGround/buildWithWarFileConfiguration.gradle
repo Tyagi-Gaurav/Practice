@@ -13,17 +13,6 @@ version '1.0-SNAPSHOT'
 setDescription("Gradle Practice ground")
 println "Description of project $name:" + project.description
 
-//Custom Configuration
-ext.cargoGroup = "org.codehaus.cargo"
-ext.cargoVersion = "1.7.1"
-
-configurations {
-    cargo {
-        description = "Classpath for Cargo Ant Tasks."
-        visible = false
-    }
-}
-
 //Extra Properties (Could be injected via org.gt.gradle.properties as well)
 project.ext.myProp = "myValue"
 ext {
@@ -53,15 +42,6 @@ jar {
 }
 
 dependencies {
-    //Custom configuration cargo
-    cargo group: cargoGroup, name: "cargo-core-uberjar", version: cargoVersion
-    cargo "$cargoGroup:cargo-ant:$cargoVersion"
-//    {
-//        exclude group: "xml-apis", module: "xml-apis"
-//    }
-    //Declaring file dependencies
-    cargo fileTree(dir : "${System.properties['user.home']}/libs/cargo", includeg: '*.jar')
-    cargo "xml-apis:xml-apis:2.0.2"
     compile group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
     providedCompile 'javax.servlet:servlet-api:2.5'
     runtime 'javax.servlet:jstl:1.1.2'
@@ -185,23 +165,3 @@ gradle.taskGraph.whenReady { TaskExecutionGraph taskExecutionGraph ->
 
 def releaseVersionListener = new ReleaseVersionListener()
 gradle.taskGraph.addTaskExecutionGraphListener(releaseVersionListener)
-
-task copyDependenciesToLocalDir(type: Copy) {
-    from configurations.cargo.asFileTree
-    into "${System.properties['user.home']}/libs/cargo"
-}
-//task deployToLocalTomcat {
-//    //Get All dependencies of cargo as file tree.
-//    FileTree cargoDeps = configurations.getByName("cargo").asFileTree
-//    //Resolve Cargo ANT task definition from CLASSPATH
-//    ant.taskDef(resource: "cargo.tasks", classpath: cargoDeps.asPath)
-//
-//    //Uses Cargo ANT task to download Tomcat7 distribution, deploy WAR and running the container
-//    ant.cargo(containerId: "tomcat7x", action: "run", output: "$buildDir/output.log") {
-//        configuration {
-//            deployable(type: "war", file: "todo.war")
-//        }
-//    }
-//
-//    zipUrlInstaller(installUrl: "http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.32/bin/apache-tomcat-7.0.32.zip")
-//}
