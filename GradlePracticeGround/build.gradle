@@ -5,10 +5,58 @@ plugins {
     id 'org.gretty' version '2.2.0'
 }
 
+ext.projectIds = ["group" : "org.gt.MyGradle", "version" : "0.1"]
+
 import com.gradle.*
 
-group 'MyGradle'
-version '1.0-SNAPSHOT'
+group = projectIds.group
+version = projectIds.version
+
+project(":model") {
+    group = projectIds.group
+    version = projectIds.version
+    apply plugin: "java"
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        compile group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
+    }
+}
+
+project(":repository") {
+    group = projectIds.group
+    version = projectIds.version
+    apply plugin: "java"
+
+    dependencies {
+        compile project(":model")
+    }
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+project(":web") {
+    group = projectIds.group
+    version = projectIds.version
+    apply plugin: "java"
+    apply plugin: "war"
+    apply plugin: "org.gretty"
+
+    dependencies {
+        compile project(":repository")
+        providedCompile "javax.servlet:servlet-api:2.5"
+        runtime "javax.servlet:jstl:1.1.2"
+    }
+
+    repositories {
+        mavenCentral()
+    }
+}
 
 setDescription("Gradle Practice ground")
 println "Description of project $name:" + project.description
@@ -70,9 +118,10 @@ dependencies {
 //        exclude group: "xml-apis", module: "xml-apis"
 //    }
     //Declaring file dependencies
+    compile project(":model")
+    compile project(":repository")
     cargo fileTree(dir : "${System.properties['user.home']}/libs/cargo", include: '*.jar')
     cargo "xml-apis:xml-apis:2.0.2"
-    compile group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
     providedCompile 'javax.servlet:servlet-api:2.5'
     runtime 'javax.servlet:jstl:1.1.2'
     implementation gradleApi()
