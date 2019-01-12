@@ -16,41 +16,6 @@ subprojects {
     apply plugin: "java"
 }
 
-project(":model") {
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        compile group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
-    }
-}
-
-project(":repository") {
-    dependencies {
-        compile project(":model")
-    }
-
-    repositories {
-        mavenCentral()
-    }
-}
-
-project(":web") {
-    apply plugin: "war"
-    apply plugin: "org.gretty"
-
-    dependencies {
-        compile project(":repository")
-        providedCompile "javax.servlet:servlet-api:2.5"
-        runtime "javax.servlet:jstl:1.1.2"
-    }
-
-    repositories {
-        mavenCentral()
-    }
-}
-
 setDescription("Gradle Practice ground")
 println "Description of project $name:" + project.description
 
