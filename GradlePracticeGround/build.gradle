@@ -7,13 +7,34 @@ plugins {
 
 import com.gradle.*
 
+subprojects {
+    apply plugin: "java"
+}
+
 allprojects {
     group = "org.gt.MyGradle"
     version = "0.1"
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        testCompile group: 'junit', name: 'junit', version: '4.12'
+    }
 }
 
-subprojects {
-    apply plugin: "java"
+test {
+    forkEvery = 5
+    maxParallelForks = Runtime.runtime.availableProcessors() / 2
+    systemProperty "items", "20"
+    minHeapSize = "128m"
+    maxHeapSize = "256m"
+    testLogging {
+        showStandardStreams = true //For system.out.println
+        exceptionFormat "full"
+        events "started", "passed", "skipped", "failed" //Prints specific test events during execution
+    }
 }
 
 setDescription("Gradle Practice ground")

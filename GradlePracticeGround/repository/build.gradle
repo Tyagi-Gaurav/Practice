@@ -2,6 +2,25 @@ dependencies {
     compile project(":model")
 }
 
-repositories {
-    mavenCentral()
+test {
+    exclude "**/*IntegTest.class"
 }
+
+sourceSets {
+    integration {
+        java.srcDir file("src/integration/java")
+        resources.srcDir file("src/integration/resources")
+
+        compileClasspath = sourceSets.main.output + configurations.testCompile + configurations.runtime
+        runtimeClasspath = output + compileClasspath
+    }
+}
+
+task integrationTest(type : Test) {
+    testClassesDirs = sourceSets.integration.output.classesDirs
+    classpath = sourceSets.integration.runtimeClasspath
+    include "**/*IntegTest.class"
+}
+
+check.dependsOn integrationTest
+
