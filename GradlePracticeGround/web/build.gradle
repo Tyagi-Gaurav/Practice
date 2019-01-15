@@ -7,3 +7,7 @@ dependencies {
     runtime "javax.servlet:jstl:1.1.2"
 }
 
+configurations {
+    functionalTestCompile.extendsFrom testCompile
+    functionalTestRuntime.extendsFrom testRuntime
+}

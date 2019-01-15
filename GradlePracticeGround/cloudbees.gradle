@@ -1,0 +1,30 @@
+import com.gradle.cloudbees.AppInfo
+
+if (project.hasProperty("apiKey")) {
+    ext.apiKey = project.property("apiKey")
+}
+
+if (project.hasProperty("apiSecret")) {
+    ext.apiSecret= project.property("apiSecret")
+}
+
+apply plugin: com.gradle.cloudbeesPlugin.CloudBeesPlugin
+
+task cloudBeesAppInfo(description : "Returns basic information about the application", group : "Cloudbees") {
+    inputs.property('apiKey', apikey)
+    inputs.property('apiSecret', apiSecret)
+
+    doLast {
+        logger.quiet("API Key is $apikey")
+        logger.quiet("API Secret is $apiSecret")
+    }
+}
+
+task appInfo(type : AppInfo) {
+    apiUrl = "TestUrl"
+    apiFormat = "apiFormat"
+    apiSecret = project.apiSecret
+    apiKey = project.apikey
+    apiVersion = project.version
+    appId = "appId"
+}

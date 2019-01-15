@@ -4,8 +4,9 @@ plugins {
     id 'war'
     id 'org.gretty' version '2.2.0'
 }
-
 import com.gradle.*
+
+apply from: "cloudbees.gradle"
 
 subprojects {
     apply plugin: "java"

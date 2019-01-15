@@ -11,6 +11,7 @@ sourceSets {
         java.srcDir file("src/integration/java")
         resources.srcDir file("src/integration/resources")
 
+        // Add default configurations runtime and testCompile.
         compileClasspath = sourceSets.main.output + configurations.testCompile + configurations.runtime
         runtimeClasspath = output + compileClasspath
     }
