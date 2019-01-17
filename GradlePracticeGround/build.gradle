@@ -7,6 +7,7 @@ plugins {
 import com.gradle.*
 
 apply from: "cloudbees.gradle"
+apply plugin: "distribution"
 
 subprojects {
     apply plugin: "java"
@@ -15,6 +16,22 @@ subprojects {
 allprojects {
     group = "org.gt.MyGradle"
     version = "0.1"
+
+    apply plugin: "idea"
+
+//    idea {
+//        project {
+//            jdkName = "1.8"
+//            languageLevel = "1.8"
+//        }
+//    }
+
+    idea {
+        module {
+            downloadSources = false
+            downloadJavadoc = false
+        }
+    }
 
     repositories {
         mavenCentral()
@@ -248,5 +265,36 @@ task copyDependenciesToLocalDir(type: Copy) {
 task printDependencies {
     doLast {
         configurations.getByName("cargo").each { println (it) }
+    }
+}
+
+ext.artifactBaseName = "GradlePracticeGround"
+
+task sourcesJar(type: Jar) {
+    baseName artifactBaseName
+    classifier "sources"
+    from sourceSets.main.allSource
+}
+
+task groovydocJar(type: Jar, dependsOn : groovydoc) {
+    baseName artifactBaseName
+    classifier "groovydoc"
+    from groovydoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives groovydocJar
+}
+
+assemble.dependsOn sourcesJar, groovydocJar
+
+distributions {
+    main {
+        baseName = archivesBaseName
+
+        contents {
+            from {libDir}
+        }
     }
 }

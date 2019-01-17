@@ -17,6 +17,14 @@ sourceSets {
     }
 }
 
+idea {
+    module {
+        sourceSets.integration.allSource.srcDirs.each {
+            testSourceDirs += it
+        }
+    }
+}
+
 task integrationTest(type : Test) {
     testClassesDirs = sourceSets.integration.output.classesDirs
     classpath = sourceSets.integration.runtimeClasspath

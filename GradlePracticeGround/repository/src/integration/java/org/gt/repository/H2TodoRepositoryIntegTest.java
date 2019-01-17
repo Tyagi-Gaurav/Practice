@@ -12,7 +12,7 @@ public class H2TodoRepositoryIntegTest {
 
     @Before
     public void setUp() throws Exception {
-        toDoRepository = new H2TodoRepository();
+        toDoRepository = new InMemoryToDoRepository();
     }
 
     @Test
@@ -21,7 +21,6 @@ public class H2TodoRepositoryIntegTest {
         toDoItem.setName("Write Integration Tests");
         long newId = toDoRepository.insert(toDoItem);
         toDoItem.setId(newId);
-        assertNotNull(newId);
 
         ToDoItem persistedItem = toDoRepository.findById(newId);
         assertNotNull(persistedItem);
