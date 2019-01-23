@@ -5,17 +5,38 @@ plugins {
     id 'org.gretty' version '2.2.0'
 }
 import com.gradle.*
+import com.gradle.external.Commander
 
 apply from: "cloudbees.gradle"
 apply plugin: "distribution"
+apply plugin: "maven-publish"
 
 subprojects {
     apply plugin: "java"
 }
 
+publishing {
+    publications {
+        plugin(MavenPublication) {
+            from components.java
+            artifactId "GradlePracticeGround" //artifactId for publishing
+
+            artifact sourcesJar
+            artifact groovydocJar
+        }
+    }
+
+    repositories {
+        maven {
+            name "myLocal" //Task name to publish: publishPluginPublicationToMyLocalRepository
+            url "file://$projectDir/../repo"
+        }
+    }
+}
+
 allprojects {
     group = "org.gt.MyGradle"
-    version = "0.1"
+    //version = "0.1"
 
     apply plugin: "idea"
 
@@ -25,6 +46,8 @@ allprojects {
 //            languageLevel = "1.8"
 //        }
 //    }
+
+    apply from: "$rootDir/versioning.gradle"
 
     idea {
         module {
@@ -84,7 +107,7 @@ println project.someOtherProp
 ext.someOtherProp = 567
 
 //Setting project version
-project.version = "1.0-SNAPSHOT"
+project.version = "0.1"
 
 sourceCompatibility = 1.8
 
@@ -148,7 +171,7 @@ task third(dependsOn: [printVersion]) {
 }
 
 //Adding Arbitrary code
-version = new ProjectVersion(0, 1)
+version = new ProjectVersion(0, 1, "")
 
 ext.versionFile = file('version.properties')
 
@@ -171,13 +194,15 @@ ProjectVersion readVersion() { //Invoked in Configuration Phase
         stream -> versionProperties.load(stream)
     }
 
+//    new ProjectVersion(versionProperties.major.toInteger(),
+//            versionProperties.minor.toInteger(), versionProperties.release.toBoolean())
     new ProjectVersion(versionProperties.major.toInteger(),
-            versionProperties.minor.toInteger(), versionProperties.release.toBoolean())
+            versionProperties.minor.toInteger(), "")
 }
 
 
 task makeReleaseVersion(type: ReleaseVersionTask) {
-    release = version.release
+    //release = version.release
     destFile = versionFile
 }
 
@@ -282,6 +307,7 @@ task groovydocJar(type: Jar, dependsOn : groovydoc) {
     from groovydoc.destinationDir
 }
 
+//Creating different artifacts
 artifacts {
     archives sourcesJar
     archives groovydocJar
@@ -289,6 +315,7 @@ artifacts {
 
 assemble.dependsOn sourcesJar, groovydocJar
 
+//Creating a .zip/.tar distribution
 distributions {
     main {
         baseName = archivesBaseName
@@ -297,4 +324,21 @@ distributions {
             from {libDir}
         }
     }
+}
+
+//Executes the gradle plugin commander for executing the plugin
+task showImages(type: Commander) {
+    commands = ["up"]
+    dir = file("$rootDir")
+}
+
+//Capturing different environment configs within gradle using ConfigSlurper
+def env = project.hasProperty("env") ? project.getProperty("env") : "local"
+logger.quiet "Loading configuration for environment : $env"
+
+def configFile = file("$rootDir/gradle/config/buildConfig.groovy")
+def parsedConfig = new ConfigSlurper(env).parse(configFile.toURI().toURL())
+
+allprojects {
+    ext.config = parsedConfig
 }

@@ -1,0 +1,34 @@
+plugins {
+    id 'java'
+}
+
+group 'org.gt.MyGradle'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven {
+        name "myLocal" //Task name to publish: publishPluginPublicationToMyLocalRepository
+        url "file:${System.getProperty('user.home')}/.m2/repository"
+    }
+}
+
+configurations {
+    myapp
+}
+
+dependencies {
+    myapp group: project.group, name: "GradlePracticeGround", version: project.version.toString(), ext: "jar"
+}
+
+ext.downloadDir = file("$buildDir/download/artifacts")
+
+task fetchJar(type: Copy) {
+    logger.quiet "Looking for $project.group"
+    logger.quiet "Looking for $project.name"
+    logger.quiet "Looking for $project.version"
+    logger.quiet "Looking in ${System.getProperty('user.home')}/.m2/repository"
+    from configurations.myapp
+    into downloadDir
+}

@@ -7,7 +7,35 @@ dependencies {
     runtime "javax.servlet:jstl:1.1.2"
 }
 
+//Creating new configurations from existing
 configurations {
     functionalTestCompile.extendsFrom testCompile
     functionalTestRuntime.extendsFrom testRuntime
+}
+
+//Creating a build info file for the project and including it within the application
+task createBuildInfoFile {
+    doLast {
+        def buildInfoFile = new File("$buildDir/build-info.properties")
+        Properties props = new Properties()
+        props.setProperty("version", project.version.toString())
+        props.setProperty("timestamp", project.buildTimestamp)
+        props.store(buildInfoFile.newWriter(), null)
+    }
+}
+
+war {
+    dependsOn createBuildInfoFile
+    baseName = 'todo'
+
+    from (buildDir) {
+        include "build-info.properties"
+        into ("WEB-INF/classes")
+    }
+}
+
+task deployWar() {
+    doLast {
+        logger.quiet("Deploying file to $config.server.hostname via SSH on port $config.server.sshPort")
+    }
 }

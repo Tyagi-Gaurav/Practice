@@ -1,23 +1,23 @@
 package com.gradle
 
 class ProjectVersion {
-    Integer major
-    Integer minor
-    Boolean release
+    final Integer major
+    final Integer minor
+    final String build
 
-    ProjectVersion(Integer major, Integer minor) {
-        this(major, minor, Boolean.FALSE)
-    }
-
-    ProjectVersion(Integer major, Integer minor, Boolean release) {
+    ProjectVersion(Integer major, Integer minor, String build) {
         this.major = major
         this.minor = minor
-        this.release = release
+        this.build = build
     }
-
 
     @Override
     String toString() {
-        return "$major.$minor${release ? "" : "-SNAPSHOT"}"
+        String fullVersion = "$major.$minor"
+
+        if (build) {
+            fullVersion += ".$build"
+        }
+        fullVersion
     }
 }
