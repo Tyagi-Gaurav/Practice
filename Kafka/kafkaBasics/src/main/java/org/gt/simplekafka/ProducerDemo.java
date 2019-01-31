@@ -18,7 +18,7 @@ public class ProducerDemo {
         properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
                 StringSerializer.class.getName());
 
-        //Create Producer
+        //Create Producer(<Key as String, Value as String>)
         KafkaProducer<String, String> kafkaProducer = new KafkaProducer<>(properties);
 
         //Create Producer Record
@@ -28,8 +28,9 @@ public class ProducerDemo {
         //Send Data - asynchronous
         kafkaProducer.send(producerRecord);
 
-        //flush Data
+        //flush Data (wait for data to be sent)
         kafkaProducer.flush();
+        //Flush and close producer
         kafkaProducer.close();
     }
 }

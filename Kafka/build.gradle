@@ -5,9 +5,11 @@ plugins {
 group 'javagradle'
 version '1.0-SNAPSHOT'
 
-sourceCompatibility = 1.8
+allprojects {
+    repositories {
+        mavenCentral()
+    }
 
-repositories {
-    mavenCentral()
+    sourceCompatibility = 1.8
 }
 

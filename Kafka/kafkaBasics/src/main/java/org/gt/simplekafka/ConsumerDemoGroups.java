@@ -19,7 +19,7 @@ public class ConsumerDemoGroups {
         Properties properties = new Properties();
 
         String bootStrapServers = "127.0.0.1:9092";
-        String groupId = "my-fourth-application";
+        String groupId = "my-sixth-application";
         String topic = "first_topic";
 
         //Create Consumer Configs

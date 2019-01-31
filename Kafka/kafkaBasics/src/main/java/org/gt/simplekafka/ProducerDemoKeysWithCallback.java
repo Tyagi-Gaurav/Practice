@@ -27,9 +27,7 @@ public class ProducerDemoKeysWithCallback {
         //Create Producer
         KafkaProducer<String, String> kafkaProducer = new KafkaProducer<>(properties);
 
-        //Create Producer Record
-
-        //Send Data - asynchronous
+        //Send Data Callback - asynchronous
         Callback callback = (metadata, exception) -> {
             //executes every time record is successfully sent.
             if (Objects.isNull(exception)) {
@@ -50,6 +48,7 @@ public class ProducerDemoKeysWithCallback {
             String value = "Hello World " + i;
             String key = "id_" + i;
 
+            //Create Producer Record
             kafkaProducer.send(new ProducerRecord<>(topic, key, value), callback);
         }
 

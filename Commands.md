@@ -536,9 +536,21 @@ kafka-topics --zookeeper 127.0.0.1:2181 --topic second_topic --delete
 ```
 kafka-console-producer --broker-list 127.0.0.1:9092 --topic first_topic --producer-property acks=all
 ```
-- kafka console consumer
+- kafka console producer with keys
 ```
-kafka-console-consumer --bootstrap-server 127.0.0.1:9092 --topic first_topic --from-beginning
+kafka-console-producer --broker-list 127.0.0.1:9092 --topic first_topic --property parse.key=true --property key.separator=,
+```
+- kafka console consumer (From Beginning)
+```
+kafka-console-consumer --bootstrap-server 127.0.0.1:9092 --topic first_topic --from-beginning --group my_first_application
+```
+- kafka console consumer with keys
+```
+kafka-console-consumer --bootstrap-server 127.0.0.1:9092 --topic first_topic --from-beginning --property print.key=true --property key.separator=,
+```
+- kafka console consumer with formatted output and keys
+```
+kafka-console-consumer --bootstrap-server localhost:9092 --topic streams-plaintext-output --from-beginning --formatter kafka.tools.DefaultMessageFormatter --property print.key=true --property print.value=true --property key.deserializer=org.apache.kafka.common.serialization.StringDeserializer --property value.deserializer=org.apache.kafka.common.serialization.LongDeserializer
 ```
 - List all consumer groups
 ```
@@ -548,7 +560,7 @@ kafka-consumer-groups --bootstrap-server 127.0.0.1:9092 --list
 ```
 kafka-consumer-groups --bootstrap-server 127.0.0.1:9092 --topic first_topic --group my_first_application --describe
 ```
-- How do you reset offsets?
+- How do you reset offsets for replaying messages?
 ```
 kafka-consumer-groups --bootstrap-server 127.0.0.1:9092 --topic first_topic --group my_first_application --reset-offsets --execute --to-earliest
 ```
