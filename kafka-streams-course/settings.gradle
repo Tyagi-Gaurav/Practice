@@ -1,3 +1,4 @@
 rootProject.name = 'kafka-streams-course'
 include 'word-count'
+include 'favourite-color'
 
