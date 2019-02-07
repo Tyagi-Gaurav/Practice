@@ -6,6 +6,7 @@ import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
+import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.*;
 
 import java.util.Arrays;
@@ -21,6 +22,25 @@ public class WordCountApp {
         properties.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, stringSerde.getClass());
         properties.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, stringSerde.getClass());
 
+        WordCountApp wordCountApp = new WordCountApp();
+
+        KafkaStreams kafkaStreams = new KafkaStreams(wordCountApp.createTopology(), properties);
+        // The drawback of cleaning up local state prior is that your app must rebuilt its local state from scratch, which
+        // will take time and will require reading all the state-relevant data from the Kafka cluster over the network.
+        // Thus in a production scenario you typically do not want to clean up always as we do here but rather only when it
+        // is truly needed, i.e., only under certain conditions (e.g., the presence of a command line flag for your app).
+        // See `ApplicationResetExample.java` for a production-like example.
+        kafkaStreams.cleanUp();
+        kafkaStreams.start();
+
+        System.out.println(kafkaStreams.toString());
+
+        //Add shutdown hook to respond to SIGTERM and gracefully close kafka streams
+        Runtime.getRuntime().addShutdownHook(new Thread(kafkaStreams::close));
+    }
+
+    public Topology createTopology() {
+        Serde<String> stringSerde = Serdes.String();
         StreamsBuilder streamsBuilder = new StreamsBuilder();
 
         //1 - Stream from Kafka
@@ -40,18 +60,6 @@ public class WordCountApp {
 
         wordCountTable.toStream().to("word-count-output", Produced.with(stringSerde, Serdes.Long()));
 
-        KafkaStreams kafkaStreams = new KafkaStreams(streamsBuilder.build(), properties);
-        // The drawback of cleaning up local state prior is that your app must rebuilt its local state from scratch, which
-        // will take time and will require reading all the state-relevant data from the Kafka cluster over the network.
-        // Thus in a production scenario you typically do not want to clean up always as we do here but rather only when it
-        // is truly needed, i.e., only under certain conditions (e.g., the presence of a command line flag for your app).
-        // See `ApplicationResetExample.java` for a production-like example.
-        kafkaStreams.cleanUp();
-        kafkaStreams.start();
-
-        System.out.println(kafkaStreams.toString());
-
-        //Add shutdown hook to respond to SIGTERM and gracefully close kafka streams
-        Runtime.getRuntime().addShutdownHook(new Thread(kafkaStreams::close));
+        return streamsBuilder.build();
     }
 }

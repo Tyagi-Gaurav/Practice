@@ -1,9 +1,5 @@
 package org.gt.streams;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -11,12 +7,14 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class IdempotentBankProducer {
     public static void main(String[] args) {
@@ -66,15 +64,19 @@ public class IdempotentBankProducer {
 
         Random random = new Random();
         AtomicBoolean isRunning = new AtomicBoolean(true);
+        Map<String, Long> collect = metaDataList.stream()
+                .collect(Collectors.toMap(metaData -> metaData.name,
+                        metaData -> 0L));
 
         metaDataList.stream()
                 .map(md -> (Runnable) () -> {
                     while (isRunning.get()) {
-                        md.add((long) random.nextInt(100), LocalDateTime.now());
+                        md.next((long) random.nextInt(100), LocalDateTime.now());
                         System.out.println(String.format("Posting %s to kafka", md.toString()));
-                        //ProducerRecord<String, String> producerRecord = new ProducerRecord<>("bank-transactions", md.name, md.toString());
-                        //kafkaProducer.send(producerRecord, callback);
+                        ProducerRecord<String, String> producerRecord = new ProducerRecord<>("bank-transactions", md.name, md.toString());
+                        kafkaProducer.send(producerRecord, callback);
                         try {
+                            collect.computeIfPresent(md.name, (s, oldValue) -> oldValue + md.amount);
                             Thread.sleep(100);
                         } catch (InterruptedException e) {
                             System.err.println(e.getMessage());
@@ -94,37 +96,10 @@ public class IdempotentBankProducer {
             }
             System.out.println("Shutdown complete!");
 
-            metaDataList.forEach(md -> {
-                System.out.println(String.format("Total bank balance for %s is %d" , md.name, md.amount));
+            collect.forEach((key, value) -> {
+                System.out.println(String.format("Total bank balance for %s is %d" , key, value));
             });
         }
         ));
-    }
-
-    private static class MetaData {
-        String name;
-        Long amount = 0L;
-        private String time;
-
-        public MetaData(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-                return objectMapper.writeValueAsString(this);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-            return "{}";
-        }
-
-        public void add(Long value, LocalDateTime time) {
-            amount += value;
-            this.time = time.format(DateTimeFormatter.ISO_DATE_TIME);
-        }
     }
 }
