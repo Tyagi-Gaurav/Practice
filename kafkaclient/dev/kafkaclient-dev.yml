@@ -1,0 +1,2 @@
+kafka.host: localhost:9092
+example.property: "I am the dev"
