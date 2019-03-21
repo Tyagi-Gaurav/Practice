@@ -577,3 +577,82 @@ GET /_cat/nodes?v
 ```
 GET /_cat/indices?v
 ```
+### Gradle
+- How to show dependencyTree
+- ./gradlew dependencies
+
+### Cassandra
+- Checking status using node tool
+```
+nodetool status
+```
+- Get info about a cassandra node
+```
+nodetool info
+```
+- Describe cluster
+```
+nodetool describecluster
+```
+- Get Logging Levels
+```
+./nodetool getlogginglevels
+```
+- Set logging level
+```
+./nodetool setlogginglevel org.apache.cassandra TRACE
+```
+- Set Trace Probability
+```
+./nodetool settraceprobability 0.1
+```
+- Drain connections
+```
+./nodetool drain
+```
+- Stop cassandra
+```
+./nodetool stopdaemon
+```
+- Check the ring
+```
+nodetool ring
+```
+- Check gossipInfo
+```
+nodetool gossipInfo
+```
+- Check which records belong to which tokens
+```
+select token(<column>), <column> from <table>;
+```
+- Get IP address of the node which stores the partition with a respective partition value.
+```
+./nodetool getendpoints <keyspace> <table> '<partition_key>'
+```
+- Show System peers
+```
+SELECT peer, data_center, host_id, preferred_ip, rack,
+   release_version, rpc_address, schema_version
+   FROM system.peers;
+```
+- Show the hosts that own the key
+```
+/home/ubuntu/node1/resources/cassandra/bin/nodetool getendpoints <keyspace> <table> <keys>
+```
+- Show column family stats
+```
+~/node/bin/nodetool cfstats keyspace1.standard1
+```
+- Flush memtable to sstables
+```
+/home/ubuntu/node/resources/cassandra/bin/nodetool flush
+```
+- Reduce the probability of false positive for bloom filter
+```
+ALTER TABLE keyspace1.standard1 WITH bloom_filter_fp_chance = 0.0001;
+```
+- Rebuild SSTables for a specified keyspace and table.
+```
+/home/ubuntu/node/resources/cassandra/bin/nodetool upgradesstables --include-all-sstables
+```

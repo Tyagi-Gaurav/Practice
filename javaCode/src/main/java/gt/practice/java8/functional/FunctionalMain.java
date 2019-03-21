@@ -1,8 +1,6 @@
 package gt.practice.java8.functional;
 
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.*;
 
 public class FunctionalMain {
     public static void main(String[] args) {
@@ -14,6 +12,14 @@ public class FunctionalMain {
 
         System.out.println(check(p));
         System.out.println(check(ip));
+
+        int x = 4;
+
+        Supplier<Integer> function = () -> x + 1;
+
+        System.out.println(x);
+        System.out.println(function.get());
+        System.out.println(function.get());
     }
 
     static boolean check(Predicate<Integer> p) {

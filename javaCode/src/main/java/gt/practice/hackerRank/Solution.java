@@ -1,22 +1,27 @@
 package gt.practice.hackerRank;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Scanner;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class Solution {
 
-    // Complete the sockMerchant function below.
-    static int sockMerchant(int n, int[] ar) {
-        return Arrays.stream(ar)
-                .boxed()
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-                .entrySet()
-                .stream()
-                .mapToInt(x -> (int) (x.getValue() / 2))
-                .sum();
+    // Complete the squares function below.
+    static int squares(int a, int b) {
+        int count = 0;
+
+        double sqrt = Math.sqrt(a);
+        int start = (int) sqrt;
+
+        if (sqrt == start) {
+            count++;
+        }
+
+        while (start * start + (start * 2 + 1) <= b) {
+            count++;
+            start++;
+        }
+
+        return count;
     }
 
     private static final Scanner scanner = new Scanner(System.in);
@@ -24,26 +29,24 @@ public class Solution {
     public static void main(String[] args) throws IOException {
         //BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
 
-        int n = scanner.nextInt();
+        int q = scanner.nextInt();
         scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])?");
 
-        int[] ar = new int[n];
+        for (int qItr = 0; qItr < q; qItr++) {
+            String[] ab = scanner.nextLine().split(" ");
 
-        String[] arItems = scanner.nextLine().split(" ");
-        scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])?");
+            int a = Integer.parseInt(ab[0]);
 
-        for (int i = 0; i < n; i++) {
-            int arItem = Integer.parseInt(arItems[i]);
-            ar[i] = arItem;
+            int b = Integer.parseInt(ab[1]);
+
+            int result = squares(a, b);
+
+            System.out.println(result);
+            //bufferedWriter.write(String.valueOf(result));
+            //bufferedWriter.newLine();
         }
 
-        int result = sockMerchant(n, ar);
-
-//        bufferedWriter.write(String.valueOf(result));
-//        bufferedWriter.newLine();
-//
-//        bufferedWriter.close();
-        System.out.println(result);
+        //bufferedWriter.close();
 
         scanner.close();
     }
