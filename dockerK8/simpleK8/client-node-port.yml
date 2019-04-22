@@ -1,0 +1,20 @@
+apiVersion: v1
+#Kind indicates the type of object
+kind: Service
+metadata:
+  name: client-node-port
+spec:
+  type: NodePort
+  ports:
+    - port: 3050        #Could be used by another pod that needs to access the pod with label "component: web"
+      targetPort: 3000  #Same as the container port within the pod.yml
+      nodePort: 31515   #Port that is exposed to outside world by the node that we could for example,
+                        #type in a browser. If we don't specify, a random port is assigned.
+                        #Value between 30000 to 32767
+  selector:
+      component: web
+     #Looks for any other component that has a label "component: web". Could have called
+     #this label anything, like "tier: web" etc.\
+
+     # Looks for any object with label "component:web" and exposes its port
+     # 3000 to outside world.

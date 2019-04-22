@@ -1,0 +1,12 @@
+apiVersion: v1 #Kind indicates the type of object
+kind: Pod
+metadata:
+  name: client-pod
+  labels:
+    component: web #Using Label Selector framework
+spec:
+  containers: #Note the name is containers (Plural)
+  - name: client
+    image: chonku/multi-worker
+    ports:
+      - containerPort: 3000 #Port to expose to outside world.

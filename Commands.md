@@ -503,6 +503,18 @@ mpstat, sysstat, vmstats
 ```
 kubectl cluster-info
 ```
+- Show all contexts
+```
+kubectl config get-contexts
+```
+- Get IP for miniKube
+```
+miniKube ip
+```
+### Feed a config file to kubectl
+```
+kubectl apply -f <fileName>
+```
 ### Zookeeper & Kafka
 - How to start Zookeeper
 ```
