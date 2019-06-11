@@ -1,54 +1,45 @@
 package gt.practice.hackerRank;
 
-import java.io.IOException;
-import java.util.Scanner;
-
+import java.io.*;
+import java.util.*;
 public class Solution {
+    public static void main(String args[] ) throws Exception {
 
-    // Complete the squares function below.
-    static int squares(int a, int b) {
-        int count = 0;
+        //Write code here
+        Scanner scanner = new Scanner(System.in);
+        int numberOfTests = scanner.nextInt();
 
-        double sqrt = Math.sqrt(a);
-        int start = (int) sqrt;
+        for (int i = 0; i < numberOfTests; i++) {
+            int numberOfPlayers = scanner.nextInt();
+            int vill[] = new int[numberOfPlayers];
+            int play[] = new int[numberOfPlayers];
 
-        if (sqrt == start) {
-            count++;
+            read(scanner, numberOfPlayers, vill);
+            read(scanner, numberOfPlayers, play);
+
+            Arrays.sort(vill);
+            Arrays.sort(play);
+
+            int j = 0;
+            while (j < numberOfPlayers) {
+                if (vill[j] > play[j]) {
+                    System.out.println("LOSE");
+                    break;
+                }
+
+                j++;
+            }
+
+            if (j == numberOfPlayers) {
+                System.out.println("WIN");
+            }
         }
-
-        while (start * start + (start * 2 + 1) <= b) {
-            count++;
-            start++;
-        }
-
-        return count;
     }
 
-    private static final Scanner scanner = new Scanner(System.in);
-
-    public static void main(String[] args) throws IOException {
-        //BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
-
-        int q = scanner.nextInt();
-        scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])?");
-
-        for (int qItr = 0; qItr < q; qItr++) {
-            String[] ab = scanner.nextLine().split(" ");
-
-            int a = Integer.parseInt(ab[0]);
-
-            int b = Integer.parseInt(ab[1]);
-
-            int result = squares(a, b);
-
-            System.out.println(result);
-            //bufferedWriter.write(String.valueOf(result));
-            //bufferedWriter.newLine();
+    private static void read(Scanner scanner, int numberOfPlayers, int[] vill) {
+        for (int j = 0; j < numberOfPlayers; j++) {
+            vill[j] = scanner.nextInt();
         }
-
-        //bufferedWriter.close();
-
-        scanner.close();
     }
 }
 
