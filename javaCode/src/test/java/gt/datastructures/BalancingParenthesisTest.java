@@ -3,7 +3,6 @@ package gt.datastructures;
 import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
-import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,7 +24,10 @@ public class BalancingParenthesisTest {
             new Pair("())", 2),
             new Pair(")()(", 0),
             new Pair("((())())()", -1),
-            new Pair("((()))))()", 6)
+            new Pair("((()))))()", 6),
+            new Pair("(()((())()))", -1),
+            new Pair("()))", 2),
+            new Pair("(()()(()", 7)
     };
 
     static class Pair {
