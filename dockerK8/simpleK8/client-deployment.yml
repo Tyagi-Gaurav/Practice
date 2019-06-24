@@ -1,0 +1,19 @@
+apiVersion: apps/v1 #Kind indicates the type of object
+kind: Deployment
+metadata:
+  name: client-deployment
+spec:
+  replicas: 1
+  selector: #How do I find the pods I manage after they're created? Oh..right, lets
+    matchLabels: #ask master to look for objects with label "component:web"
+      component: web
+  template:
+    metadata:
+      labels:
+        component: web
+    spec:
+      containers:
+        - name: client
+          image: chonku/multi-client
+          ports:
+            - containerPort: 3000

@@ -511,7 +511,11 @@ kubectl config get-contexts
 ```
 miniKube ip
 ```
-### Feed a config file to kubectl
+- Creating secrets
+```
+kubectl create secret generic pgpassword --from-literal PGPASSWORD=
+```
+- Feed a config file to kubectl
 ```
 kubectl apply -f <fileName>
 ```
