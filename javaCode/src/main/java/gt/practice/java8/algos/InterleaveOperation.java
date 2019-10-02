@@ -5,9 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
-import static com.sun.tools.javac.util.List.*;
 
 /**
  * Given serialA primitive item and serialA list,
@@ -25,7 +23,7 @@ import static com.sun.tools.javac.util.List.*;
  */
 public class InterleaveOperation {
     public static void main(String[] args) {
-        List<Integer> input = of(1, 4, 5);
+        List<Integer> input = Arrays.asList(1, 4, 5);
         Integer num = 3;
 
         System.out.println(interleave(input, num));
