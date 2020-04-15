@@ -1,9 +1,14 @@
 package gt.practice.akka;
 
 import akka.actor.AbstractActor;
+import akka.actor.ActorContext;
 import akka.actor.ActorLogging;
+import akka.actor.ActorRef;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import scala.Option;
+import scala.PartialFunction;
+import scala.runtime.BoxedUnit;
 
 import java.util.Optional;
 
