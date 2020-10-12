@@ -1,5 +1,15 @@
 package gt.practice.jdbc;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.sql.Blob;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -22,10 +32,71 @@ public class ScrollablePractice {
             //printCustomerForward(conn);
             //printCustomerScrollingFromEnd(conn);
             //sumPaymentsPreparedStatement(conn, 2004);
-            sumPaymentsCallableStatement(conn, 2004);
+            //sumPaymentsCallableStatement(conn, 2004);
+            updateAllProductImagesAndStoreLocally(conn);
+            getAllProductImagesAndStoreLocally(conn);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private static void updateAllProductImagesAndStoreLocally(Connection conn) throws SQLException, IOException {
+        PreparedStatement preparedStatement = conn.prepareStatement("SELECT productLine, image FROM productlines",
+                ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        String[] carImages = new String[] {
+                "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+                "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60",
+                "https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60",
+                "https://images.unsplash.com/photo-1514316454349-750a7fd3da3a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60",
+                "https://images.unsplash.com/photo-1583121274602-3e2820c69888?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60",
+                "https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60"
+        };
+        int imageIndex = 0;
+
+        while (resultSet.next()) {
+            resultSet.updateBlob(2, getStreamFrom(carImages[imageIndex]));
+            imageIndex  = (imageIndex + 1) % carImages.length;
+            resultSet.updateRow();
+        }
+
+        resultSet.close();
+    }
+
+    private static void getAllProductImagesAndStoreLocally(Connection conn) throws SQLException, IOException {
+        PreparedStatement preparedStatement = conn.prepareStatement("SELECT productLine, image FROM productlines",
+                ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        while (resultSet.next()) {
+            String fileName = String.format("%s/%s.png", "/Users/gauravt/Downloads",resultSet.getString("productLine"));
+            Blob image = resultSet.getBlob(2);
+            InputStream binaryStream = image.getBinaryStream();
+            byte[] b = new byte[1024];
+            ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
+            int total;
+            int size = 1024;
+            while ((total = binaryStream.read(b,  0, size)) != -1) {
+                byteArray.write(b, 0, total);
+                int available = binaryStream.available();
+                if (available < size) size = available;
+            }
+
+            FileOutputStream fileOutputStream = new FileOutputStream(new File(fileName));
+            fileOutputStream.write(byteArray.toByteArray());
+            fileOutputStream.flush();
+            fileOutputStream.close();
+            binaryStream.close();
+        }
+
+        resultSet.close();
+    }
+
+    public static InputStream getStreamFrom(String url) throws IOException {
+        URL u = new URL(url);
+        URLConnection urlConnection = u.openConnection();
+        return urlConnection.getInputStream();
     }
 
     private static void sumPaymentsCallableStatement(Connection conn, int year) throws SQLException {
